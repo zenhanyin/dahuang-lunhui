@@ -333,6 +333,14 @@
       fragments: 0,
       xuanhuiBond: 0,
       sunCinders: 0,
+      swordHeart: 0,
+      qingyangTrace: 0,
+      foxBond: 0,
+      shadowTrust: 0,
+      inkContract: 0,
+      iceLedger: 0,
+      fireOath: 0,
+      moFeiyunProof: 0,
       path: "未定",
       turn: 0,
       act: 0,
@@ -2477,6 +2485,14 @@
       state.fragments = Math.max(0, old.fragments + (bonus.fragments || 0));
       state.xuanhuiBond = Math.max(0, Math.floor((old.xuanhuiBond || 0) * 0.6));
       state.sunCinders = Math.max(0, old.sunCinders || 0);
+      state.swordHeart = Math.max(0, Math.floor((old.swordHeart || 0) * 0.55));
+      state.qingyangTrace = Math.max(0, old.qingyangTrace || 0);
+      state.foxBond = Math.max(0, Math.floor((old.foxBond || 0) * 0.55));
+      state.shadowTrust = Math.max(0, Math.floor((old.shadowTrust || 0) * 0.55));
+      state.inkContract = Math.max(0, Math.floor((old.inkContract || 0) * 0.55));
+      state.iceLedger = Math.max(0, old.iceLedger || 0);
+      state.fireOath = Math.max(0, Math.floor((old.fireOath || 0) * 0.55));
+      state.moFeiyunProof = Math.max(0, old.moFeiyunProof || 0);
       state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
       state.karma = choice.hell ? 15 : 0;
       state.log = choice.hell
