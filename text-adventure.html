@@ -82,6 +82,21 @@
       white-space: pre-line;
     }
 
+    .sketch {
+      width: min(520px, 100%);
+      margin: 24px 0 0;
+      border: 1px solid var(--line);
+      background: rgba(244, 239, 223, 0.035);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .sketch svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
     .choices {
       display: grid;
       gap: 12px;
@@ -222,6 +237,7 @@
       <p class="subtitle">带着记忆重生的修仙文字模拟器</p>
       <h2 id="scene-title"></h2>
       <p id="scene-text"></p>
+      <div id="scene-sketch" class="sketch" aria-label="当前道途简笔画"></div>
       <div id="choices" class="choices"></div>
     </section>
 
@@ -285,6 +301,7 @@
       talent: 0,
       fragments: 0,
       path: "未定",
+      turn: 0,
       flags: {},
       log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
     };
@@ -770,6 +787,7 @@
 
     const sceneTitle = document.querySelector("#scene-title");
     const sceneText = document.querySelector("#scene-text");
+    const sceneSketch = document.querySelector("#scene-sketch");
     const choices = document.querySelector("#choices");
     const life = document.querySelector("#life");
     const realm = document.querySelector("#realm");
@@ -909,6 +927,95 @@
       return typeof value === "function" ? value() : value;
     }
 
+    function hashText(text) {
+      let hash = 2166136261;
+      for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function pick(list, salt = "") {
+      return list[hashText(`${state.scene}|${state.life}|${state.turn}|${state.realm}|${state.virtue}|${state.karma}|${salt}`) % list.length];
+    }
+
+    function variedSceneText(scene, baseText) {
+      if (scene.ending) return baseText;
+
+      const weather = [
+        "薄雾从山谷里漫上来，像上一世没有说完的话。",
+        "风掠过竹林，几片落叶在你脚边排成卦象。",
+        "远处钟声忽近忽远，仿佛有人在另一条时间线上叩门。",
+        "灵气在空气里浮动，像水面细碎的月光。"
+      ];
+      const morality = state.virtue >= 70
+        ? ["你心口有一缕清光，照得许多选择都没那么浑浊。", "功德不替你赢，却让雷云迟疑了一息。"]
+        : state.virtue <= 35
+          ? ["因果像冷铁贴在腕上，提醒你有些账还没有还。", "你能感觉到幽冥很近，近到像一口井在脚下张开。"]
+          : ["人间的善恶没有替你做决定，只把重量放回你掌心。", "你仍在路中间，左边是捷径，右边是长阶。"];
+      const pathTone = state.path === "邪修"
+        ? ["血煞功在经脉里低鸣，像一柄尚未出鞘的刀。", "偏锋之法给你速度，也逼你更早回答自己为何修行。"]
+        : state.path === "正修"
+          ? ["吐纳之间，灵台如井，倒映出更高处的云。", "正修不让你少受苦，只让你在苦里不轻易变形。"]
+          : state.path === "兼修"
+            ? ["正邪两脉在丹田边缘相望，像两条最终汇入一处的河。", "你开始明白，法门有阴阳，底线却不能分裂。"]
+            : ["旧梦贴着识海翻动，你还没有决定这一世要走哪条路。"];
+      const omen = state.karma >= 30
+        ? ["乌线缠上天边，某个债主正在命数里转身。"]
+        : state.fragments >= 3
+          ? ["天命碎片微微发热，画出一扇并不完整的门。"]
+          : ["这一次轮回仍有空白，空白处也许藏着新路。"];
+
+      return `${pick(weather, "weather")}\n${pick(morality, "morality")}\n${pick(pathTone, "path")}\n${pick(omen, "omen")}\n\n${baseText}`;
+    }
+
+    function sketchForState(scene) {
+      const tone = state.virtue >= 65 ? "#7fc8a9" : state.virtue <= 35 ? "#d97869" : "#d8b35f";
+      const shadow = state.karma >= 30 ? "#d97869" : "#6f7967";
+      const sky = state.scene === "hell" || state.scene === "heartDemon" ? "#2b1d20" : "#171d16";
+      const stars = Array.from({ length: Math.min(7, state.realm + 1) }, (_, index) => {
+        const x = 36 + index * 26 + (hashText(`${state.turn}-${index}`) % 8);
+        const y = 28 + (hashText(`${state.scene}-${index}`) % 32);
+        return `<circle cx="${x}" cy="${y}" r="2" fill="${tone}" opacity="0.8"/>`;
+      }).join("");
+      const karmaLines = state.karma > 12
+        ? `<path d="M250 36 C220 84 286 110 246 158 S288 232 228 256" fill="none" stroke="#d97869" stroke-width="${Math.min(7, 1 + state.karma / 10)}" opacity="0.55"/>`
+        : "";
+      const halo = state.virtue > 60
+        ? `<circle cx="260" cy="126" r="54" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.45"/>`
+        : "";
+      const fragmentDoor = state.fragments >= 2
+        ? `<path d="M356 88 L414 58 L414 222 L356 196 Z" fill="none" stroke="#d8b35f" stroke-width="3"/><path d="M384 96 L384 200" stroke="#d8b35f" stroke-width="2" opacity="0.7"/>`
+        : "";
+
+      const sceneGlyphs = {
+        birth: `<path d="M36 236 L138 96 L238 236" fill="none" stroke="${tone}" stroke-width="4"/><path d="M96 236 L178 126 L270 236" fill="none" stroke="#b9b39f" stroke-width="3" opacity="0.75"/>`,
+        sect: `<path d="M72 220 L72 132 L146 84 L220 132 L220 220" fill="none" stroke="${tone}" stroke-width="4"/><path d="M104 220 L104 156 L188 156 L188 220" fill="none" stroke="#b9b39f" stroke-width="3"/>`,
+        market: `<path d="M58 210 C96 130 154 130 194 210" fill="none" stroke="${shadow}" stroke-width="5"/><path d="M88 166 L178 166 M112 136 L154 206" stroke="#d8b35f" stroke-width="3" opacity="0.7"/>`,
+        demon: `<path d="M70 218 C94 132 146 104 208 142 C244 164 238 214 202 230" fill="none" stroke="${shadow}" stroke-width="4"/><circle cx="174" cy="156" r="5" fill="#d97869"/>`,
+        tribulation: `<path d="M178 36 L122 134 L174 126 L122 236 L250 106 L188 116 Z" fill="${tone}" opacity="0.18" stroke="${tone}" stroke-width="4"/>`,
+        heartDemon: `<path d="M98 220 C94 130 164 86 222 142 C280 86 350 130 346 220" fill="none" stroke="#d97869" stroke-width="5"/><path d="M206 126 C230 162 204 186 232 222" fill="none" stroke="#d97869" stroke-width="3"/>`,
+        hell: `<path d="M36 230 C92 180 106 98 172 126 C238 154 248 84 316 116 C374 144 374 202 454 232" fill="none" stroke="#d97869" stroke-width="5" opacity="0.75"/>`,
+        ascend: `<path d="M198 230 L198 76 L318 76 L318 230" fill="none" stroke="${tone}" stroke-width="4"/><path d="M228 104 C248 84 276 84 296 104" fill="none" stroke="#f4efdf" stroke-width="3" opacity="0.55"/>`,
+        breakWheel: `<circle cx="256" cy="148" r="82" fill="none" stroke="${tone}" stroke-width="4"/><path d="M176 148 L336 148 M256 68 L256 228" stroke="#b9b39f" stroke-width="3" opacity="0.65"/>`
+      };
+
+      const glyph = sceneGlyphs[state.scene] || sceneGlyphs.birth;
+      return `<svg viewBox="0 0 512 288" role="img" aria-label="${scene.title}">
+        <rect width="512" height="288" fill="${sky}"/>
+        ${stars}
+        <path d="M0 248 C84 218 124 252 196 226 S330 230 512 206" fill="none" stroke="#b9b39f" stroke-width="2" opacity="0.3"/>
+        ${karmaLines}
+        ${halo}
+        ${glyph}
+        ${fragmentDoor}
+        <circle cx="260" cy="126" r="${10 + state.realm * 4}" fill="${tone}" opacity="0.18"/>
+        <path d="M248 116 L260 92 L272 116 L268 156 L252 156 Z" fill="none" stroke="#f4efdf" stroke-width="3"/>
+        <path d="M236 172 C252 190 278 190 294 172" fill="none" stroke="${tone}" stroke-width="3"/>
+      </svg>`;
+    }
+
     function availableChoices(scene) {
       return (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
     }
@@ -949,6 +1056,7 @@
       }
 
       if (choice.once) state.flags[choice.once] = true;
+      state.turn += 1;
       const currentScene = state.scene;
       const intendedScene = choice.to;
       if (choice.effect) choice.effect(state);
@@ -978,7 +1086,8 @@
       }
       sceneTitle.textContent = scene.title;
       sceneTitle.className = scene.ending ? "ending" : "";
-      sceneText.textContent = textOf(scene.text);
+      sceneText.textContent = variedSceneText(scene, textOf(scene.text));
+      if (sceneSketch) sceneSketch.innerHTML = sketchForState(scene);
 
       choices.innerHTML = "";
       availableChoices(scene).forEach(choice => {
