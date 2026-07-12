@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>大荒轮回录</title>
+  <!-- deploy: webp-art-v2 -->
+  <title>?????</title>
   <style>
     :root {
       color-scheme: dark;
@@ -842,6 +843,39 @@
               s.talent += 4;
               s.log = "你把上一世的碎梦串成线：铜门、幽都、登神大典，似乎从来不是三件事。";
             }
+          },
+          {
+            text: "上云麓仙居，查三卷天书残页",
+            to: "jadeClue",
+            effect: s => {
+              s.path = "云麓仙居";
+              s.qi += 22 + s.talent;
+              s.karma += 3;
+              s.fragments += 1;
+              s.log = "云麓火光照见一页残书：神明并非永远站在天上。";
+            }
+          },
+          {
+            text: "去翎羽山庄，向遗墨学机关术",
+            to: "greatCouncil",
+            effect: s => {
+              s.path = "翎羽山庄";
+              s.qi += 18 + s.talent;
+              s.virtue += 6;
+              s.fragments += 1;
+              s.log = "遗墨的机关鸟落在你肩上，铜门裂纹被拓成一张会动的图。";
+            }
+          },
+          {
+            text: "直接北上，追随玄晖问幽都",
+            to: "northSea",
+            effect: s => {
+              s.path = "北溟孤旅";
+              s.qi += 26 + s.talent;
+              s.karma += 5;
+              s.years -= 2;
+              s.log = "风雪比传闻更冷。你看见一个背负太阳旧名的人，仍向北走。";
+            }
           }
         ]
       },
@@ -1426,6 +1460,21 @@
       return JSON.parse(JSON.stringify(value));
     }
 
+    function browserSeed() {
+      try {
+        const key = "dahuang-player-seed";
+        let seed = window.localStorage && window.localStorage.getItem(key);
+        if (!seed) {
+          seed = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          window.localStorage && window.localStorage.setItem(key, seed);
+        }
+        return seed;
+      } catch (error) {
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+    }
+
+    const playerSeed = browserSeed();
     let state = cloneData(freshLife);
 
 
@@ -1674,34 +1723,53 @@
       return list[hashText(`${state.scene}|${state.life}|${state.turn}|${state.realm}|${state.virtue}|${state.karma}|${salt}`) % list.length];
     }
 
+    function seededRank(text, salt = "") {
+      return hashText(`${playerSeed}|${state.life}|${state.turn}|${state.realm}|${salt}|${text}`);
+    }
+
     function variedSceneText(scene, baseText) {
       if (scene.ending) return baseText;
 
       const weather = [
-        "薄雾从山谷里漫上来，像上一世没有说完的话。",
-        "风掠过竹林，几片落叶在你脚边排成卦象。",
-        "远处钟声忽近忽远，仿佛有人在另一条时间线上叩门。",
-        "灵气在空气里浮动，像水面细碎的月光。"
+        "?????????????????????",
+        "???????????????????",
+        "?????????????????????????",
+        "??????????????????"
       ];
       const morality = state.virtue >= 70
-        ? ["你心口有一缕清光，照得许多选择都没那么浑浊。", "功德不替你赢，却让雷云迟疑了一息。"]
+        ? ["?????????????????????", "?????????????????"]
         : state.virtue <= 35
-          ? ["因果像冷铁贴在腕上，提醒你有些账还没有还。", "你能感觉到幽冥很近，近到像一口井在脚下张开。"]
-          : ["人间的善恶没有替你做决定，只把重量放回你掌心。", "你仍在路中间，左边是捷径，右边是长阶。"];
-      const pathTone = state.path === "邪修"
-        ? ["血煞功在经脉里低鸣，像一柄尚未出鞘的刀。", "偏锋之法给你速度，也逼你更早回答自己为何修行。"]
-        : state.path === "正修"
-          ? ["吐纳之间，灵台如井，倒映出更高处的云。", "正修不让你少受苦，只让你在苦里不轻易变形。"]
-          : state.path === "兼修"
-            ? ["正邪两脉在丹田边缘相望，像两条最终汇入一处的河。", "你开始明白，法门有阴阳，底线却不能分裂。"]
-            : ["旧梦贴着识海翻动，你还没有决定这一世要走哪条路。"];
+          ? ["?????????????????????", "?????????????????"]
+          : ["???????????????????????", "???????????????????"];
+      const pathTone = state.path === "??"
+        ? ["?????????????????????", "?????????????????????"]
+        : state.path === "??"
+          ? ["???????????????????", "?????????????????????"]
+          : state.path === "??"
+            ? ["????????????????????????", "????????????????????"]
+            : ["????????????????????????"];
+      const sceneLore = {
+        birth: ["?????????????????????????", "?????????????????????????"],
+        memoryArchive: ["?????????????????????????????", "??????????????????????????????"],
+        jadeClue: ["??????????????????????????????", "?????????????????????"],
+        copperGate: ["???????????????????????", "????????????????????????"],
+        northSea: ["????????????????????????", "???????????????????????"],
+        greatCouncil: ["??????????????????????????", "???????????????????????????"],
+        heartDemon: ["????????????????????????", "?????????????????????????????"],
+        hell: ["?????????????????????", "???????????????????????????"],
+        trueAscend: ["??????????????????????????", "???????????????????????"],
+        trueEnding: ["???????????????????????????"],
+        falseAscend: ["?????????????????"],
+        sacrifice: ["????????????????????????????"]
+      };
       const omen = state.karma >= 30
-        ? ["乌线缠上天边，某个债主正在命数里转身。"]
+        ? ["???????????????????"]
         : state.fragments >= 3
-          ? ["天命碎片微微发热，画出一扇并不完整的门。"]
-          : ["这一次轮回仍有空白，空白处也许藏着新路。"];
+          ? ["????????????????????"]
+          : ["????????????????????"];
+      const lore = sceneLore[state.scene] || ["????????????????????????"];
 
-      return `${pick(weather, "weather")}\n${pick(morality, "morality")}\n${pick(pathTone, "path")}\n${pick(omen, "omen")}\n\n${baseText}`;
+      return pick(weather, "weather") + "\n" + pick(morality, "morality") + "\n" + pick(pathTone, "path") + "\n" + pick(lore, "lore") + "\n" + pick(omen, "omen") + "\n\n" + baseText;
     }
 
     function sketchForState(scene) {
@@ -1913,18 +1981,60 @@
     }
 
     function artworkForState(scene) {
-      const copperScenes = new Set(["copperGate", "northSea", "hell", "heartDemon", "ascend", "falseAscend", "trueAscend", "breakWheel", "sacrifice"]);
-      const src = copperScenes.has(state.scene) ? "assets/copper-gate.png" : "assets/xiling-ruins.png";
+      const imagePools = {
+        birth: ["assets/xiling-ruins.webp", "assets/great-council.webp", "assets/copper-gate.webp"],
+        memoryArchive: ["assets/copper-gate.webp", "assets/great-council.webp", "assets/east-sea-godrealm.webp"],
+        sect: ["assets/xiling-ruins.webp", "assets/great-council.webp"],
+        iceHeart: ["assets/iceheart-hall.webp"],
+        shadow: ["assets/leize-shadow.webp", "assets/cold-shadow.webp"],
+        foxRoad: ["assets/fox-road.webp"],
+        coldShadow: ["assets/cold-shadow.webp"],
+        jadeClue: ["assets/great-council.webp", "assets/copper-gate.webp", "assets/east-sea-godrealm.webp"],
+        copperGate: ["assets/copper-gate.webp", "assets/east-sea-godrealm.webp"],
+        northSea: ["assets/beiming-road.webp", "assets/copper-gate.webp", "assets/hell-rebirth.webp"],
+        greatCouncil: ["assets/great-council.webp"],
+        tribulation: ["assets/tribulation.webp"],
+        afterBreak: ["assets/tribulation.webp", "assets/great-council.webp", "assets/heart-trial.webp"],
+        heartDemon: ["assets/heart-trial.webp", "assets/cold-shadow.webp", "assets/copper-gate.webp"],
+        ascend: ["assets/tribulation.webp", "assets/copper-gate.webp", "assets/heart-trial.webp"],
+        breakWheel: ["assets/copper-gate.webp", "assets/great-council.webp", "assets/east-sea-godrealm.webp"],
+        trueAscend: ["assets/true-ascend.webp", "assets/great-council.webp", "assets/tribulation.webp"],
+        falseAscend: ["assets/copper-gate.webp"],
+        trueEnding: ["assets/true-ascend.webp", "assets/great-council.webp"],
+        sacrifice: ["assets/copper-gate.webp", "assets/tribulation.webp", "assets/true-ascend.webp"],
+        death: ["assets/xiling-ruins.webp", "assets/beiming-road.webp", "assets/hell-rebirth.webp"],
+        hell: ["assets/hell-rebirth.webp", "assets/beiming-road.webp", "assets/cold-shadow.webp"],
+        ascendResult: ["assets/tribulation.webp"]
+      };
+      const pool = imagePools[state.scene] || ["assets/xiling-ruins.webp"];
+      const src = pool[seededRank(state.scene, "art") % pool.length];
+      const positions = ["center center", "center top", "center 38%", "center 58%", "left center", "right center"];
+      const position = positions[seededRank(state.scene, "art-position") % positions.length];
       const filter = state.scene === "hell" || state.scene === "heartDemon"
-        ? "contrast(1.08) saturate(0.9) hue-rotate(-8deg)"
-        : state.scene === "northSea"
-          ? "contrast(1.05) saturate(0.85) hue-rotate(12deg)"
-          : "contrast(1.03) saturate(0.95)";
-      return `<div class="art-frame"><img src="${src}" alt="${scene.title}" style="filter:${filter};"></div>`;
+        ? "contrast(1.1) saturate(0.92) hue-rotate(-8deg)"
+        : state.scene === "northSea" || state.scene === "death"
+          ? "contrast(1.06) saturate(0.88) hue-rotate(10deg)"
+          : "contrast(1.04) saturate(0.98)";
+      return `<div class="art-frame"><img src="${src}" alt="${scene.title}" style="filter:${filter}; object-position:${position};"></div>`;
     }
 
     function availableChoices(scene) {
-      return (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
+      const base = (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
+      if (state.scene !== "birth") return base;
+
+      const fixed = base.filter(choice => choice.requires || choice.rebirth || choice.hardReset || choice.always);
+      const origin = base.filter(choice => !fixed.includes(choice));
+      const visibleOrigins = Math.min(origin.length, 3 + Math.floor(Math.max(0, state.memory) / 6));
+      const seededOrigins = origin
+        .map((choice, index) => ({
+          choice,
+          rank: hashText(`${playerSeed}|life:${state.life}|origin:${choice.text}|${index}`)
+        }))
+        .sort((left, right) => left.rank - right.rank)
+        .slice(0, visibleOrigins)
+        .map(item => item.choice);
+
+      return [...seededOrigins, ...fixed];
     }
 
     function rebirth(choice) {

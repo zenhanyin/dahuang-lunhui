@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "build": "vinext build"
+    "build": "node build-site.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

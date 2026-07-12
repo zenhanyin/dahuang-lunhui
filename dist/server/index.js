@@ -12,8 +12,19 @@ export default {
     const url = new URL(request.url);
     if (url.pathname in imageAssets) {
       const bytes = Uint8Array.from(atob(imageAssets[url.pathname]), char => char.charCodeAt(0));
-      return new Response(bytes, { headers: { "content-type": contentType(url.pathname), "cache-control": "public, max-age=31536000, immutable" } });
+      return new Response(bytes, {
+        headers: {
+          "content-type": contentType(url.pathname),
+          "cache-control": "public, max-age=31536000, immutable"
+        }
+      });
     }
-    return new Response(gameHtml, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
+
+    return new Response(gameHtml, {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-cache"
+      }
+    });
   }
 };
