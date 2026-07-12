@@ -14,8 +14,10 @@ fs.mkdirSync(distAssetDir, { recursive: true });
 fs.mkdirSync(path.dirname(hostingDest), { recursive: true });
 
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const storyConfig = fs.readFileSync(path.join(root, "story-config.js"), "utf8");
 fs.writeFileSync(path.join(dist, "index.html"), html, "utf8");
 fs.writeFileSync(path.join(dist, "text-adventure.html"), html, "utf8");
+fs.writeFileSync(path.join(dist, "story-config.js"), storyConfig, "utf8");
 fs.copyFileSync(hostingSource, hostingDest);
 
 const imageAssets = {};
@@ -26,6 +28,9 @@ for (const file of fs.readdirSync(assetDir).filter(file => /\.(webp|png)$/i.test
 }
 
 const worker = `const gameHtml = ${JSON.stringify(html)};
+const textAssets = ${JSON.stringify({
+  "/story-config.js": storyConfig
+})};
 const imageAssets = ${JSON.stringify(imageAssets)};
 
 function contentType(pathname) {
@@ -43,6 +48,15 @@ export default {
         headers: {
           "content-type": contentType(url.pathname),
           "cache-control": "public, max-age=31536000, immutable"
+        }
+      });
+    }
+
+    if (url.pathname in textAssets) {
+      return new Response(textAssets[url.pathname], {
+        headers: {
+          "content-type": "application/javascript; charset=utf-8",
+          "cache-control": "no-cache"
         }
       });
     }

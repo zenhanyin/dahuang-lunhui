@@ -314,6 +314,7 @@
     </aside>
   </main>
 
+  <script src="story-config.js"></script>
   <script>
     const realms = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "渡劫", "飞升"];
 
@@ -1513,7 +1514,16 @@
       }
     });
 
+    const storyConfig = window.DAHUANG_STORY_CONFIG || {};
+
+    function currentChapter() {
+      const chapters = storyConfig.chapters || [];
+      return chapters[Math.min(chapters.length - 1, Math.max(0, state.act || 0))] || null;
+    }
+
     function chapterName() {
+      const chapter = currentChapter();
+      if (chapter && chapter.name) return chapter.name;
       const act = state.act || 0;
       if (act <= 0) return "雷后入局";
       if (act === 1) return "诸门相疑";
@@ -1523,11 +1533,16 @@
 
     function chapterText() {
       const act = state.act || 0;
+      const statusLines = storyConfig.statusLines || {};
       const status = state.karma >= 60
-        ? "你的因果太重，魍魉席后的影子始终盯着你的手。"
+        ? (statusLines.highKarma || "你的因果太重，魍魉席后的影子始终盯着你的手。")
         : state.virtue >= 120
-          ? "你的名声已足以压住半座议厅，但真正的信任仍要靠下一步换来。"
-          : "你尚未赢得所有人的信任，诸门只肯给你一次说明的机会。";
+          ? (statusLines.highVirtue || "你的名声已足以压住半座议厅，但真正的信任仍要靠下一步换来。")
+          : (statusLines.normal || "你尚未赢得所有人的信任，诸门只肯给你一次说明的机会。");
+      const chapter = currentChapter();
+      if (chapter && chapter.text && chapter.text.normal) {
+        return chapter.text.normal.replaceAll("{{status}}", status);
+      }
 
       if (act <= 0) {
         return `雷劫散后，西陵旧议厅的水镜忽然亮起。天机营把铜门裂纹拓在镜中，冰心堂带来城外疫民名单，魍魉长老只问一句：上一世，是谁把这道裂纹藏起来的？\n\n${status}\n\n这一幕的关键不再是“去哪”，而是你要先处理哪一个真实冲突。`;
@@ -1544,10 +1559,45 @@
       return `本世的线索已经收束：诸门的旧账、幽都的误读、铜门的裂纹、九天的祭席，都指向同一个问题。\n\n力量足够时，你可以登九天；碎片足够时，你可以重订绝地天通；若因果压过道心，幽都会把你送回人间重走。`;
     }
 
+    function requirementPass(requirements = {}, s = state) {
+      if (requirements.realmMin !== undefined && s.realm < requirements.realmMin) return false;
+      if (requirements.realmMax !== undefined && s.realm > requirements.realmMax) return false;
+      if (requirements.fragmentsMin !== undefined && s.fragments < requirements.fragmentsMin) return false;
+      if (requirements.virtueMin !== undefined && s.virtue < requirements.virtueMin) return false;
+      if (requirements.karmaMin !== undefined && s.karma < requirements.karmaMin) return false;
+      if (requirements.karmaMax !== undefined && s.karma > requirements.karmaMax) return false;
+      if (requirements.yearsMin !== undefined && s.years < requirements.yearsMin) return false;
+      return true;
+    }
+
+    function applyConfigEffects(s, config) {
+      const effects = config.effects || {};
+      Object.entries(effects).forEach(([key, value]) => {
+        if (typeof s[key] === "number" && typeof value === "number") s[key] += value;
+      });
+      if (config.talentToQi) s.qi += s.talent;
+      if (config.setPath) s.path = config.setPath;
+      if (config.log) s.log = config.log;
+    }
+
+    function configChoice(config) {
+      return {
+        text: config.text,
+        to: config.to,
+        requires: config.requires ? s => requirementPass(config.requires, s) : undefined,
+        effect: s => applyConfigEffects(s, config),
+        advanceAct: config.advanceAct
+      };
+    }
+
     function chapterChoices() {
       const act = state.act || 0;
       if (state.years <= 0) {
         return [{ text: "闭眼前记下最后一枚裂纹", to: "death" }];
+      }
+      const chapter = currentChapter();
+      if (chapter && Array.isArray(chapter.choices)) {
+        return chapter.choices.map(configChoice);
       }
 
       if (act <= 0) {
