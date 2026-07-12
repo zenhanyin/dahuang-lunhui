@@ -206,6 +206,15 @@
       white-space: pre-line;
     }
 
+    .life-summary {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid rgba(216, 179, 95, 0.36);
+      background: rgba(216, 179, 95, 0.08);
+      color: var(--ink);
+      white-space: pre-line;
+    }
+
     .ending {
       color: var(--good);
       font-weight: 700;
@@ -1588,7 +1597,7 @@
       },
 
       updateLabel() {
-        if (audioState) audioState.textContent = this.enabled ? "开" : "关";
+        if (audioState) audioState.textContent = this.enabled ? "\u5f00" : "\u5173";
       },
 
       profile() {
@@ -1612,7 +1621,7 @@
           const target = profile.root * profile.drone[index % profile.drone.length];
           try {
             osc.frequency.setTargetAtTime(target, now, 0.8);
-            gain.gain.setTargetAtTime(index === 0 ? 0.045 : 0.018, now, 1.4);
+            gain.gain.setTargetAtTime(index === 0 ? 0.026 : 0.01, now, 1.4);
           } catch (error) {}
         });
       },
@@ -1623,7 +1632,7 @@
         const master = this.ctx.createGain();
         const profile = this.profile();
         this.master = master;
-        master.gain.setValueAtTime(0.075, now);
+        master.gain.setValueAtTime(0.32, now);
         master.connect(this.ctx.destination);
 
         profile.drone.forEach((ratio, index) => {
@@ -1631,7 +1640,7 @@
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
           osc.frequency.setValueAtTime(profile.root * ratio, now);
-          gain.gain.setValueAtTime(index === 0 ? 0.045 : 0.018, now);
+          gain.gain.setValueAtTime(index === 0 ? 0.026 : 0.01, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
@@ -1682,7 +1691,7 @@
         } catch (error) {}
       },
 
-      pluck(frequency, startTime, volume = 0.016) {
+      pluck(frequency, startTime, volume = 0.055) {
         if (!this.enabled || !this.ctx) return;
         try {
           const now = startTime || this.ctx.currentTime;
@@ -1705,12 +1714,12 @@
         } catch (error) {}
       },
 
-      breath(frequency, startTime, volume = 0.006) {
+      breath(frequency, startTime, volume = 0.018) {
         this.tone(frequency, 3.2, volume, "sine", startTime, this.master || undefined);
         this.tone(frequency * 2.01, 2.4, volume * 0.16, "sine", (startTime || this.ctx.currentTime) + 0.12, this.master || undefined);
       },
 
-      xiao(frequency, startTime, volume = 0.01) {
+      xiao(frequency, startTime, volume = 0.03) {
         if (!this.enabled || !this.ctx) return;
         const now = startTime || this.ctx.currentTime;
         this.tone(frequency, 2.8, volume, "sine", now, this.master || undefined);
@@ -1733,11 +1742,11 @@
         const ratio = profile.scale[phrase[step] % profile.scale.length];
         const base = profile.root * 2 * ratio;
         const beat = profile.pulse / 1000;
-        this.pluck(base, now, profile.color === "dark" ? 0.01 : 0.014);
-        if (step % 4 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.36, profile.color === "bright" ? 0.007 : 0.005);
-        if (step % 8 === 4) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.35, profile.color === "cold" ? 0.012 : 0.008);
-        if (profile.color === "dark" && step % 8 === 0) this.drum(now + 0.18, 0.006);
-        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.4, 0.006, "sine", now + 0.4, this.master || undefined);
+        this.pluck(base, now, profile.color === "dark" ? 0.04 : 0.055);
+        if (step % 4 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.36, profile.color === "bright" ? 0.022 : 0.016);
+        if (step % 8 === 4) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.35, profile.color === "cold" ? 0.035 : 0.026);
+        if (profile.color === "dark" && step % 8 === 0) this.drum(now + 0.18, 0.014);
+        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.4, 0.018, "sine", now + 0.4, this.master || undefined);
         this.musicStep += 1;
       },
 
@@ -1779,6 +1788,55 @@
 
     function seededRank(text, salt = "") {
       return hashText(`${playerSeed}|${state.life}|${state.turn}|${state.realm}|${salt}|${text}`);
+    }
+
+    function endingReward(sceneKey) {
+      const rewards = {
+        trueAscend: { memory: 4, fragments: 1, virtue: 12, label: "问天而归" },
+        falseAscend: { memory: 3, fragments: 1, virtue: 0, label: "九天祀名" },
+        trueEnding: { memory: 5, fragments: 2, virtue: 18, label: "大荒新约" },
+        sacrifice: { memory: 2, fragments: 1, virtue: 8, label: "百年封门" },
+        death: { memory: 2, fragments: 0, virtue: 0, label: "大荒梦回" },
+        hell: { memory: 1, fragments: 0, virtue: -12, label: "幽都照影", hell: true }
+      };
+      return rewards[sceneKey] || { memory: 1, fragments: 0, virtue: 0, label: "一世终了" };
+    }
+
+    function endingSummary(scene) {
+      if (!scene.ending) return "";
+      const reward = endingReward(state.scene);
+      const penalty = state.karma >= 40 || state.virtue < 35 || reward.hell
+        ? "幽都判定：因果偏重，下一世开局更难，但记忆更锋利。"
+        : "天命判定：此世因果可承，下一世将带着更多悟性醒来。";
+      const result = [
+        "【这一世结算】",
+        `结局：${reward.label}`,
+        `世数：第 ${state.life} 世`,
+        `最高境界：${realms[state.realm]}`,
+        `道德：${state.virtue}　因果：${state.karma}　天命碎片：${state.fragments}`,
+        `轮回收益：记忆 +${reward.memory}${reward.fragments ? `，天命碎片 +${reward.fragments}` : ""}${reward.virtue > 0 ? `，下世道德 +${reward.virtue}` : reward.virtue < 0 ? `，下世道德 ${reward.virtue}` : ""}`,
+        penalty
+      ];
+      return result.join("\n");
+    }
+
+    function endingChoices(scene) {
+      if (!scene.ending) return scene.choices || [];
+      const reward = endingReward(state.scene);
+      const hasRebirth = (scene.choices || []).some(choice => choice.rebirth);
+      const hasReset = (scene.choices || []).some(choice => choice.hardReset);
+      const choices = [];
+      if (!hasRebirth) {
+        choices.push({
+          text: reward.hell ? "从幽都重走人间，进入下一世" : "结算此世，带着记忆进入下一世",
+          rebirth: true,
+          hell: reward.hell,
+          bonus: { memory: reward.memory, fragments: reward.fragments, virtue: reward.virtue }
+        });
+      }
+      choices.push(...(scene.choices || []));
+      if (!hasReset) choices.push({ text: "彻底重开，从第 1 世开始", hardReset: true });
+      return choices;
     }
 
     function variedSceneText(scene, baseText) {
@@ -2091,6 +2149,15 @@
       return [...seededOrigins, ...fixed];
     }
 
+    function nextStoryScene() {
+      if (state.fragments >= 4 && state.realm >= 4) return "breakWheel";
+      const early = ["foxRoad", "iceHeart", "shadow"];
+      const middle = ["greatCouncil", "jadeClue", "coldShadow", "copperGate"];
+      const late = ["northSea", "copperGate", "greatCouncil", "jadeClue"];
+      const pool = state.realm <= 1 ? early : state.realm <= 3 ? middle : late;
+      return pool[seededRank(`${state.scene}|${state.turn}|${state.qi}`, "next-story") % pool.length];
+    }
+
     function rebirth(choice) {
       audio.play(choice.hell ? "danger" : "rebirth");
       const old = cloneData(state);
@@ -2103,8 +2170,8 @@
       state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
       state.karma = choice.hell ? 15 : 0;
       state.log = choice.hell
-        ? "你从幽冥归来，开局更难，但记忆更锋利。"
-        : "你再度醒来。前世的痛苦没有白费，它们沉成了悟性。";
+        ? "\u4f60\u4ece\u5e7d\u90fd\u5f52\u6765\uff0c\u5f00\u5c40\u66f4\u96be\uff0c\u4f46\u8bb0\u5fc6\u66f4\u950b\u5229\u3002"
+        : "\u4f60\u518d\u5ea6\u9192\u6765\u3002\u524d\u4e16\u7684\u75db\u82e6\u6ca1\u6709\u767d\u8d39\uff0c\u5b83\u4eec\u6c89\u6210\u4e86\u609f\u6027\u3002";
       render();
     }
 
@@ -2132,10 +2199,14 @@
       const intendedScene = choice.to;
       if (choice.effect) choice.effect(state);
       if (state.scene === currentScene) state.scene = intendedScene;
+      if (currentScene === "afterBreak" && intendedScene === "birth") {
+        state.scene = nextStoryScene();
+        state.log = "\u4f60\u6ca1\u6709\u9000\u56de\u539f\u70b9\uff0c\u800c\u662f\u5faa\u7740\u672c\u4e16\u7ebf\u7d22\u8d70\u5411\u5927\u8352\u66f4\u6df1\u5904\u3002";
+      }
 
       if (state.years <= 0 && !scenes[state.scene].ending) {
         state.scene = "death";
-        state.log = "寿元走到尽头。好在你已经学会如何把失败带回下一世。";
+        state.log = "\u5bff\u5143\u8d70\u5230\u5c3d\u5934\u3002\u597d\u5728\u4f60\u5df2\u7ecf\u5b66\u4f1a\u5982\u4f55\u628a\u5931\u8d25\u5e26\u56de\u4e0b\u4e00\u4e16\u3002";
       }
 
       if (scenes[state.scene].ending) {
@@ -2158,11 +2229,20 @@
       sceneTitle.textContent = scene.title;
       sceneTitle.className = scene.ending ? "ending" : "";
       sceneText.textContent = variedSceneText(scene, textOf(scene.text));
+      const summary = endingSummary(scene);
+      if (summary) {
+        sceneText.innerHTML = "";
+        sceneText.append(document.createTextNode(variedSceneText(scene, textOf(scene.text))));
+        const summaryBox = document.createElement("div");
+        summaryBox.className = "life-summary";
+        summaryBox.textContent = summary;
+        sceneText.append(summaryBox);
+      }
       if (sceneSketch) sceneSketch.innerHTML = artworkForState(scene);
       audio.updateMusicMode();
 
       choices.innerHTML = "";
-      availableChoices(scene).forEach(choice => {
+      availableChoices({ ...scene, choices: endingChoices(scene) }).forEach(choice => {
         if (choice.once && state.flags[choice.once]) return;
         const button = document.createElement("button");
         button.type = "button";
