@@ -75,6 +75,30 @@ window.DAHUANG_STORY_CONFIG = {
             "karma": 3
           },
           "log": "影步尽头留着半句誓词：救人者也会成为钥匙。"
+        },
+        {
+          "text": "追上自称玄晖的旅人，问他为何独往北溟",
+          "to": "northSea",
+          "effects": {
+            "xuanhuiBond": 1,
+            "sunCinders": 1,
+            "fragments": 1,
+            "years": -1
+          },
+          "log": "玄晖不答，只说北溟有一个人欠他答案。水镜里一瞬映出十轮残日。"
+        },
+        {
+          "text": "替玄晖挡下天机营盘问，只记下他的金色瞳纹",
+          "to": "foxRoad",
+          "requires": {
+            "karmaMax": 35
+          },
+          "effects": {
+            "xuanhuiBond": 2,
+            "virtue": 4,
+            "sunCinders": 1
+          },
+          "log": "他第一次认真看你，像在确认你是否把失势神子也当作活人。"
         }
       ]
     },
@@ -160,6 +184,29 @@ window.DAHUANG_STORY_CONFIG = {
             "years": -1
           },
           "log": "他们不知道真相，却会在下一世替你记得一个名字。"
+        },
+        {
+          "text": "查玄晖留在药账里的乌羽灰",
+          "to": "iceHeart",
+          "effects": {
+            "xuanhuiBond": 1,
+            "sunCinders": 2,
+            "virtue": 6
+          },
+          "log": "乌羽灰遇药灯不燃，反而照出灵巫宫旧歌里的东君日轮。"
+        },
+        {
+          "text": "把玄晖的旧名交给诸门，换取东皇太一档案",
+          "to": "greatCouncil",
+          "requires": {
+            "karmaMax": 50
+          },
+          "effects": {
+            "sunCinders": 2,
+            "karma": 8,
+            "xuanhuiBond": -1
+          },
+          "log": "诸门只听见东皇太一四字，没人问玄晖为何宁愿用人间化名。"
         }
       ]
     },
@@ -260,6 +307,35 @@ window.DAHUANG_STORY_CONFIG = {
             "fragmentsMin": 4,
             "realmMin": 3
           }
+        },
+        {
+          "text": "在北溟雪夜听玄晖讲射日之后",
+          "to": "northSea",
+          "requires": {
+            "xuanhuiBondMin": 2
+          },
+          "effects": {
+            "xuanhuiBond": 2,
+            "sunCinders": 2,
+            "memory": 1,
+            "years": -1
+          },
+          "log": "他说十日坠落时，他才知道贵为神明也会被命运写定。"
+        },
+        {
+          "text": "帮玄晖摆脱化生魔禁制，换他借金乌火炼契",
+          "to": "tribulation",
+          "requires": {
+            "sunCindersMin": 3
+          },
+          "effects": {
+            "qi": 32,
+            "karma": 6,
+            "sunCinders": 1,
+            "xuanhuiBond": 1
+          },
+          "talentToQi": true,
+          "log": "金乌火没有焚尽幽都，只烧掉了旧契上最不肯见人的一角。"
         }
       ]
     },
@@ -350,6 +426,33 @@ window.DAHUANG_STORY_CONFIG = {
             "years": -99
           },
           "log": "你没有失败，只是把终局推给了更强的自己。"
+        },
+        {
+          "text": "陪玄晖去见幽都王颛顼，哪怕再次被拒",
+          "to": "hell",
+          "requires": {
+            "xuanhuiBondMin": 4
+          },
+          "effects": {
+            "xuanhuiBond": 2,
+            "sunCinders": 1,
+            "memory": 1,
+            "karma": -4
+          },
+          "log": "颛顼没有开门。玄晖站在门外很久，仍没有低头。"
+        },
+        {
+          "text": "释放金乌烬，让十日残光照穿神域祭席",
+          "to": "heartDemon",
+          "requires": {
+            "sunCindersMin": 5
+          },
+          "effects": {
+            "fragments": 1,
+            "sunCinders": 2,
+            "karma": 10
+          },
+          "log": "十道残光照出九天祭席后的空名，你也听见心魔学会了神的语气。"
         }
       ]
     },
@@ -436,6 +539,36 @@ window.DAHUANG_STORY_CONFIG = {
             "realmMin": 6,
             "fragmentsMin": 4
           }
+        },
+        {
+          "text": "以玄晖之名重写东皇旧契：神子也有选择命运的权利",
+          "to": "breakWheel",
+          "requires": {
+            "xuanhuiBondMin": 6,
+            "sunCindersMin": 6,
+            "virtueMin": 70
+          },
+          "effects": {
+            "virtue": 18,
+            "fragments": 1,
+            "memory": 2
+          },
+          "log": "玄晖没有登回神座。他把最后一缕金乌火交给人间诸门共守。"
+        },
+        {
+          "text": "强迫玄晖归位东皇，以十日之火焚开天门",
+          "to": "ascend",
+          "requires": {
+            "sunCindersMin": 6,
+            "karmaMin": 35
+          },
+          "effects": {
+            "qi": 60,
+            "karma": 24,
+            "xuanhuiBond": -3
+          },
+          "talentToQi": true,
+          "log": "十日同升，天门大开。可你分不清那是飞升，还是又一次把他献上祭席。"
         }
       ]
     }
@@ -478,7 +611,8 @@ window.DAHUANG_STORY_CONFIG = {
     ],
     "northSea": [
       "assets/beiming-pact.webp",
-      "assets/beiming-road.webp"
+      "assets/beiming-road.webp",
+      "assets/xuanhui-beiming.webp"
     ],
     "greatCouncil": [
       "assets/sect-new-pact.webp",
@@ -494,11 +628,13 @@ window.DAHUANG_STORY_CONFIG = {
     ],
     "heartDemon": [
       "assets/heart-trial.webp",
-      "assets/underworld-ledger.webp"
+      "assets/underworld-ledger.webp",
+      "assets/xuanhui-beiming.webp"
     ],
     "hell": [
       "assets/underworld-ledger.webp",
-      "assets/hell-rebirth.webp"
+      "assets/hell-rebirth.webp",
+      "assets/xuanhui-beiming.webp"
     ],
     "ascend": [
       "assets/true-ascend.webp",
