@@ -2580,6 +2580,12 @@
 
     function choose(choice) {
       audio.play("click");
+      track("choice", {
+        text: choice.text,
+        to: choice.to || "",
+        ending: Boolean(choice.rebirth || choice.hardReset),
+        currentTitle: textOf((scenes[state.scene] || scenes.birth).title)
+      });
       if (choice.hardReset) {
         hardReset();
         return;
@@ -2609,6 +2615,15 @@
       }
 
       if (scenes[state.scene].ending) {
+        track("ending", {
+          endingScene: state.scene,
+          title: textOf(scenes[state.scene].title),
+          life: state.life,
+          realm: realms[state.realm],
+          virtue: state.virtue,
+          karma: state.karma,
+          fragments: state.fragments
+        });
         audio.play(state.scene === "hell" ? "danger" : "ending");
       } else if (state.scene === "afterBreak") {
         audio.play("break");
@@ -2675,6 +2690,7 @@
     }
 
     render();
+    track("visit", { title: document.title });
     })();
   </script>
 </body>
