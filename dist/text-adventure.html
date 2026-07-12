@@ -330,6 +330,7 @@
       fragments: 0,
       path: "未定",
       turn: 0,
+      act: 0,
       flags: {},
       log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
     };
@@ -1275,15 +1276,55 @@
 
       afterBreak: {
         title: "轮回分岔",
-        text: () => `你如今是${realms[state.realm]}修士，诸门旧闻在识海中重新排列。\n\n若继续查下去，你可能终止铜门轮回，也可能登上九天后发现自己只是另一枚祭品。`,
+        text: () => `你如今是${realms[state.realm]}修士，诸门旧闻在识海中重新排列。\n\n这一处不是回到原点，而是本世真正的分岔：你可以召集诸门、直入铜门、北上幽都、压下心魔，也可以继续破境，直到登九天或重订绝地天通。`,
         choices: [
           {
-            text: "继续在大荒行走",
-            to: "birth",
+            text: "召集诸门重开铜门议局",
+            to: "greatCouncil",
             requires: s => s.realm < 5 && s.years > 0,
             effect: s => {
               s.years -= 1;
-              s.log = "你重新踏上路。西陵、雷泽、北溟，每一处都有人还在等答案。";
+              s.virtue += 4;
+              s.log = "你没有再独自绕路，而是把天机、冰心、云麓、魍魉都拖到同一张桌前。";
+            }
+          },
+          {
+            text: "持天命碎片直入铜门裂隙",
+            to: "copperGate",
+            requires: s => s.fragments >= 2 && s.years > 0,
+            effect: s => {
+              s.qi += 14 + s.talent;
+              s.karma += 8;
+              s.log = "碎片贴上铜纹时，门内传来上一世没听完的回声。";
+            }
+          },
+          {
+            text: "北上北溟，追问玄晖与幽都旧约",
+            to: "northSea",
+            requires: s => s.fragments >= 1 && s.years > 0,
+            effect: s => {
+              s.years -= 1;
+              s.fragments += 1;
+              s.log = "你越过风雪，终于明白幽都不是结局，而是一座被误读太久的门。";
+            }
+          },
+          {
+            text: "先入镜阵，压下铜门心魔",
+            to: "heartDemon",
+            requires: s => s.karma >= 25,
+            effect: s => {
+              s.memory += 1;
+              s.log = "你决定先看清自己，再去审问诸神。";
+            }
+          },
+          {
+            text: "闭关冲境，为登九天蓄势",
+            to: "tribulation",
+            requires: s => s.realm < 5 && s.years > 1,
+            effect: s => {
+              s.qi += 32 + s.talent;
+              s.years -= 2;
+              s.log = "你把本世线索压入丹田，准备以更高境界去撬开天门。";
             }
           },
           {
@@ -1294,7 +1335,7 @@
           {
             text: "重订绝地天通，终止铜门轮回",
             to: "breakWheel",
-            requires: s => s.fragments >= 4 && s.realm >= 4
+            requires: s => s.fragments >= 4 && s.realm >= 3
           },
           {
             text: "寿元耗尽，带着大荒旧梦重生",
@@ -1463,6 +1504,172 @@
         choices: []
       }
     });
+
+    Object.assign(scenes, {
+      afterBreak: {
+        title: () => `第 ${Math.min(4, (state.act || 0) + 1)} 幕：${chapterName()}`,
+        text: () => chapterText(),
+        choices: () => chapterChoices()
+      }
+    });
+
+    function chapterName() {
+      const act = state.act || 0;
+      if (act <= 0) return "雷后入局";
+      if (act === 1) return "诸门相疑";
+      if (act === 2) return "铜门显影";
+      return "天命收束";
+    }
+
+    function chapterText() {
+      const act = state.act || 0;
+      const status = state.karma >= 60
+        ? "你的因果太重，魍魉席后的影子始终盯着你的手。"
+        : state.virtue >= 120
+          ? "你的名声已足以压住半座议厅，但真正的信任仍要靠下一步换来。"
+          : "你尚未赢得所有人的信任，诸门只肯给你一次说明的机会。";
+
+      if (act <= 0) {
+        return `雷劫散后，西陵旧议厅的水镜忽然亮起。天机营把铜门裂纹拓在镜中，冰心堂带来城外疫民名单，魍魉长老只问一句：上一世，是谁把这道裂纹藏起来的？\n\n${status}\n\n这一幕的关键不再是“去哪”，而是你要先处理哪一个真实冲突。`;
+      }
+
+      if (act === 1) {
+        return `你已经把第一条线索摆上桌面。遗墨的机关鸟落在梁上，吐出一片带盐痕的天书残页；冷喻没有看残页，只看你腰间的天命碎片。\n\n${status}\n\n现在故事开始分叉：公开残页会迫使诸门站队，私查北溟会更接近幽都旧约，强入铜门则可能让心魔提前醒来。`;
+      }
+
+      if (act === 2) {
+        return `铜门裂纹终于回应了你。水镜里先是北溟雪，再是东海神域的潮声，最后映出九天登神大典上一排没有名字的祭席。\n\n${status}\n\n这一幕已经接近终局。你可以补齐真相，也可以直接用修为撬开天门；若因果继续压上来，幽都会先替你作答。`;
+      }
+
+      return `本世的线索已经收束：诸门的旧账、幽都的误读、铜门的裂纹、九天的祭席，都指向同一个问题。\n\n力量足够时，你可以登九天；碎片足够时，你可以重订绝地天通；若因果压过道心，幽都会把你送回人间重走。`;
+    }
+
+    function chapterChoices() {
+      const act = state.act || 0;
+      if (state.years <= 0) {
+        return [{ text: "闭眼前记下最后一枚裂纹", to: "death" }];
+      }
+
+      if (act <= 0) {
+        return [
+          {
+            text: "逼问魍魉长老：上一世谁藏起裂纹",
+            to: "shadow",
+            effect: s => {
+              s.karma += 4;
+              s.fragments += 1;
+              s.log = "魍魉席后一阵沉默。有人终于承认，铜门裂纹不是第一次出现。";
+            }
+          },
+          {
+            text: "先救城外疫民，换冰心堂公开药账",
+            to: "iceHeart",
+            effect: s => {
+              s.virtue += 12;
+              s.years -= 1;
+              s.log = "药账里夹着一枚旧印，印文正与铜门边缘吻合。";
+            }
+          },
+          {
+            text: "让遗墨机关鸟拓下水镜裂纹",
+            to: "jadeClue",
+            effect: s => {
+              s.fragments += 1;
+              s.qi += 10 + s.talent;
+              s.log = "机关鸟飞回时，爪上多了一粒东海盐晶。";
+            }
+          }
+        ];
+      }
+
+      if (act === 1) {
+        return [
+          {
+            text: "公开天书残页，迫诸门当场站队",
+            to: "greatCouncil",
+            effect: s => {
+              s.virtue += 8;
+              s.karma += 3;
+              s.log = "诸门终于不再谈风骨，只开始谈各自欠下的债。";
+            }
+          },
+          {
+            text: "夜入北溟，追玄晖留下的幽都旧约",
+            to: "northSea",
+            effect: s => {
+              s.fragments += 1;
+              s.years -= 1;
+              s.log = "北溟风雪里，你听见幽都并不承认自己是地狱。";
+            }
+          },
+          {
+            text: "独自贴近铜门，听清门内喊出的名字",
+            to: "copperGate",
+            effect: s => {
+              s.qi += 16 + s.talent;
+              s.karma += 8;
+              s.log = "铜门没有打开，只把你的倒影换成了上一世的样子。";
+            }
+          }
+        ];
+      }
+
+      if (act === 2) {
+        return [
+          {
+            text: "入镜阵审问心魔，先定自己的底线",
+            to: "heartDemon",
+            requires: s => s.karma >= 20,
+            effect: s => {
+              s.memory += 1;
+              s.log = "心魔没有退散，只把最锋利的问题留给你。";
+            }
+          },
+          {
+            text: "闭关冲境，用金丹火推开九天门缝",
+            to: "tribulation",
+            requires: s => s.realm < 5,
+            effect: s => {
+              s.qi += 34 + s.talent;
+              s.years -= 2;
+              s.log = "你把残页、药账、裂纹一并压入丹田，雷云再次聚拢。";
+            }
+          },
+          {
+            text: "以碎片拼合旧约，提前重订绝地天通",
+            to: "breakWheel",
+            requires: s => s.fragments >= 4 && s.realm >= 3
+          },
+          {
+            text: "登九天，直接问神明旧账",
+            to: "ascend",
+            requires: s => s.realm >= 5
+          }
+        ];
+      }
+
+      return [
+        {
+          text: "以诸门新约重封铜门",
+          to: "breakWheel",
+          requires: s => s.fragments >= 4 && s.virtue >= 60
+        },
+        {
+          text: "登九天，看清祭席后的名字",
+          to: "ascend",
+          requires: s => s.realm >= 5
+        },
+        {
+          text: "因果压身，先入幽都照见本心",
+          to: "hell",
+          requires: s => s.karma >= 55
+        },
+        {
+          text: "寿元将尽，把本世线索交给下一世",
+          to: "death"
+        }
+      ];
+    }
 
     function cloneData(value) {
       if (typeof structuredClone === "function") return structuredClone(value);
@@ -1823,8 +2030,9 @@
     function endingChoices(scene) {
       if (!scene.ending) return scene.choices || [];
       const reward = endingReward(state.scene);
-      const hasRebirth = (scene.choices || []).some(choice => choice.rebirth);
-      const hasReset = (scene.choices || []).some(choice => choice.hardReset);
+      const baseChoices = sceneChoiceList(scene);
+      const hasRebirth = baseChoices.some(choice => choice.rebirth);
+      const hasReset = baseChoices.some(choice => choice.hardReset);
       const choices = [];
       if (!hasRebirth) {
         choices.push({
@@ -1834,13 +2042,14 @@
           bonus: { memory: reward.memory, fragments: reward.fragments, virtue: reward.virtue }
         });
       }
-      choices.push(...(scene.choices || []));
+      choices.push(...baseChoices);
       if (!hasReset) choices.push({ text: "彻底重开，从第 1 世开始", hardReset: true });
       return choices;
     }
 
     function variedSceneText(scene, baseText) {
       if (scene.ending) return baseText;
+      if (state.scene === "afterBreak") return baseText;
 
       const weather = [
         "薄雾从山谷里漫上来，像上一世没有说完的话。",
@@ -2127,11 +2336,15 @@
         : state.scene === "northSea" || state.scene === "death"
           ? "contrast(1.06) saturate(0.88) hue-rotate(10deg)"
           : "contrast(1.04) saturate(0.98)";
-      return `<div class="art-frame"><img src="${src}" alt="${scene.title}" style="filter:${filter}; object-position:${position};"></div>`;
+      return `<div class="art-frame"><img src="${src}" alt="${textOf(scene.title)}" style="filter:${filter}; object-position:${position};"></div>`;
+    }
+
+    function sceneChoiceList(scene) {
+      return typeof scene.choices === "function" ? scene.choices() : (scene.choices || []);
     }
 
     function availableChoices(scene) {
-      const base = (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
+      const base = sceneChoiceList(scene).filter(choice => !choice.requires || choice.requires(state));
       if (state.scene !== "birth") return base;
 
       const fixed = base.filter(choice => choice.requires || choice.rebirth || choice.hardReset || choice.always);
@@ -2195,6 +2408,7 @@
 
       if (choice.once) state.flags[choice.once] = true;
       state.turn += 1;
+      if (choice.advanceAct !== false) state.act = Math.min(4, (state.act || 0) + 1);
       const currentScene = state.scene;
       const intendedScene = choice.to;
       if (choice.effect) choice.effect(state);
@@ -2226,7 +2440,7 @@
         state.scene = "birth";
         state.log = "轮回出现裂隙，但你稳住了识海，重新回到山脚。";
       }
-      sceneTitle.textContent = scene.title;
+      sceneTitle.textContent = textOf(scene.title);
       sceneTitle.className = scene.ending ? "ending" : "";
       sceneText.textContent = variedSceneText(scene, textOf(scene.text));
       const summary = endingSummary(scene);
