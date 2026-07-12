@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "build": "vinext build"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vinext": "latest"
+  },
+  "devDependencies": {}
+}

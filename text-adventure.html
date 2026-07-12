@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>轮回问道</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121510;
+      --panel: #20251d;
+      --panel-2: #2a3127;
+      --ink: #f4efdf;
+      --muted: #b9b39f;
+      --accent: #d8b35f;
+      --good: #7fc8a9;
+      --bad: #d97869;
+      --line: rgba(244, 239, 223, 0.15);
+      --shadow: rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(216, 179, 95, 0.18), transparent 28rem),
+        radial-gradient(circle at 82% 86%, rgba(127, 200, 169, 0.12), transparent 30rem),
+        linear-gradient(135deg, #0d100d 0%, var(--bg) 46%, #1a1b15 100%);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      line-height: 1.65;
+      padding: 24px;
+    }
+
+    main {
+      width: min(1060px, 100%);
+      min-height: min(740px, calc(100vh - 48px));
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      border: 1px solid var(--line);
+      background: rgba(32, 37, 29, 0.9);
+      box-shadow: 0 24px 70px var(--shadow);
+    }
+
+    .story {
+      display: flex;
+      flex-direction: column;
+      padding: clamp(22px, 4vw, 42px);
+      border-right: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(32px, 6vw, 58px);
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    #scene-title {
+      margin: 0 0 12px;
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    #scene-text {
+      margin: 0;
+      max-width: 72ch;
+      font-size: 18px;
+      white-space: pre-line;
+    }
+
+    .choices {
+      display: grid;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 32px;
+    }
+
+    button {
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      outline: none;
+      transform: translateY(-1px);
+      border-color: rgba(216, 179, 95, 0.72);
+      background: #333b2f;
+    }
+
+    aside {
+      padding: 28px 24px;
+      background: rgba(12, 14, 11, 0.34);
+    }
+
+    .side-block + .side-block {
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: rgba(244, 239, 223, 0.04);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    li strong {
+      color: var(--ink);
+      text-align: right;
+    }
+
+    .meter {
+      height: 11px;
+      border: 1px solid var(--line);
+      background: #11130f;
+      overflow: hidden;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--good), var(--accent));
+      transition: width 260ms ease;
+    }
+
+    .log {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: pre-line;
+    }
+
+    .ending {
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .warning {
+      color: var(--bad);
+    }
+
+    @media (max-width: 800px) {
+      body {
+        padding: 0;
+      }
+
+      main {
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        border: 0;
+      }
+
+      .story {
+        min-height: 66vh;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="story" aria-live="polite">
+      <h1>轮回问道</h1>
+      <p class="subtitle">带着记忆重生的修仙文字模拟器</p>
+      <h2 id="scene-title"></h2>
+      <p id="scene-text"></p>
+      <div id="choices" class="choices"></div>
+    </section>
+
+    <aside>
+      <section class="side-block">
+        <h2>这一世</h2>
+        <ul>
+          <li><span>世数</span><strong id="life"></strong></li>
+          <li><span>境界</span><strong id="realm"></strong></li>
+          <li><span>流派</span><strong id="path"></strong></li>
+          <li><span>寿元</span><strong id="years"></strong></li>
+        </ul>
+      </section>
+
+      <section class="side-block">
+        <h2>修为</h2>
+        <div class="meter" aria-label="修为进度"><span id="qi-bar"></span></div>
+        <ul>
+          <li><span>灵力</span><strong id="qi"></strong></li>
+          <li><span>道德</span><strong id="virtue"></strong></li>
+          <li><span>因果</span><strong id="karma"></strong></li>
+        </ul>
+      </section>
+
+      <section class="side-block">
+        <h2>轮回记忆</h2>
+        <ul>
+          <li><span>记忆点</span><strong id="memory"></strong></li>
+          <li><span>悟性</span><strong id="talent"></strong></li>
+          <li><span>天命碎片</span><strong id="fragments"></strong></li>
+        </ul>
+      </section>
+
+      <section class="side-block">
+        <h2>记录</h2>
+        <p id="log" class="log"></p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const realms = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "渡劫", "飞升"];
+
+    const freshLife = {
+      scene: "birth",
+      life: 1,
+      realm: 0,
+      qi: 0,
+      years: 8,
+      virtue: 50,
+      karma: 0,
+      memory: 0,
+      talent: 0,
+      fragments: 0,
+      path: "未定",
+      flags: {},
+      log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
+    };
+
+    let state = structuredClone(freshLife);
+
+    const scenes = {
+      birth: {
+        title: "山脚重生",
+        text: () => `第 ${state.life} 世，你又在同一个清晨醒来。\n\n窗外青山如洗，村口老槐树下有一位白发道人摆摊算命。你记得前世许多片段：有人正道登天，有人邪法速成，也有人因道德亏损，飞升时坠入幽冥，被迫重走人间。\n\n这一次，你要怎样开局？`,
+        choices: [
+          {
+            text: "拜入青云观，走稳健正修",
+            to: "sect",
+            effect: s => {
+              s.path = "正修";
+              s.qi += 16 + s.talent;
+              s.virtue += 10;
+              s.years += 2;
+              s.log = "青云观传你吐纳法。慢一些，但根基清明。";
+            }
+          },
+          {
+            text: "向散修换血煞功，走偏锋邪修",
+            to: "market",
+            effect: s => {
+              s.path = "邪修";
+              s.qi += 26 + s.talent;
+              s.karma += 8;
+              s.virtue -= 6;
+              s.log = "血煞功不必伤人也能修，只是更容易被欲念牵引。";
+            }
+          },
+          {
+            text: "用记忆点换开局悟性",
+            to: "birth",
+            requires: s => s.memory >= 3,
+            effect: s => {
+              s.memory -= 3;
+              s.talent += 5;
+              s.log = "你把一段轮回记忆炼成直觉。下一次吐纳，天地像慢了半拍。";
+            }
+          },
+          {
+            text: "追问白发道人：轮回是谁布下的？",
+            to: "oldMan",
+            requires: s => s.fragments >= 2 || s.life >= 3,
+            effect: s => {
+              s.log = "道人看了你很久：能问到这里，说明你已经不止活过一次。";
+            }
+          }
+        ]
+      },
+
+      oldMan: {
+        title: "老槐树下",
+        text: "白发道人摊开掌心，里面不是铜钱，而是一枚裂开的天命印。\n\n他说：所谓轮回，并非天罚。三千年前仙界断路，有人把凡间做成炉，把一次次人生做成柴，想炼出一个能补天的人。\n\n你可以顺着炉火变强，也可以在足够强时打破炉壁。",
+        choices: [
+          {
+            text: "收下天命印碎片",
+            to: "birth",
+            once: "oldManShard",
+            effect: s => {
+              s.fragments += 1;
+              s.memory += 1;
+              s.log = "碎片融入识海。你隐约看见飞升门后，并不全是光。";
+            }
+          },
+          { text: "暂时离开", to: "birth" }
+        ]
+      },
+
+      sect: {
+        title: "青云观",
+        text: "你在观中修行十年。师兄弟争夺内门名额，山下又传来妖潮将至的消息。\n\n正修讲克己守心，但不是软弱。真正的正，是强大之后仍肯护人。",
+        choices: [
+          {
+            text: "苦修破境",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 30 + s.talent;
+              s.years -= 2;
+              s.log = "你闭关苦修，灵台澄澈。";
+            }
+          },
+          {
+            text: "下山护村，积累功德",
+            to: "demon",
+            effect: s => {
+              s.virtue += 18;
+              s.qi += 12 + s.talent;
+              s.years -= 1;
+              s.log = "你救下许多凡人，也看见修士力量该落向哪里。";
+            }
+          },
+          {
+            text: "偷看禁卷，研究邪法的边界",
+            to: "forbidden",
+            effect: s => {
+              s.path = "兼修";
+              s.qi += 20 + s.talent;
+              s.karma += 4;
+              s.log = "禁卷不只记载恶，也记载人心的险。你决定只取术，不取贪。";
+            }
+          }
+        ]
+      },
+
+      market: {
+        title: "黑市洞府",
+        text: "邪修集市藏在雨夜山腹。这里出售速成法、替劫符、夺灵阵，也有人只把邪法当作刀，绝不砍向无辜者。\n\n力量来得越快，越需要自己握紧方向。",
+        choices: [
+          {
+            text: "修血煞功，但只炼凶兽血气",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 34 + s.talent;
+              s.karma += 6;
+              s.virtue += 3;
+              s.years -= 2;
+              s.log = "你避开伤人捷径，进境仍快，只是心魔更早找上门。";
+            }
+          },
+          {
+            text: "买下替劫符，留给无辜者",
+            to: "demon",
+            effect: s => {
+              s.qi += 10 + s.talent;
+              s.virtue += 15;
+              s.karma -= 4;
+              s.years -= 1;
+              s.log = "黑市商人笑你亏本。可你知道，有些账不在灵石里算。";
+            }
+          },
+          {
+            text: "贪快吞服三枚赤魂丹",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 46 + s.talent;
+              s.virtue -= 16;
+              s.karma += 18;
+              s.years -= 3;
+              s.log = "药力汹涌如火，你听见自己的欲望在丹田里说话。";
+            }
+          }
+        ]
+      },
+
+      forbidden: {
+        title: "禁卷残页",
+        text: "残页上写着一句话：正邪不在法，在用法之人。\n\n你发现所谓邪法本源是古仙补天术的残缺部分。它能吞浊气、炼怨念，若无人约束，也能吞人心。",
+        choices: [
+          {
+            text: "立誓只炼怨浊，不夺生魂",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 25 + s.talent;
+              s.virtue += 8;
+              s.karma -= 2;
+              s.fragments += 1;
+              s.log = "誓言落下时，天命印微微发热。";
+            }
+          },
+          {
+            text: "把残页交给师门共同研究",
+            to: "sectTruth",
+            effect: s => {
+              s.virtue += 16;
+              s.qi += 14 + s.talent;
+              s.log = "长老没有毁掉残页，只问你：若法可救人，何必先给它定罪？";
+            }
+          }
+        ]
+      },
+
+      demon: {
+        title: "山下妖潮",
+        text: "妖潮并非天灾，而是有人抽走山脉灵脉，逼灵兽失巢。你站在村口，看见上一世害死你的魔修也在救孩子。\n\n故事从来没有简单到只分黑白。",
+        choices: [
+          {
+            text: "救人优先，放过那名魔修",
+            to: "sectTruth",
+            effect: s => {
+              s.virtue += 16;
+              s.karma -= 5;
+              s.qi += 15 + s.talent;
+              s.log = "魔修临走前丢给你半枚天命印碎片。";
+              s.fragments += 1;
+            }
+          },
+          {
+            text: "追查抽灵脉的幕后人",
+            to: "sectTruth",
+            effect: s => {
+              s.qi += 24 + s.talent;
+              s.years -= 2;
+              s.log = "线索指向仙盟。所谓正道魁首，正在偷凡间的未来。";
+              s.fragments += 1;
+            }
+          },
+          {
+            text: "借妖潮磨炼战力",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 38 + s.talent;
+              s.karma += 7;
+              s.virtue -= 4;
+              s.years -= 2;
+              s.log = "你没有害人，但你开始把灾难看成台阶。这个念头很危险。";
+            }
+          }
+        ]
+      },
+
+      sectTruth: {
+        title: "仙盟密令",
+        text: "你终于查到真相：仙盟每百年挑选“可飞升者”，不是为了送他们成仙，而是送去仙界裂隙当燃料。\n\n白发道人、魔修、青云观长老，都曾是炉中薪柴。轮回让你变强，也在筛选你的心。",
+        choices: [
+          {
+            text: "公开密令，联合正邪修士",
+            to: "tribulation",
+            effect: s => {
+              s.virtue += 20;
+              s.qi += 20 + s.talent;
+              s.karma -= 8;
+              s.fragments += 1;
+              s.log = "越来越多人站到你身后。正邪不是阵营，选择才是。";
+            }
+          },
+          {
+            text: "独自潜入仙盟夺天梯钥",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 42 + s.talent;
+              s.karma += 10;
+              s.years -= 2;
+              s.log = "你赢得很快，也失去很快。孤身入局，心魔最爱这种时刻。";
+            }
+          }
+        ]
+      },
+
+      tribulation: {
+        title: "破境雷劫",
+        text: () => `雷云压下，你的修为抵达瓶颈。\n\n当前灵力：${state.qi}。灵力越高，破境越稳；道德越低，天劫越重；因果越深，心魔越强。`,
+        choices: [
+          {
+            text: "迎雷破境",
+            to: "afterBreak",
+            effect: s => {
+              const threshold = 28 + s.realm * 22 + Math.max(0, 50 - s.virtue) + Math.max(0, s.karma);
+              if (s.qi >= threshold) {
+                s.realm += 1;
+                s.qi = Math.max(0, s.qi - threshold + 8);
+                s.years += 5;
+                s.memory += 1;
+                s.log = `你扛过雷劫，踏入${realms[s.realm]}。这次经验化作 1 点轮回记忆。`;
+              } else {
+                s.scene = "death";
+                s.log = "雷光落下，你知道还差一点。下一世，你会记住这一道雷。";
+              }
+            }
+          },
+          {
+            text: "沉心补德，先化解因果",
+            to: "afterBreak",
+            effect: s => {
+              s.virtue += 12;
+              s.karma = Math.max(0, s.karma - 10);
+              s.qi += 6 + s.talent;
+              s.years -= 1;
+              s.log = "你没有急着变强。很多时候，慢一步才走得更远。";
+            }
+          },
+          {
+            text: "以邪法吞雷，强行提速",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 38 + s.talent;
+              s.karma += 14;
+              s.virtue -= 10;
+              s.log = "雷霆被你炼入血脉。力量是真的，代价也是真的。";
+            }
+          }
+        ]
+      },
+
+      afterBreak: {
+        title: "道途抉择",
+        text: () => `你如今是${realms[state.realm]}修士。轮回记忆越积越厚，前世失败正在变成今生的台阶。\n\n若继续修行，你可能飞升、坠入幽冥，或者揭开天命炉的终局。`,
+        choices: [
+          {
+            text: "继续这一世",
+            to: "sect",
+            requires: s => s.realm < 5 && s.years > 0,
+            effect: s => {
+              s.years -= 1;
+              s.log = "你收拾行囊，再入尘世。";
+            }
+          },
+          {
+            text: "尝试飞升",
+            to: "ascend",
+            requires: s => s.realm >= 5
+          },
+          {
+            text: "直面天命炉，打破轮回",
+            to: "breakWheel",
+            requires: s => s.fragments >= 4 && s.realm >= 4
+          },
+          {
+            text: "寿元耗尽，坦然入轮回",
+            to: "death",
+            requires: s => s.years <= 0
+          }
+        ]
+      },
+
+      heartDemon: {
+        title: "心魔问道",
+        text: "心魔不是另一个你，而是你每次想走捷径时留下的影子。\n\n它问：既然轮回能重来，为什么还要珍惜这一世的人？",
+        choices: [
+          {
+            text: "承认贪念，但不让它掌舵",
+            to: "tribulation",
+            effect: s => {
+              s.virtue += 10;
+              s.karma = Math.max(0, s.karma - 8);
+              s.memory += 1;
+              s.log = "你没有否认黑暗，只是把灯重新点亮。";
+            }
+          },
+          {
+            text: "以意志镇压心魔",
+            to: "afterBreak",
+            effect: s => {
+              s.qi += 20 + s.talent;
+              s.karma += 5;
+              s.log = "你暂时赢了，但镇压不是化解。";
+            }
+          },
+          {
+            text: "任由心魔接管",
+            to: "hell",
+            effect: s => {
+              s.virtue -= 30;
+              s.karma += 30;
+              s.log = "你得到了力量，也把自己从人间的牵挂里拔了出来。";
+            }
+          }
+        ]
+      },
+
+      ascend: {
+        title: "飞升门前",
+        text: () => `天门打开，金光照落。可门后传来锁链声。\n\n你的道德为 ${state.virtue}，因果为 ${state.karma}。道德越低，飞升越像审判；因果越深，越容易被打入幽冥重走人间。`,
+        choices: [
+          {
+            text: "踏入天门",
+            to: "ascendResult",
+            effect: s => {
+              const burden = Math.max(0, 65 - s.virtue) + s.karma;
+              if (burden >= 55) {
+                s.scene = "hell";
+                s.log = "天门金光一转成黑。你不是飞升，而是被因果拖入幽冥。";
+              } else if (s.fragments >= 4 && s.virtue >= 60) {
+                s.scene = "trueAscend";
+                s.log = "你看穿天门后的裂隙，终于有资格选择自己的飞升。";
+              } else {
+                s.scene = "falseAscend";
+                s.log = "你飞升了，却发现自己只是被送上更高处的炉台。";
+              }
+            }
+          },
+          {
+            text: "退回人间，先补全因果",
+            to: "sect",
+            effect: s => {
+              s.virtue += 8;
+              s.karma = Math.max(0, s.karma - 8);
+              s.log = "能退一步的人，往往比只会往前冲的人更接近大道。";
+            }
+          }
+        ]
+      },
+
+      breakWheel: {
+        title: "天命炉底",
+        text: "四枚天命碎片合一，照出炉底真相：仙界裂隙需要燃料，但并非必须烧人。\n\n若有人愿意把正修的守心、邪修的炼浊、轮回的记忆合成新法，就能补天而不献祭众生。",
+        choices: [
+          {
+            text: "以众生功德补天，终止轮回",
+            to: "trueEnding",
+            requires: s => s.virtue >= 70 && s.realm >= 4
+          },
+          {
+            text: "以自身为钥，封炉一世",
+            to: "sacrifice",
+            requires: s => s.virtue >= 45
+          },
+          {
+            text: "强夺天命炉，成为新炉主",
+            to: "hell",
+            effect: s => {
+              s.virtue -= 40;
+              s.karma += 50;
+              s.log = "你赢过了旧炉主，却变成了下一道枷锁。幽冥已经在等你。";
+            }
+          }
+        ]
+      },
+
+      trueAscend: {
+        title: "结局：清明飞升",
+        text: "你没有被天门吞没，而是带着人间万千因果穿门而过。\n\n仙界裂隙前，你立下新规：飞升不是献祭，强者不该把弱者当作柴薪。从此正邪各修其法，同受一条底线约束：不伤无辜，不弃人间。",
+        ending: true,
+        choices: [
+          { text: "带着更多记忆再入轮回", rebirth: true },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      falseAscend: {
+        title: "结局：炉上仙",
+        text: "你登上仙界，却发现脚下是无数前辈烧尽后的灰。\n\n这一世不算失败。你记住了天门后的真相。下一世，你会更早寻找天命碎片。",
+        ending: true,
+        choices: [
+          { text: "带着真相重生", rebirth: true, bonus: { memory: 3, fragments: 1 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      trueEnding: {
+        title: "真结局：万世不再为炉",
+        text: "你把轮回记忆还给所有曾被炉火吞没的人。\n\n正修守住底线，邪修炼化浊气，凡人不再被当成命数里的消耗。天裂仍在，但补天终于不需要牺牲无辜者。\n\n你没有成为传说里的神。你只是让后来者不必一次次重生，才有资格活成自己。",
+        ending: true,
+        choices: [
+          { text: "以新天道再开一局", hardReset: true }
+        ]
+      },
+
+      sacrifice: {
+        title: "结局：一世封炉",
+        text: "你没有足够功德补天，只能以自身为钥，封住天命炉一世。\n\n人间获得百年喘息。百年后，也许会有另一个带着记忆的人醒来，接过你没走完的路。",
+        ending: true,
+        choices: [
+          { text: "下一世接续此愿", rebirth: true, bonus: { memory: 2, virtue: 8 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      death: {
+        title: "结局：身死道未消",
+        text: "这一世到此为止。死亡像一扇旧门，门后仍是那个山脚清晨。\n\n你失去了修为，却留下经验。轮回并不温柔，但它允许你把失败变成下一次的力量。",
+        ending: true,
+        choices: [
+          { text: "带着记忆重生", rebirth: true, bonus: { memory: 2 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      hell: {
+        title: "结局：幽冥重走人间",
+        text: "因果沉重，道德亏损，天门化作幽冥。\n\n你没有被永久惩罚，只是被迫从最艰难的人间再走一遍：少一点天赋，多一点债。只有重新理解力量为何而用，才可能再次靠近飞升。",
+        ending: true,
+        choices: [
+          { text: "从幽冥转生", rebirth: true, hell: true },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      ascendResult: {
+        title: "天门之后",
+        text: "天门正在判断你的因果。",
+        choices: []
+      }
+    };
+
+    const sceneTitle = document.querySelector("#scene-title");
+    const sceneText = document.querySelector("#scene-text");
+    const choices = document.querySelector("#choices");
+    const life = document.querySelector("#life");
+    const realm = document.querySelector("#realm");
+    const path = document.querySelector("#path");
+    const years = document.querySelector("#years");
+    const qiBar = document.querySelector("#qi-bar");
+    const qi = document.querySelector("#qi");
+    const virtue = document.querySelector("#virtue");
+    const karma = document.querySelector("#karma");
+    const memory = document.querySelector("#memory");
+    const talent = document.querySelector("#talent");
+    const fragments = document.querySelector("#fragments");
+    const log = document.querySelector("#log");
+
+    function textOf(value) {
+      return typeof value === "function" ? value() : value;
+    }
+
+    function availableChoices(scene) {
+      return scene.choices.filter(choice => !choice.requires || choice.requires(state));
+    }
+
+    function rebirth(choice) {
+      const old = structuredClone(state);
+      const bonus = choice.bonus || {};
+      state = structuredClone(freshLife);
+      state.life = old.life + 1;
+      state.memory = Math.max(0, old.memory + 1 + (bonus.memory || 0) - (choice.hell ? 2 : 0));
+      state.talent = Math.max(0, Math.floor(old.talent * 0.55) + Math.floor(state.memory / 3) - (choice.hell ? 2 : 0));
+      state.fragments = Math.max(0, old.fragments + (bonus.fragments || 0));
+      state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
+      state.karma = choice.hell ? 15 : 0;
+      state.log = choice.hell
+        ? "你从幽冥归来，开局更难，但记忆更锋利。"
+        : "你再度醒来。前世的痛苦没有白费，它们沉成了悟性。";
+      render();
+    }
+
+    function hardReset() {
+      state = structuredClone(freshLife);
+      render();
+    }
+
+    function choose(choice) {
+      if (choice.hardReset) {
+        hardReset();
+        return;
+      }
+
+      if (choice.rebirth) {
+        rebirth(choice);
+        return;
+      }
+
+      if (choice.once) state.flags[choice.once] = true;
+      const currentScene = state.scene;
+      const intendedScene = choice.to;
+      if (choice.effect) choice.effect(state);
+      if (state.scene === currentScene) state.scene = intendedScene;
+
+      if (state.years <= 0 && !scenes[state.scene].ending) {
+        state.scene = "death";
+        state.log = "寿元走到尽头。好在你已经学会如何把失败带回下一世。";
+      }
+
+      render();
+    }
+
+    function render() {
+      const scene = scenes[state.scene];
+      sceneTitle.textContent = scene.title;
+      sceneTitle.className = scene.ending ? "ending" : "";
+      sceneText.textContent = textOf(scene.text);
+
+      choices.innerHTML = "";
+      availableChoices(scene).forEach(choice => {
+        if (choice.once && state.flags[choice.once]) return;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = choice.text;
+        button.addEventListener("click", () => choose(choice));
+        choices.appendChild(button);
+      });
+
+      life.textContent = `第 ${state.life} 世`;
+      realm.textContent = realms[state.realm];
+      path.textContent = state.path;
+      years.textContent = `${Math.max(0, state.years)} 年`;
+      qi.textContent = state.qi;
+      virtue.textContent = state.virtue;
+      virtue.className = state.virtue < 35 ? "warning" : "";
+      karma.textContent = state.karma;
+      karma.className = state.karma > 35 ? "warning" : "";
+      memory.textContent = state.memory;
+      talent.textContent = state.talent;
+      fragments.textContent = state.fragments;
+      log.textContent = state.log;
+
+      const nextThreshold = 28 + state.realm * 22 + Math.max(0, 50 - state.virtue) + Math.max(0, state.karma);
+      qiBar.style.width = `${Math.min(100, Math.round((state.qi / Math.max(1, nextThreshold)) * 100))}%`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
