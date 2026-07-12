@@ -319,6 +319,7 @@
 
   <script src="story-config.js"></script>
   <script>
+    (() => {
     const realms = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "渡劫", "飞升"];
 
     const freshLife = {
@@ -1529,7 +1530,7 @@
       afterBreak: {
         title: () => {
           const maxChapter = Math.max(1, (storyConfig.chapters || []).length);
-          return `第 ${Math.min(maxChapter, (state.act || 0) + 1)} 幕：${chapterName()}`;
+          return chapterName();
         },
         text: () => chapterText(),
         choices: () => chapterChoices()
@@ -1537,6 +1538,7 @@
     });
 
     const storyConfig = window.DAHUANG_STORY_CONFIG || {};
+    delete window.DAHUANG_STORY_CONFIG;
 
     function currentChapter() {
       const chapters = storyConfig.chapters || [];
@@ -1772,7 +1774,7 @@
       ];
     }
 
-    scenes.birth.title = () => `第 ${state.life} 世：${chapterName()}`;
+    scenes.birth.title = () => chapterName();
     scenes.birth.text = () => chapterText();
     scenes.birth.choices = () => chapterChoices();
 
@@ -2673,6 +2675,7 @@
     }
 
     render();
+    })();
   </script>
 </body>
 </html>

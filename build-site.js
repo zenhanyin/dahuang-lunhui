@@ -13,11 +13,17 @@ fs.mkdirSync(path.join(dist, "server"), { recursive: true });
 fs.mkdirSync(distAssetDir, { recursive: true });
 fs.mkdirSync(path.dirname(hostingDest), { recursive: true });
 
-const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const storyConfig = fs.readFileSync(path.join(root, "story-config.js"), "utf8");
+const storyJson = storyConfig
+  .replace(/^\s*window\.DAHUANG_STORY_CONFIG\s*=\s*/, "")
+  .replace(/;\s*$/, "");
+JSON.parse(storyJson);
+const packedStory = Buffer.from(storyJson, "utf8").toString("base64");
+const storyLoader = `<script>(()=>{const b="${packedStory}";const raw=atob(b);const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));window.DAHUANG_STORY_CONFIG=JSON.parse(new TextDecoder().decode(bytes));})();</script>`;
+const html = sourceHtml.replace('<script src="story-config.js"></script>', storyLoader);
 fs.writeFileSync(path.join(dist, "index.html"), html, "utf8");
 fs.writeFileSync(path.join(dist, "text-adventure.html"), html, "utf8");
-fs.writeFileSync(path.join(dist, "story-config.js"), storyConfig, "utf8");
 fs.copyFileSync(hostingSource, hostingDest);
 
 const imageAssets = {};
@@ -28,9 +34,7 @@ for (const file of fs.readdirSync(assetDir).filter(file => /\.(webp|png)$/i.test
 }
 
 const worker = `const gameHtml = ${JSON.stringify(html)};
-const textAssets = ${JSON.stringify({
-  "/story-config.js": storyConfig
-})};
+const textAssets = {};
 const imageAssets = ${JSON.stringify(imageAssets)};
 
 function contentType(pathname) {

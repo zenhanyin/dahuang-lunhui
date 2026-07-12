@@ -111,7 +111,7 @@ function loadGame() {
 
   vm.createContext(context);
   vm.runInContext(configJs, context, { filename: "story-config.js" });
-  const instrumented = `${scripts.at(-1)[1]}
+  const hook = `
 globalThis.__risk = {
   get state() { return state; },
   set state(value) { state = value; },
@@ -122,6 +122,11 @@ globalThis.__risk = {
   render,
   choose
 };`;
+  const gameScript = scripts.at(-1)[1];
+  const closeIndex = gameScript.lastIndexOf("})();");
+  const instrumented = closeIndex >= 0
+    ? `${gameScript.slice(0, closeIndex)}${hook}\n${gameScript.slice(closeIndex)}`
+    : `${gameScript}${hook}`;
   vm.runInContext(instrumented, context, { filename: "text-adventure.html" });
   return { context, elements };
 }
