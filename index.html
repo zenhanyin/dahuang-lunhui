@@ -2112,6 +2112,17 @@
     function endingSummary(scene) {
       if (!scene.ending) return "";
       const reward = endingReward(state.scene);
+      const verdicts = [
+        state.xuanhuiBond >= 5 ? "判词：你没有把失势神子当作法器。金乌火因此仍愿照向人间。" : "",
+        state.swordHeart >= 5 ? "判词：你接过黄泉与碧落之间的一剑，却没有把人间斩成通路。" : "",
+        state.qingyangTrace >= 4 ? "判词：青阳旧痕已入识海。少昊、东海与幽都之间，还有一笔旧账等你来问。" : "",
+        state.moFeiyunProof >= 3 ? "判词：白羽没有被风吹走。冷喻旧案终有一世会被摆上明堂。" : "",
+        state.iceLedger >= 3 ? "判词：药账里的活人不再只是数字。你记住了他们真正的死期。" : "",
+        state.shadowTrust >= 3 ? "判词：影子也有底线。夜哭记下了你划掉的那些名字。" : "",
+        state.foxBond >= 3 ? "判词：狐火曾为陌生人停步。令狐九尾离懂得人间又近了一寸。" : "",
+        state.inkContract >= 3 ? "判词：机关鸟飞过战火，带回来的不止盐晶，还有愿意担责的人心。" : "",
+        state.fireOath >= 3 ? "判词：荒火没有烧穿底线。彤记住了你先撤凡人再破门的顺序。" : ""
+      ].filter(Boolean);
       const penalty = state.karma >= 40 || state.virtue < 35 || reward.hell
         ? "幽都判定：因果偏重，下一世开局更难，但记忆更锋利。"
         : "天命判定：此世因果可承，下一世将带着更多悟性醒来。";
@@ -2122,6 +2133,7 @@
         `最高境界：${realms[state.realm]}`,
         `道德：${state.virtue}　因果：${state.karma}　天命碎片：${state.fragments}`,
         `轮回收益：记忆 +${reward.memory}${reward.fragments ? `，天命碎片 +${reward.fragments}` : ""}${reward.virtue > 0 ? `，下世道德 +${reward.virtue}` : reward.virtue < 0 ? `，下世道德 ${reward.virtue}` : ""}`,
+        ...verdicts,
         penalty
       ];
       return result.join("\n");
