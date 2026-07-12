@@ -2377,7 +2377,8 @@
         hell: ["assets/hell-rebirth.webp", "assets/beiming-road.webp", "assets/cold-shadow.webp"],
         ascendResult: ["assets/tribulation.webp"]
       };
-      const pool = imagePools[state.scene] || ["assets/xiling-ruins.webp"];
+      const configuredArtPools = storyConfig.artPools || {};
+      const pool = configuredArtPools[state.scene] || imagePools[state.scene] || ["assets/xiling-ruins.webp"];
       const src = pool[seededRank(state.scene, "art") % pool.length];
       const positions = ["center center", "center top", "center 38%", "center 58%", "left center", "right center"];
       const position = positions[seededRank(state.scene, "art-position") % positions.length];
@@ -2458,7 +2459,8 @@
 
       if (choice.once) state.flags[choice.once] = true;
       state.turn += 1;
-      if (choice.advanceAct !== false) state.act = Math.min(4, (state.act || 0) + 1);
+      const configuredMaxAct = Math.max(4, (storyConfig.chapters || []).length - 1);
+      if (choice.advanceAct !== false) state.act = Math.min(configuredMaxAct, (state.act || 0) + 1);
       const currentScene = state.scene;
       const intendedScene = choice.to;
       if (choice.effect) choice.effect(state);

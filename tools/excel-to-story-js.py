@@ -137,10 +137,21 @@ def build_config(workbook_path: Path):
         if key and text:
             status_lines[key] = text
 
-    return {
+    art_pools = {}
+    if "ArtPools" in wb.sheetnames:
+        for row in rows_by_header(wb["ArtPools"]):
+            scene = str(row.get("Scene", ""))
+            image = str(row.get("Image", ""))
+            if scene and image:
+                art_pools.setdefault(scene, []).append(image)
+
+    config = {
         "chapters": [chapter for _, chapter in sorted(chapters, key=lambda item: item[0])],
         "statusLines": status_lines,
     }
+    if art_pools:
+        config["artPools"] = art_pools
+    return config
 
 
 def main():
