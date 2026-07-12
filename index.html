@@ -309,7 +309,7 @@
       <section class="side-block">
         <h2>声音</h2>
         <button id="audio-toggle" class="audio-toggle" type="button">
-          <span>大荒主题 / 音效</span>
+          <span>大荒主题音乐 / 音效</span>
           <strong id="audio-state">关</strong>
         </button>
       </section>
@@ -1833,6 +1833,7 @@
       master: null,
       musicStep: 0,
       currentMode: "",
+      userMuted: false,
 
       async start() {
         if (!AudioContextClass) {
@@ -1844,6 +1845,7 @@
           if (!this.ctx) this.ctx = new AudioContextClass();
           if (this.ctx.state === "suspended") await this.ctx.resume();
           this.enabled = true;
+          this.userMuted = false;
           this.startMusic();
           this.play("start");
           this.updateLabel();
@@ -1853,15 +1855,23 @@
         }
       },
 
-      stop() {
+      stop(manual = false) {
         this.enabled = false;
+        if (manual) this.userMuted = true;
         this.stopMusic();
         this.updateLabel();
       },
 
       toggle() {
-        if (this.enabled) this.stop();
-        else this.start();
+        if (this.enabled) this.stop(true);
+        else {
+          this.userMuted = false;
+          this.start();
+        }
+      },
+
+      ensureStarted() {
+        if (!this.enabled && !this.userMuted) this.start();
       },
 
       updateLabel() {
@@ -1872,10 +1882,10 @@
         const danger = state.scene === "hell" || state.scene === "heartDemon" || state.scene === "copperGate";
         const bright = state.scene === "birth" || state.scene === "sect" || state.scene === "foxRoad" || state.scene === "greatCouncil" || state.scene === "trueEnding";
         const cold = state.scene === "northSea" || state.scene === "shadow";
-        if (danger) return { root: 73.42, scale: [1, 1.125, 1.333, 1.5, 1.875, 2], pulse: 4200, drone: [1, 2], color: "dark" };
-        if (cold) return { root: 82.41, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 4600, drone: [1, 2], color: "cold" };
-        if (bright) return { root: 98, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 4000, drone: [1, 2], color: "bright" };
-        return { root: 87.31, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 4300, drone: [1, 2], color: "neutral" };
+        if (danger) return { root: 73.42, scale: [1, 1.125, 1.333, 1.5, 1.875, 2], pulse: 2600, drone: [0.5, 1, 2], color: "dark" };
+        if (cold) return { root: 82.41, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 2900, drone: [0.5, 1, 2], color: "cold" };
+        if (bright) return { root: 98, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2500, drone: [0.5, 1, 2], color: "bright" };
+        return { root: 87.31, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2800, drone: [0.5, 1, 2], color: "neutral" };
       },
 
       updateMusicMode() {
@@ -1889,7 +1899,7 @@
           const target = profile.root * profile.drone[index % profile.drone.length];
           try {
             osc.frequency.setTargetAtTime(target, now, 0.8);
-            gain.gain.setTargetAtTime(index === 0 ? 0.026 : 0.01, now, 1.4);
+            gain.gain.setTargetAtTime([0.058, 0.032, 0.018][index] || 0.014, now, 1.4);
           } catch (error) {}
         });
       },
@@ -1900,7 +1910,7 @@
         const master = this.ctx.createGain();
         const profile = this.profile();
         this.master = master;
-        master.gain.setValueAtTime(0.32, now);
+        master.gain.setValueAtTime(0.62, now);
         master.connect(this.ctx.destination);
 
         profile.drone.forEach((ratio, index) => {
@@ -1908,7 +1918,7 @@
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
           osc.frequency.setValueAtTime(profile.root * ratio, now);
-          gain.gain.setValueAtTime(index === 0 ? 0.026 : 0.01, now);
+          gain.gain.setValueAtTime([0.058, 0.032, 0.018][index] || 0.014, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
@@ -1921,7 +1931,7 @@
         this.timer = window.setInterval(() => {
           if (!this.enabled || !this.ctx) return;
           this.scheduleTheme();
-        }, 3900);
+        }, 1850);
       },
 
       stopMusic() {
@@ -2009,8 +2019,8 @@
       xiao(frequency, startTime, volume = 0.03) {
         if (!this.enabled || !this.ctx) return;
         const now = startTime || this.ctx.currentTime;
-        this.tone(frequency, 2.8, volume, "sine", now, this.master || undefined);
-        this.tone(frequency * 1.005, 2.4, volume * 0.5, "sine", now + 0.05, this.master || undefined);
+        this.tone(frequency, 2.9, volume, "sine", now, this.master || undefined);
+        this.tone(frequency * 1.005, 2.5, volume * 0.55, "sine", now + 0.05, this.master || undefined);
       },
 
       drum(startTime, volume = 0.012) {
@@ -2029,11 +2039,12 @@
         const ratio = profile.scale[phrase[step] % profile.scale.length];
         const base = profile.root * 2 * ratio;
         const beat = profile.pulse / 1000;
-        this.pluck(base, now, profile.color === "dark" ? 0.04 : 0.055);
-        if (step % 4 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.36, profile.color === "bright" ? 0.022 : 0.016);
-        if (step % 8 === 4) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.35, profile.color === "cold" ? 0.035 : 0.026);
-        if (profile.color === "dark" && step % 8 === 0) this.drum(now + 0.18, 0.014);
-        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.4, 0.018, "sine", now + 0.4, this.master || undefined);
+        this.pluck(base, now, profile.color === "dark" ? 0.065 : 0.082);
+        this.pluck(base * 1.5, now + beat * 0.34, profile.color === "dark" ? 0.032 : 0.044);
+        if (step % 2 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.22, profile.color === "bright" ? 0.034 : 0.026);
+        if (step % 4 === 1) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.28, profile.color === "cold" ? 0.052 : 0.04);
+        if (profile.color === "dark" && step % 4 === 0) this.drum(now + 0.14, 0.022);
+        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.6, 0.028, "sine", now + 0.35, this.master || undefined);
         this.musicStep += 1;
       },
 
@@ -2548,7 +2559,10 @@
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = choice.text;
-        button.addEventListener("click", () => choose(choice));
+        button.addEventListener("click", () => {
+          audio.ensureStarted();
+          choose(choice);
+        });
         choices.appendChild(button);
       });
 
