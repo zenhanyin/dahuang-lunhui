@@ -91,10 +91,28 @@
       overflow: hidden;
     }
 
-    .sketch svg {
+    .sketch img {
       width: 100%;
       height: 100%;
       display: block;
+      object-fit: cover;
+    }
+
+    .art-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #101711;
+    }
+
+    .art-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(16, 23, 17, 0.08), rgba(16, 23, 17, 0.18)),
+        radial-gradient(circle at 24% 24%, rgba(216, 179, 95, 0.12), transparent 36%);
+      pointer-events: none;
     }
 
     .choices {
@@ -1495,7 +1513,7 @@
           const target = profile.root * profile.drone[index % profile.drone.length];
           try {
             osc.frequency.setTargetAtTime(target, now, 0.8);
-            gain.gain.setTargetAtTime(index === 0 ? 0.42 : 0.16, now, 0.8);
+            gain.gain.setTargetAtTime(index === 0 ? 0.62 : 0.24, now, 0.8);
           } catch (error) {}
         });
       },
@@ -1506,7 +1524,7 @@
         const master = this.ctx.createGain();
         const profile = this.profile();
         this.master = master;
-        master.gain.setValueAtTime(0.055, now);
+        master.gain.setValueAtTime(0.16, now);
         master.connect(this.ctx.destination);
 
         profile.drone.forEach((ratio, index) => {
@@ -1514,7 +1532,7 @@
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
           osc.frequency.setValueAtTime(profile.root * ratio, now);
-          gain.gain.setValueAtTime(index === 0 ? 0.42 : 0.16, now);
+          gain.gain.setValueAtTime(index === 0 ? 0.62 : 0.24, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
@@ -1523,6 +1541,9 @@
 
         this.currentMode = "";
         this.updateMusicMode();
+        this.scheduleTheme();
+        window.setTimeout(() => this.scheduleTheme(), 260);
+        window.setTimeout(() => this.scheduleTheme(), 560);
         this.timer = window.setInterval(() => {
           if (!this.enabled || !this.ctx) return;
           this.scheduleTheme();
@@ -1622,14 +1643,14 @@
         const now = this.ctx.currentTime;
         const patterns = {
           click: [[220, 0], [330, 0.045]],
-          start: [[196, 0], [294, 0.09], [392, 0.18]],
+          start: [[165, 0], [220, 0.12], [247, 0.24], [330, 0.38], [440, 0.56]],
           break: [[330, 0], [495, 0.08], [660, 0.16]],
           rebirth: [[147, 0], [220, 0.11], [330, 0.24]],
           ending: [[392, 0], [523, 0.13], [784, 0.34]],
           danger: [[110, 0], [98, 0.12], [82, 0.24]]
         };
         (patterns[kind] || patterns.click).forEach(([frequency, offset]) => {
-          this.tone(frequency, 0.18, kind === "danger" ? 0.07 : 0.05, kind === "danger" ? "sawtooth" : "sine", now + offset);
+          this.tone(frequency, kind === "start" ? 0.34 : 0.18, kind === "danger" ? 0.09 : 0.075, kind === "danger" ? "sawtooth" : "sine", now + offset);
         });
       }
     };
@@ -1891,6 +1912,17 @@
       </svg>`;
     }
 
+    function artworkForState(scene) {
+      const copperScenes = new Set(["copperGate", "northSea", "hell", "heartDemon", "ascend", "falseAscend", "trueAscend", "breakWheel", "sacrifice"]);
+      const src = copperScenes.has(state.scene) ? "assets/copper-gate.png" : "assets/xiling-ruins.png";
+      const filter = state.scene === "hell" || state.scene === "heartDemon"
+        ? "contrast(1.08) saturate(0.9) hue-rotate(-8deg)"
+        : state.scene === "northSea"
+          ? "contrast(1.05) saturate(0.85) hue-rotate(12deg)"
+          : "contrast(1.03) saturate(0.95)";
+      return `<div class="art-frame"><img src="${src}" alt="${scene.title}" style="filter:${filter};"></div>`;
+    }
+
     function availableChoices(scene) {
       return (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
     }
@@ -1962,7 +1994,7 @@
       sceneTitle.textContent = scene.title;
       sceneTitle.className = scene.ending ? "ending" : "";
       sceneText.textContent = variedSceneText(scene, textOf(scene.text));
-      if (sceneSketch) sceneSketch.innerHTML = sketchForState(scene);
+      if (sceneSketch) sceneSketch.innerHTML = artworkForState(scene);
       audio.updateMusicMode();
 
       choices.innerHTML = "";
