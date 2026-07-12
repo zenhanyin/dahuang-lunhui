@@ -46,6 +46,24 @@ function contentType(pathname) {
 export default {
   async fetch(request) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/track") {
+      if (request.method !== "POST") {
+        return new Response(JSON.stringify({ ok: false, error: "method_not_allowed" }), {
+          status: 405,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store"
+          }
+        });
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store"
+        }
+      });
+    }
+
     if (url.pathname in imageAssets) {
       const bytes = Uint8Array.from(atob(imageAssets[url.pathname]), char => char.charCodeAt(0));
       return new Response(bytes, {
