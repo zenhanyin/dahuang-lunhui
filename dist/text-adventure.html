@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- deploy: webp-art-v2 -->
-  <title>?????</title>
+  <title>&#22823;&#33618;&#36718;&#22238;&#24405;</title>
   <style>
     :root {
       color-scheme: dark;
@@ -1477,6 +1477,56 @@
     const playerSeed = browserSeed();
     let state = cloneData(freshLife);
 
+    function analyticsSessionId() {
+      try {
+        const key = "dahuang-analytics-session";
+        let id = window.sessionStorage && window.sessionStorage.getItem(key);
+        if (!id) {
+          id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+          window.sessionStorage && window.sessionStorage.setItem(key, id);
+        }
+        return id;
+      } catch (error) {
+        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      }
+    }
+
+    const analyticsSession = analyticsSessionId();
+    let lastTrackedScene = "";
+
+    function track(eventName, detail = {}) {
+      const payload = {
+        event: eventName,
+        session: analyticsSession,
+        player: hashText(playerSeed).toString(16),
+        scene: state.scene,
+        life: state.life,
+        realm: realms[state.realm],
+        path: state.path,
+        virtue: state.virtue,
+        karma: state.karma,
+        fragments: state.fragments,
+        turn: state.turn,
+        ts: Date.now(),
+        detail
+      };
+      const body = JSON.stringify(payload);
+      try {
+        if (navigator.sendBeacon) {
+          const sent = navigator.sendBeacon("/api/track", new Blob([body], { type: "application/json" }));
+          if (sent) return;
+        }
+      } catch (error) {}
+      try {
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body,
+          keepalive: true
+        }).catch(() => {});
+      } catch (error) {}
+    }
+
 
     const sceneTitle = document.querySelector("#scene-title");
     const sceneText = document.querySelector("#scene-text");
@@ -1545,10 +1595,10 @@
         const danger = state.scene === "hell" || state.scene === "heartDemon" || state.scene === "copperGate";
         const bright = state.scene === "birth" || state.scene === "sect" || state.scene === "foxRoad" || state.scene === "greatCouncil" || state.scene === "trueEnding";
         const cold = state.scene === "northSea" || state.scene === "shadow";
-        if (danger) return { root: 82.41, scale: [1, 1.125, 1.2, 1.5, 1.6, 1.875, 2], pulse: 980, drone: [0.72, 1, 1.2], color: "dark" };
-        if (cold) return { root: 98, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 1420, drone: [1, 1.5, 2], color: "cold" };
-        if (bright) return { root: 110, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 1180, drone: [1, 1.5, 2], color: "bright" };
-        return { root: 103.83, scale: [1, 1.125, 1.25, 1.5, 1.666, 1.875, 2], pulse: 1280, drone: [1, 1.5, 2], color: "neutral" };
+        if (danger) return { root: 73.42, scale: [1, 1.125, 1.333, 1.5, 1.875, 2], pulse: 4200, drone: [1, 2], color: "dark" };
+        if (cold) return { root: 82.41, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 4600, drone: [1, 2], color: "cold" };
+        if (bright) return { root: 98, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 4000, drone: [1, 2], color: "bright" };
+        return { root: 87.31, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 4300, drone: [1, 2], color: "neutral" };
       },
 
       updateMusicMode() {
@@ -1562,7 +1612,7 @@
           const target = profile.root * profile.drone[index % profile.drone.length];
           try {
             osc.frequency.setTargetAtTime(target, now, 0.8);
-            gain.gain.setTargetAtTime(index === 0 ? 0.62 : 0.24, now, 0.8);
+            gain.gain.setTargetAtTime(index === 0 ? 0.045 : 0.018, now, 1.4);
           } catch (error) {}
         });
       },
@@ -1573,7 +1623,7 @@
         const master = this.ctx.createGain();
         const profile = this.profile();
         this.master = master;
-        master.gain.setValueAtTime(0.16, now);
+        master.gain.setValueAtTime(0.075, now);
         master.connect(this.ctx.destination);
 
         profile.drone.forEach((ratio, index) => {
@@ -1581,7 +1631,7 @@
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
           osc.frequency.setValueAtTime(profile.root * ratio, now);
-          gain.gain.setValueAtTime(index === 0 ? 0.62 : 0.24, now);
+          gain.gain.setValueAtTime(index === 0 ? 0.045 : 0.018, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
@@ -1591,12 +1641,10 @@
         this.currentMode = "";
         this.updateMusicMode();
         this.scheduleTheme();
-        window.setTimeout(() => this.scheduleTheme(), 260);
-        window.setTimeout(() => this.scheduleTheme(), 560);
         this.timer = window.setInterval(() => {
           if (!this.enabled || !this.ctx) return;
           this.scheduleTheme();
-        }, 980);
+        }, 3900);
       },
 
       stopMusic() {
@@ -1634,7 +1682,7 @@
         } catch (error) {}
       },
 
-      pluck(frequency, startTime, volume = 0.04) {
+      pluck(frequency, startTime, volume = 0.016) {
         if (!this.enabled || !this.ctx) return;
         try {
           const now = startTime || this.ctx.currentTime;
@@ -1644,29 +1692,35 @@
           osc.type = "triangle";
           osc.frequency.setValueAtTime(frequency, now);
           filter.type = "lowpass";
-          filter.frequency.setValueAtTime(1800, now);
-          filter.frequency.exponentialRampToValueAtTime(420, now + 0.42);
+          filter.frequency.setValueAtTime(900, now);
+          filter.frequency.exponentialRampToValueAtTime(240, now + 1.1);
           gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
           osc.connect(filter);
           filter.connect(gain);
           gain.connect(this.master || this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 1);
+          osc.stop(now + 1.95);
         } catch (error) {}
       },
 
-      breath(frequency, startTime, volume = 0.018) {
-        this.tone(frequency, 1.6, volume, "sine", startTime, this.master || undefined);
-        this.tone(frequency * 2.01, 1.2, volume * 0.28, "sine", (startTime || this.ctx.currentTime) + 0.04, this.master || undefined);
+      breath(frequency, startTime, volume = 0.006) {
+        this.tone(frequency, 3.2, volume, "sine", startTime, this.master || undefined);
+        this.tone(frequency * 2.01, 2.4, volume * 0.16, "sine", (startTime || this.ctx.currentTime) + 0.12, this.master || undefined);
       },
 
-      drum(startTime, volume = 0.05) {
+      xiao(frequency, startTime, volume = 0.01) {
         if (!this.enabled || !this.ctx) return;
         const now = startTime || this.ctx.currentTime;
-        this.tone(62, 0.14, volume, "sine", now, this.master || undefined);
-        this.tone(42, 0.22, volume * 0.55, "triangle", now + 0.02, this.master || undefined);
+        this.tone(frequency, 2.8, volume, "sine", now, this.master || undefined);
+        this.tone(frequency * 1.005, 2.4, volume * 0.5, "sine", now + 0.05, this.master || undefined);
+      },
+
+      drum(startTime, volume = 0.012) {
+        if (!this.enabled || !this.ctx) return;
+        const now = startTime || this.ctx.currentTime;
+        this.tone(62, 0.18, volume, "sine", now, this.master || undefined);
       },
 
       scheduleTheme() {
@@ -1674,16 +1728,16 @@
         this.updateMusicMode();
         const profile = this.profile();
         const now = this.ctx.currentTime;
-        const phrase = [0, 2, 4, 3, 2, 5, 4, 1, 0, 2, 3, 5, 4, 2, 1, 0];
+        const phrase = [0, 2, 3, 5, 3, 2, 0, 1, 2, 5, 4, 3, 2, 1, 0, 0];
         const step = this.musicStep % phrase.length;
         const ratio = profile.scale[phrase[step] % profile.scale.length];
         const base = profile.root * 2 * ratio;
         const beat = profile.pulse / 1000;
-        this.pluck(base, now, profile.color === "dark" ? 0.032 : 0.044);
-        if (step % 4 === 0) this.breath(profile.root * 4 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.12, profile.color === "bright" ? 0.022 : 0.015);
-        if (profile.color === "dark" && step % 2 === 0) this.drum(now + 0.05, 0.055);
-        if (profile.color === "cold" && step % 4 === 2) this.tone(base * 1.5, 0.45, 0.018, "sine", now + beat * 0.45, this.master || undefined);
-        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 0.7, 0.018, "sine", now + 0.28, this.master || undefined);
+        this.pluck(base, now, profile.color === "dark" ? 0.01 : 0.014);
+        if (step % 4 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.36, profile.color === "bright" ? 0.007 : 0.005);
+        if (step % 8 === 4) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.35, profile.color === "cold" ? 0.012 : 0.008);
+        if (profile.color === "dark" && step % 8 === 0) this.drum(now + 0.18, 0.006);
+        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.4, 0.006, "sine", now + 0.4, this.master || undefined);
         this.musicStep += 1;
       },
 
@@ -1692,14 +1746,14 @@
         const now = this.ctx.currentTime;
         const patterns = {
           click: [[220, 0], [330, 0.045]],
-          start: [[165, 0], [220, 0.12], [247, 0.24], [330, 0.38], [440, 0.56]],
+          start: [[220, 0], [330, 0.18], [440, 0.38]],
           break: [[330, 0], [495, 0.08], [660, 0.16]],
           rebirth: [[147, 0], [220, 0.11], [330, 0.24]],
           ending: [[392, 0], [523, 0.13], [784, 0.34]],
           danger: [[110, 0], [98, 0.12], [82, 0.24]]
         };
         (patterns[kind] || patterns.click).forEach(([frequency, offset]) => {
-          this.tone(frequency, kind === "start" ? 0.34 : 0.18, kind === "danger" ? 0.09 : 0.075, kind === "danger" ? "sawtooth" : "sine", now + offset);
+          this.tone(frequency, kind === "start" ? 0.32 : 0.16, kind === "danger" ? 0.035 : 0.035, "sine", now + offset);
         });
       }
     };
@@ -1731,43 +1785,43 @@
       if (scene.ending) return baseText;
 
       const weather = [
-        "?????????????????????",
-        "???????????????????",
-        "?????????????????????????",
-        "??????????????????"
+        "薄雾从山谷里漫上来，像上一世没有说完的话。",
+        "风掠过竹林，几片落叶在你脚边排成卦象。",
+        "远处钟声忽近忽远，仿佛有门派在另一条时间线上叩门。",
+        "灵气在空气里浮动，像水面细碎的月光。"
       ];
       const morality = state.virtue >= 70
-        ? ["?????????????????????", "?????????????????"]
+        ? ["你心口有一缕清光，照得许多选择都不再混浊。", "功德不替你赢，却让雷云迟疑了一息。"]
         : state.virtue <= 35
-          ? ["?????????????????????", "?????????????????"]
-          : ["???????????????????????", "???????????????????"];
-      const pathTone = state.path === "??"
-        ? ["?????????????????????", "?????????????????????"]
-        : state.path === "??"
-          ? ["???????????????????", "?????????????????????"]
-          : state.path === "??"
-            ? ["????????????????????????", "????????????????????"]
-            : ["????????????????????????"];
+          ? ["因果像冷铁贴在腕上，提醒你有些账还没有还。", "幽都很近，近到像一口井在脚下张开。"]
+          : ["人间的善恶没有替你做决定，只把重量放回你掌心。", "你仍在路中间，左边是捷径，右边是长阶。"];
+      const pathTone = state.path === "邪修"
+        ? ["偏锋之法在经脉里低鸣，像一柄尚未出鞘的刀。", "险法给你速度，也逼你更早回答自己为何修行。"]
+        : state.path === "正修"
+          ? ["吐纳之间，灵台如井，倒映出更高处的云。", "正修不让你少受苦，只让你在苦里不轻易变形。"]
+          : state.path === "兼修"
+            ? ["阴阳两脉在丹田边缘相望，像两条最终汇入一处的河。", "你开始明白，法门有阴阳，底线却不能分裂。"]
+            : ["旧梦贴着识海翻动，你还没有决定这一世要走哪条路。"];
       const sceneLore = {
-        birth: ["?????????????????????????", "?????????????????????????"],
-        memoryArchive: ["?????????????????????????????", "??????????????????????????????"],
-        jadeClue: ["??????????????????????????????", "?????????????????????"],
-        copperGate: ["???????????????????????", "????????????????????????"],
-        northSea: ["????????????????????????", "???????????????????????"],
-        greatCouncil: ["??????????????????????????", "???????????????????????????"],
-        heartDemon: ["????????????????????????", "?????????????????????????????"],
-        hell: ["?????????????????????", "???????????????????????????"],
-        trueAscend: ["??????????????????????????", "???????????????????????"],
-        trueEnding: ["???????????????????????????"],
-        falseAscend: ["?????????????????"],
-        sacrifice: ["????????????????????????????"]
+        birth: ["西陵城墙仍有旧火痕，城外难民把大荒的风声听成命数。", "这一世显现的路并不完整，像天命故意只露出几枚棋子。"],
+        memoryArchive: ["绝地天通之后，神与人的道路被强行切开，可裂缝从未真正合拢。", "九天登神大典的残影掠过识海，你听见有人在云端抹去凡人的名字。"],
+        jadeClue: ["云麓残卷提到东海神域，那里不是天外桃源，而是旧神边界的潮汐。", "天书页边有盐痕，像从东海尽头的神门里漂来。"],
+        copperGate: ["太古铜门不是门，更像一枚钉在大荒命脉上的旧钉。", "铜纹里藏着旧神的誓言，也藏着东海神域不愿承认的债。"],
+        northSea: ["北溟风雪把人的名字吹得很薄，唯有执念会越冻越亮。", "幽都的方向没有星光，只有旧神沉默时留下的回声。"],
+        greatCouncil: ["八大门派同席时，谁也不愿先承认自己也曾向神明借过火。", "天机、冰心、云麓、魍魉各守一端，拼起来才像半部大荒史。"],
+        heartDemon: ["心魔并不总说谎，它只是把你不愿看的真话说得太尖。", "镜阵里每一世都在发问：变强之后，你还愿不愿意把手伸向人间？"],
+        hell: ["幽都不惩罚法门，只追问你把力量用在了哪里。", "黄泉尽头仍有回人间的路，只是每一步都要踩过自己的因果。"],
+        trueAscend: ["真正的飞升不是离开大荒，而是能在天门之后仍回望人间。", "东海神域的潮声终于退去，露出被旧神藏起的天阶。"],
+        trueEnding: ["神界边界被重新写下：凡人不是祭品，门派也不该只是棋子。"],
+        falseAscend: ["天门若只认力量，便只是另一座幽都。"],
+        sacrifice: ["以身补门不是失败，若能让后来者少走一段黑路，便也是登神。"]
       };
       const omen = state.karma >= 30
-        ? ["???????????????????"]
+        ? ["乌线缠上天边，某个债主正在命数里转身。"]
         : state.fragments >= 3
-          ? ["????????????????????"]
-          : ["????????????????????"];
-      const lore = sceneLore[state.scene] || ["????????????????????????"];
+          ? ["天命碎片微微发热，画出一扇并不完整的门。"]
+          : ["这一次轮回仍有空白，空白处也许藏着新路。"];
+      const lore = sceneLore[state.scene] || ["大荒很大，大到每一条支流都能把人带向另一种结局。"];
 
       return pick(weather, "weather") + "\n" + pick(morality, "morality") + "\n" + pick(pathTone, "path") + "\n" + pick(lore, "lore") + "\n" + pick(omen, "omen") + "\n\n" + baseText;
     }
