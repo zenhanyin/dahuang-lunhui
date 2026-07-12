@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>轮回问道</title>
+  <title>大荒轮回录</title>
   <style>
     :root {
       color-scheme: dark;
@@ -233,8 +233,8 @@
 <body>
   <main>
     <section class="story" aria-live="polite">
-      <h1>轮回问道</h1>
-      <p class="subtitle">带着记忆重生的修仙文字模拟器</p>
+      <h1>大荒轮回录</h1>
+      <p class="subtitle">在大荒诸门与幽都裂隙之间，带着记忆重走天命</p>
       <h2 id="scene-title"></h2>
       <p id="scene-text"></p>
       <div id="scene-sketch" class="sketch" aria-label="当前道途简笔画"></div>
@@ -279,7 +279,7 @@
       <section class="side-block">
         <h2>声音</h2>
         <button id="audio-toggle" class="audio-toggle" type="button">
-          <span>音效 / 音乐</span>
+          <span>大荒主题 / 音效</span>
           <strong id="audio-state">关</strong>
         </button>
       </section>
@@ -305,13 +305,6 @@
       flags: {},
       log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
     };
-
-    function cloneData(value) {
-      if (typeof structuredClone === "function") return structuredClone(value);
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    let state = cloneData(freshLife);
 
     const scenes = {
       birth: {
@@ -785,6 +778,639 @@
       }
     };
 
+    Object.keys(scenes).forEach(key => delete scenes[key]);
+    Object.assign(scenes, {
+      birth: {
+        title: "西陵旧梦",
+        text: () => `第 ${state.life} 世，你在西陵城外醒来。\n\n太古铜门的黑影仍悬在北方，城墙上残留着妖魔攻城后的焦痕。上一世，你见过云麓火落、天机断阵、冰心药庐满地灯盏，也见过自称玄晖的旅人孤身往北溟去。\n\n这一世，你仍带着记忆。你知道大荒不是简单的正邪之争：有人以邪影自保，有妖为人守城，有神子坠泥仍不肯低头。你要先把自己交给哪一条路？`,
+        choices: [
+          {
+            text: "入天机营，先守住西陵百姓",
+            to: "sect",
+            effect: s => {
+              s.path = "天机营";
+              s.qi += 16 + s.talent;
+              s.virtue += 14;
+              s.years += 2;
+              s.log = "铁甲很沉，但城门后的哭声更沉。你学会把盾立在人前。";
+            }
+          },
+          {
+            text: "赴冰心堂，学医也学毒",
+            to: "iceHeart",
+            effect: s => {
+              s.path = "冰心堂";
+              s.qi += 14 + s.talent;
+              s.virtue += 10;
+              s.log = "冰心长老说：药可救人，毒也可止恶，难的是下手时心要清醒。";
+            }
+          },
+          {
+            text: "往雷泽寻魍魉，学暗影里的刀",
+            to: "shadow",
+            effect: s => {
+              s.path = "魍魉";
+              s.qi += 24 + s.talent;
+              s.karma += 7;
+              s.log = "雷泽雾深，影之主留下的试炼不问出身，只问你为何拔刀。";
+            }
+          },
+          {
+            text: "用记忆点换一次大荒旧闻",
+            to: "memoryArchive",
+            requires: s => s.memory >= 3,
+            effect: s => {
+              s.memory -= 3;
+              s.talent += 4;
+              s.log = "你把上一世的碎梦串成线：铜门、幽都、登神大典，似乎从来不是三件事。";
+            }
+          }
+        ]
+      },
+
+      memoryArchive: {
+        title: "旧闻成线",
+        text: "你在梦中看见三段旧史：绝地天通后，神与人被迫分途；九天登神大典让凡人仰望天阶，也让某些神明学会俯视人间；北溟幽都之王守着铜门，像守着一段不能让世人知道的真相。\n\n醒来时，你掌心多了一枚淡金色裂纹。它不像法器，更像一段被命运删去的注脚。",
+        choices: [
+          {
+            text: "记下铜门裂纹",
+            to: "birth",
+            once: "memoryArchiveShard",
+            effect: s => {
+              s.fragments += 1;
+              s.qi += 8 + s.talent;
+              s.log = "天命碎片并不发光，只在你提到北溟时微微发烫。";
+            }
+          },
+          { text: "回到西陵城外", to: "birth" }
+        ]
+      },
+
+      sect: {
+        title: "天机残阵",
+        text: "天机营的营旗被烟熏得发黑。普通士卒一边修城墙，一边把最后的干粮分给逃难者。\n\n你想起人物志里那只青丘九尾狐：他本来只想理解人间感情，却在长合镇看见天机将士以盾挡妖，终于明白“情”有时就是站在别人前面。",
+        choices: [
+          {
+            text: "护送难民去长合镇",
+            to: "foxRoad",
+            effect: s => {
+              s.virtue += 18;
+              s.qi += 12 + s.talent;
+              s.years -= 1;
+              s.log = "你护住了一队孩子。有人问你的名字，你只说：下一世还会来的。";
+            }
+          },
+          {
+            text: "修复天机断阵，准备再守一次城",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 30 + s.talent;
+              s.virtue += 6;
+              s.years -= 2;
+              s.log = "阵眼亮起时，你听见城墙深处有上古金铁之声回应。";
+            }
+          },
+          {
+            text: "追查是谁故意放开铜门防线",
+            to: "jadeClue",
+            effect: s => {
+              s.qi += 18 + s.talent;
+              s.fragments += 1;
+              s.log = "线索指向一枚碎裂玉符，上面残留着云麓与太虚两脉都不愿承认的咒痕。";
+            }
+          }
+        ]
+      },
+
+      iceHeart: {
+        title: "冰心药庐",
+        text: "江南药庐灯火通明。伤者从西陵一路送来，有天机士卒，有云麓弟子，也有被妖魔裹挟的化生魔。\n\n冰心堂内部仍在争论医毒之界：若毒能让一支妖魔小队昏睡，算救人还是伤生？若药只能救一人，你要先救无辜者，还是救握有情报的敌将？",
+        choices: [
+          {
+            text: "以医术救人，不问阵营",
+            to: "foxRoad",
+            effect: s => {
+              s.virtue += 20;
+              s.qi += 10 + s.talent;
+              s.karma = Math.max(0, s.karma - 5);
+              s.log = "一个化生魔醒来后没有道谢，只低声说：北溟有人也不想开战。";
+            }
+          },
+          {
+            text: "炼迷魂毒，阻止下一波攻城",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 26 + s.talent;
+              s.karma += 5;
+              s.virtue += 5;
+              s.log = "毒雾没有夺命，却让你明白：手段越锋利，越要有人守着边界。";
+            }
+          },
+          {
+            text: "追随冷喻旧案，查邪影真言",
+            to: "coldShadow",
+            effect: s => {
+              s.path = "太虚邪影";
+              s.qi += 24 + s.talent;
+              s.karma += 6;
+              s.log = "冷喻的故事像一根刺：被称为魔女的人，未必从一开始就想伤人。";
+            }
+          }
+        ]
+      },
+
+      shadow: {
+        title: "雷泽影试",
+        text: "雷泽湿雾像一张没有边缘的网。魍魉长老让你在沉船旧地等一夜，若天亮前仍没有暴露呼吸，才算入门。\n\n夜半，你看见一道黑影在月下练刀。那不是鬼，是夜哭留下的影步残象。影之主的传承不只教人杀，也教人明白哪些目标不能碰。",
+        choices: [
+          {
+            text: "只接刺杀妖魔统领的任务",
+            to: "copperGate",
+            effect: s => {
+              s.qi += 34 + s.talent;
+              s.karma += 6;
+              s.virtue += 6;
+              s.log = "刀从阴影里出，却没有落向无辜者。雷泽长老第一次正眼看你。";
+            }
+          },
+          {
+            text: "偷取六翼令，强行掌控情报网",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 42 + s.talent;
+              s.karma += 18;
+              s.virtue -= 12;
+              s.log = "情报来得太快，快到你开始把人命看成棋子。";
+            }
+          },
+          {
+            text: "追踪夜哭旧路，查玉玑子与七夜的盟约",
+            to: "jadeClue",
+            effect: s => {
+              s.qi += 22 + s.talent;
+              s.fragments += 1;
+              s.log = "你发现所谓盟约里有一页被撕去，撕口残留北溟寒气。";
+            }
+          }
+        ]
+      },
+
+      foxRoad: {
+        title: "长合镇狐火",
+        text: "长合镇外，难民队伍被妖魔斥候截住。一个书生模样的男子站在路边，袖中却有九道白影微微摇动。\n\n他自称令狐九尾，说自己仍不太理解人类为何愿意替陌生人挡刀。但当第一面天机盾牌倒下时，他抬手放出狐火，火光温柔，却足以逼退群魔。",
+        choices: [
+          {
+            text: "与令狐九尾并肩护送百姓",
+            to: "copperGate",
+            effect: s => {
+              s.virtue += 18;
+              s.qi += 20 + s.talent;
+              s.karma = Math.max(0, s.karma - 4);
+              s.log = "九尾狐说：这大概就是感情。你说：也是大荒还能被称为人间的原因。";
+            }
+          },
+          {
+            text: "请求狐火幻术，潜入妖魔营",
+            to: "jadeClue",
+            effect: s => {
+              s.qi += 28 + s.talent;
+              s.karma += 4;
+              s.log = "狐火遮住你的气息，却遮不住你看见铜门深处时的寒意。";
+            }
+          }
+        ]
+      },
+
+      coldShadow: {
+        title: "邪影与白羽",
+        text: "深山海崖边，你找到冷喻旧居。传闻里的太虚魔女没有坐在尸山血海上，她只是坐在玄龟背上，看一场很慢的夕阳。\n\n她问你：若世界先把一个人推成魔，再要求她证明自己无辜，这样的正道，算不算正？莫非云留下的白羽压在桌上，干净得像一句迟来的证词。",
+        choices: [
+          {
+            text: "向冷喻学会控制邪影，而非放纵邪影",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 32 + s.talent;
+              s.karma += 5;
+              s.virtue += 8;
+              s.fragments += 1;
+              s.log = "邪影第一次没有吞噬你，而是站到你身后。";
+            }
+          },
+          {
+            text: "用邪影报复所有污名你的人",
+            to: "hell",
+            effect: s => {
+              s.qi += 48 + s.talent;
+              s.karma += 40;
+              s.virtue -= 30;
+              s.log = "你赢了争辩，却输给了伤口。幽冥的门在你脚下张开。";
+            }
+          },
+          {
+            text: "带走莫非云白羽，去云麓查旧案",
+            to: "jadeClue",
+            effect: s => {
+              s.virtue += 10;
+              s.qi += 16 + s.talent;
+              s.fragments += 1;
+              s.log = "白羽不替任何门派辩解，只证明世上仍有人会做干净的选择。";
+            }
+          }
+        ]
+      },
+
+      jadeClue: {
+        title: "玉符裂痕",
+        text: "你沿着玉符裂痕查到一段被故意掩去的旧事：太古铜门不是单纯的封印，它也是神界、幽都与人间互相推卸代价的门。\n\n玉玑子想借乱世重塑秩序，七夜想让幽都不再只是被封在北溟的阴影。两人的路都不干净，却都不是一句“邪恶”能概括。",
+        choices: [
+          {
+            text: "公开玉符证据，联合诸门审问真相",
+            to: "greatCouncil",
+            effect: s => {
+              s.virtue += 20;
+              s.qi += 18 + s.talent;
+              s.karma = Math.max(0, s.karma - 8);
+              s.fragments += 1;
+              s.log = "天机、冰心、云麓、魍魉第一次坐到同一张案前，所有人都不舒服，但都没有离席。";
+            }
+          },
+          {
+            text: "独自夺取玉符，先拿力量再谈真相",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 44 + s.talent;
+              s.karma += 16;
+              s.virtue -= 8;
+              s.log = "你离答案更近，却离别人更远。轮回最喜欢这种孤独。";
+            }
+          },
+          {
+            text: "追随玄晖北上，直问幽都王颛顼",
+            to: "northSea",
+            effect: s => {
+              s.qi += 24 + s.talent;
+              s.fragments += 1;
+              s.years -= 2;
+              s.log = "北溟风雪里，有人仍以人身背负太阳神子的骄傲。";
+            }
+          }
+        ]
+      },
+
+      copperGate: {
+        title: "太古铜门",
+        text: "太古铜门前，妖魔军阵如潮。门缝里不是单纯魔气，而是更古老的神界余烬，像有人把上古旧债全都塞进这道门里。\n\n你忽然明白：若只把门关上，下一世它还会再开。若只把敌人杀尽，新的敌人会从同一段谎言里长出来。",
+        choices: [
+          {
+            text: "守门救人，先撑过这一夜",
+            to: "tribulation",
+            effect: s => {
+              s.virtue += 16;
+              s.qi += 30 + s.talent;
+              s.years -= 2;
+              s.log = "这一夜很长，但城中灯火没有灭。";
+            }
+          },
+          {
+            text: "入门取证，查铜门深处的上古契约",
+            to: "northSea",
+            effect: s => {
+              s.qi += 34 + s.talent;
+              s.karma += 6;
+              s.fragments += 1;
+              s.log = "铜门内侧刻着一行字：绝地天通之后，仍有人想重开天梯。";
+            }
+          },
+          {
+            text: "借妖魔之势磨炼自己",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 46 + s.talent;
+              s.karma += 12;
+              s.virtue -= 5;
+              s.log = "你没有主动害人，但你开始把灾难当作修行资源。这个念头很冷。";
+            }
+          }
+        ]
+      },
+
+      northSea: {
+        title: "北溟雪路",
+        text: "北溟没有传说里那么遥远，只是每走一步，都像有人在命里加一层霜。\n\n玄晖在风雪中前行。他曾是太阳神子东皇太一，也曾是被碾入泥中的化生魔。他要见幽都王颛顼，不是为了认父，而是为了问：为什么众生总要替神明的旧错付账？",
+        choices: [
+          {
+            text: "陪玄晖入幽都王庭",
+            to: "greatCouncil",
+            effect: s => {
+              s.qi += 28 + s.talent;
+              s.fragments += 1;
+              s.virtue += 8;
+              s.log = "玄晖没有回头，只说：若我倒下，替我把问题问完。";
+            }
+          },
+          {
+            text: "以北溟寒气淬炼自身",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 40 + s.talent;
+              s.karma += 8;
+              s.years -= 2;
+              s.log = "寒气入骨，你的力量更纯，也更不近人情。";
+            }
+          },
+          {
+            text: "偷听幽都密议，独占真相",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 36 + s.talent;
+              s.karma += 15;
+              s.virtue -= 6;
+              s.log = "真相若只被一个人握住，就会变成另一种权力。";
+            }
+          }
+        ]
+      },
+
+      greatCouncil: {
+        title: "大荒诸门会盟",
+        text: "西陵废墟上，诸门终于会盟。天机带来守城军册，冰心带来伤者名录，魍魉带来暗杀名单，云麓带来天书残页，翎羽送来遗墨修复的机关图。\n\n争吵持续三日。有人要杀尽幽都，有人要重开登神大典，有人只想关门自保。你知道，这就是大荒：众声喧哗，却仍有人愿意为了不相识的人留下。",
+        choices: [
+          {
+            text: "提出新约：诸门共守铜门，共审神明旧契",
+            to: "breakWheel",
+            requires: s => s.fragments >= 4 && s.virtue >= 55,
+            effect: s => {
+              s.qi += 28 + s.talent;
+              s.virtue += 15;
+              s.log = "不是所有人都信你，但至少他们愿意先不拔剑。";
+            }
+          },
+          {
+            text: "以武压服诸门，先赢再说",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 48 + s.talent;
+              s.karma += 20;
+              s.virtue -= 12;
+              s.log = "会盟安静了。安静得像一座坟。";
+            }
+          },
+          {
+            text: "闭关破境，等足够强再改天命",
+            to: "tribulation",
+            effect: s => {
+              s.qi += 38 + s.talent;
+              s.years -= 2;
+              s.log = "你离开会盟，知道下一次回来时，必须给出答案。";
+            }
+          }
+        ]
+      },
+
+      tribulation: {
+        title: "大荒命劫",
+        text: () => `雷云从太古铜门上方压下，像整部大荒旧史都在审你。\n\n当前灵力：${state.qi}。境界越高，越能触及真相；道德越低，命劫越重；因果越深，幽都越近。`,
+        choices: [
+          {
+            text: "迎雷破境",
+            to: "afterBreak",
+            effect: s => {
+              const threshold = 28 + s.realm * 22 + Math.max(0, 50 - s.virtue) + Math.max(0, s.karma);
+              if (s.qi >= threshold) {
+                s.realm += 1;
+                s.qi = Math.max(0, s.qi - threshold + 8);
+                s.years += 5;
+                s.memory += 1;
+                s.log = `你扛过命劫，踏入${realms[s.realm]}。雷声里有一段旧史被你听清。`;
+              } else {
+                s.scene = "death";
+                s.log = "雷光落下，你记住了失败的位置。下一世，这一道雷会慢半拍。";
+              }
+            }
+          },
+          {
+            text: "先还人间债，再问天命",
+            to: "afterBreak",
+            effect: s => {
+              s.virtue += 14;
+              s.karma = Math.max(0, s.karma - 12);
+              s.qi += 6 + s.talent;
+              s.years -= 1;
+              s.log = "你放下闭关，去修桥、救人、埋葬无名者。天道没有夸你，但雷云薄了。";
+            }
+          },
+          {
+            text: "吞铜门魔息，强行破境",
+            to: "heartDemon",
+            effect: s => {
+              s.qi += 42 + s.talent;
+              s.karma += 18;
+              s.virtue -= 10;
+              s.log = "力量来得汹涌，你却听见铜门里有人喊出了你的名字。";
+            }
+          }
+        ]
+      },
+
+      afterBreak: {
+        title: "轮回分岔",
+        text: () => `你如今是${realms[state.realm]}修士，诸门旧闻在识海中重新排列。\n\n若继续查下去，你可能终止铜门轮回，也可能登上九天后发现自己只是另一枚祭品。`,
+        choices: [
+          {
+            text: "继续在大荒行走",
+            to: "birth",
+            requires: s => s.realm < 5 && s.years > 0,
+            effect: s => {
+              s.years -= 1;
+              s.log = "你重新踏上路。西陵、雷泽、北溟，每一处都有人还在等答案。";
+            }
+          },
+          {
+            text: "登九天，问神明旧账",
+            to: "ascend",
+            requires: s => s.realm >= 5
+          },
+          {
+            text: "重订绝地天通，终止铜门轮回",
+            to: "breakWheel",
+            requires: s => s.fragments >= 4 && s.realm >= 4
+          },
+          {
+            text: "寿元耗尽，带着大荒旧梦重生",
+            to: "death",
+            requires: s => s.years <= 0
+          }
+        ]
+      },
+
+      heartDemon: {
+        title: "铜门心魔",
+        text: "心魔披着许多人的脸：玉玑子的野望、七夜的冷笑、冷喻的沉默、玄晖的不屈，还有你自己每一世失败后的不甘。\n\n它问你：既然轮回会重来，为什么不先赢？为什么还要顾及那些终将死去的人？",
+        choices: [
+          {
+            text: "承认想赢，但不拿无辜者作代价",
+            to: "tribulation",
+            effect: s => {
+              s.virtue += 12;
+              s.karma = Math.max(0, s.karma - 10);
+              s.memory += 1;
+              s.log = "心魔没有消失，只是退后一步。你终于能和自己的阴影同行。";
+            }
+          },
+          {
+            text: "镇压心魔，继续独行",
+            to: "afterBreak",
+            effect: s => {
+              s.qi += 24 + s.talent;
+              s.karma += 6;
+              s.log = "你暂时压住了它，但被压住的东西总会寻找裂缝。";
+            }
+          },
+          {
+            text: "让心魔接管，成为新的铜门执钥人",
+            to: "hell",
+            effect: s => {
+              s.virtue -= 35;
+              s.karma += 45;
+              s.log = "你终于握住了门钥，却发现门内外所有人都成了你的囚徒。";
+            }
+          }
+        ]
+      },
+
+      ascend: {
+        title: "九天登神阶",
+        text: () => `九天之上，登神阶如白骨铺成。神明的旧契约悬在你面前：功德足者可问天，因果重者坠幽都。\n\n你的道德为 ${state.virtue}，因果为 ${state.karma}。`,
+        choices: [
+          {
+            text: "踏上登神阶",
+            to: "ascendResult",
+            effect: s => {
+              const burden = Math.max(0, 65 - s.virtue) + s.karma;
+              if (burden >= 55) {
+                s.scene = "hell";
+                s.log = "登神阶忽然翻转，白玉化为黑水。你被因果拖回幽都。";
+              } else if (s.fragments >= 4 && s.virtue >= 60) {
+                s.scene = "trueAscend";
+                s.log = "你看穿登神阶后的祭坛，终于有资格代表大荒发问。";
+              } else {
+                s.scene = "falseAscend";
+                s.log = "你登上九天，却发现自己只是被写进神明旧契的下一行名字。";
+              }
+            }
+          },
+          {
+            text: "退回人间，先补足诸门新约",
+            to: "greatCouncil",
+            effect: s => {
+              s.virtue += 8;
+              s.karma = Math.max(0, s.karma - 8);
+              s.log = "能从天阶上退回来的人，比急着成神的人更像大荒的答案。";
+            }
+          }
+        ]
+      },
+
+      breakWheel: {
+        title: "重订绝地天通",
+        text: "四枚天命碎片合一，照出最初的契约：绝地天通不是为了让神远离人，而是为了不让任何一方把灾祸推给另一方。\n\n铜门轮回之所以反复开启，是因为旧契被人改写。若要修正它，必须有人同时承认三件事：幽都不是天生罪地，诸门不是永远清白，神明也要为旧错负责。",
+        choices: [
+          {
+            text: "以诸门新约重封铜门",
+            to: "trueEnding",
+            requires: s => s.virtue >= 70 && s.realm >= 4
+          },
+          {
+            text: "以自身为钥，替大荒争百年喘息",
+            to: "sacrifice",
+            requires: s => s.virtue >= 45
+          },
+          {
+            text: "夺取旧契，命诸门与幽都都听你裁决",
+            to: "hell",
+            effect: s => {
+              s.virtue -= 40;
+              s.karma += 55;
+              s.log = "你废掉旧神，却坐上了旧神的位置。幽都没有惩罚你，它只是让你看见自己。";
+            }
+          }
+        ]
+      },
+
+      trueAscend: {
+        title: "结局：问天而归",
+        text: "你没有留在九天成神，而是带着神明旧契回到西陵。\n\n诸门、幽都、青丘、九黎、北溟都派人来听你宣读新约。大荒仍有战火，仍有私心，仍有人会犯错；但从这一日起，再没有谁能把众生当作填补天裂的柴薪。",
+        ending: true,
+        choices: [
+          { text: "带着更多记忆再入轮回", rebirth: true },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      falseAscend: {
+        title: "结局：九天祭名",
+        text: "你登上九天，名字却被刻进祭册。\n\n这一世没有白费。你看见了登神阶后的真相，也记住了哪几枚天命碎片能改写旧契。下一世，你会更早回到西陵城外。",
+        ending: true,
+        choices: [
+          { text: "带着真相重生", rebirth: true, bonus: { memory: 3, fragments: 1 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      trueEnding: {
+        title: "真结局：天下仍是大荒",
+        text: "铜门缓缓闭合，却没有把幽都重新钉死在黑暗里。新约写明：诸门共守边界，幽都共担封印，神明旧契须向人间公开。\n\n玄晖在北溟雪中笑了一下，令狐九尾终于明白了人间感情，冷喻把邪影收回身后，遗墨的机关鸟飞过西陵城头。\n\n你没有成为新的神。你只是让后来者不必靠一次次死亡，才能换来一个答案。",
+        ending: true,
+        choices: [
+          { text: "以新大荒再开一局", hardReset: true }
+        ]
+      },
+
+      sacrifice: {
+        title: "结局：百年封门",
+        text: "你的功德不足以彻底改写旧契，只能以自身为钥，将太古铜门封住百年。\n\n百年很短，却足够让一代孩子在没有妖魔攻城的西陵长大。百年后，也许会有另一个带着记忆的人醒来，接过你没走完的路。",
+        ending: true,
+        choices: [
+          { text: "下一世接续此愿", rebirth: true, bonus: { memory: 2, virtue: 8 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      death: {
+        title: "结局：大荒梦回",
+        text: "这一世到此为止。你闭眼前，听见西陵城头有人敲响战鼓，也有人在药庐里轻声唱歌。\n\n死亡没有带走一切。它只把大荒重新摊开，等你下一世再读。",
+        ending: true,
+        choices: [
+          { text: "带着记忆重生", rebirth: true, bonus: { memory: 2 } },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      hell: {
+        title: "结局：幽都照影",
+        text: "因果太重，幽都水面映出你的每一次选择。\n\n这里不是永罚之地，而是一面镜子。你必须重新走一遍人间，少一点天赋，多一点债，直到明白力量若不能护人，便只是在替旧灾换一个名字。",
+        ending: true,
+        choices: [
+          { text: "从幽都转生", rebirth: true, hell: true },
+          { text: "彻底重开", hardReset: true }
+        ]
+      },
+
+      ascendResult: {
+        title: "登神阶后",
+        text: "九天正在衡量你的功德与因果。",
+        choices: []
+      }
+    });
+
+    function cloneData(value) {
+      if (typeof structuredClone === "function") return structuredClone(value);
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    let state = cloneData(freshLife);
+
+
     const sceneTitle = document.querySelector("#scene-title");
     const sceneText = document.querySelector("#scene-text");
     const sceneSketch = document.querySelector("#scene-sketch");
@@ -810,6 +1436,9 @@
       enabled: false,
       drones: [],
       timer: null,
+      master: null,
+      musicStep: 0,
+      currentMode: "",
 
       async start() {
         if (!AudioContextClass) {
@@ -845,31 +1474,59 @@
         if (audioState) audioState.textContent = this.enabled ? "开" : "关";
       },
 
+      profile() {
+        const danger = state.scene === "hell" || state.scene === "heartDemon" || state.scene === "copperGate";
+        const bright = state.scene === "birth" || state.scene === "sect" || state.scene === "foxRoad" || state.scene === "greatCouncil" || state.scene === "trueEnding";
+        const cold = state.scene === "northSea" || state.scene === "shadow";
+        if (danger) return { root: 82.41, scale: [1, 1.125, 1.2, 1.5, 1.6, 1.875, 2], pulse: 980, drone: [0.72, 1, 1.2], color: "dark" };
+        if (cold) return { root: 98, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 1420, drone: [1, 1.5, 2], color: "cold" };
+        if (bright) return { root: 110, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 1180, drone: [1, 1.5, 2], color: "bright" };
+        return { root: 103.83, scale: [1, 1.125, 1.25, 1.5, 1.666, 1.875, 2], pulse: 1280, drone: [1, 1.5, 2], color: "neutral" };
+      },
+
+      updateMusicMode() {
+        if (!this.enabled || !this.ctx) return;
+        const profile = this.profile();
+        const mode = `${state.scene}|${state.path}|${profile.color}`;
+        if (mode === this.currentMode) return;
+        this.currentMode = mode;
+        const now = this.ctx.currentTime;
+        this.drones.forEach(({ osc, gain }, index) => {
+          const target = profile.root * profile.drone[index % profile.drone.length];
+          try {
+            osc.frequency.setTargetAtTime(target, now, 0.8);
+            gain.gain.setTargetAtTime(index === 0 ? 0.42 : 0.16, now, 0.8);
+          } catch (error) {}
+        });
+      },
+
       startMusic() {
         if (!this.ctx || this.drones.length) return;
         const now = this.ctx.currentTime;
         const master = this.ctx.createGain();
-        master.gain.setValueAtTime(0.035, now);
+        const profile = this.profile();
+        this.master = master;
+        master.gain.setValueAtTime(0.055, now);
         master.connect(this.ctx.destination);
 
-        [110, 165, 220].forEach((frequency, index) => {
+        profile.drone.forEach((ratio, index) => {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
-          osc.frequency.setValueAtTime(frequency, now);
-          gain.gain.setValueAtTime(index === 0 ? 0.52 : 0.22, now);
+          osc.frequency.setValueAtTime(profile.root * ratio, now);
+          gain.gain.setValueAtTime(index === 0 ? 0.42 : 0.16, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
           this.drones.push({ osc, gain, master });
         });
 
+        this.currentMode = "";
+        this.updateMusicMode();
         this.timer = window.setInterval(() => {
           if (!this.enabled || !this.ctx) return;
-          const t = this.ctx.currentTime;
-          const note = [330, 392, 440, 523][Math.floor(Math.random() * 4)];
-          this.tone(note, 0.65, 0.025, "sine", t);
-        }, 5200);
+          this.scheduleTheme();
+        }, 980);
       },
 
       stopMusic() {
@@ -884,9 +1541,12 @@
           } catch (error) {}
         });
         this.drones = [];
+        this.master = null;
+        this.musicStep = 0;
+        this.currentMode = "";
       },
 
-      tone(frequency, duration = 0.16, volume = 0.06, type = "sine", startTime) {
+      tone(frequency, duration = 0.16, volume = 0.06, type = "sine", startTime, destination) {
         if (!this.enabled || !this.ctx) return;
         try {
           const now = startTime || this.ctx.currentTime;
@@ -898,10 +1558,63 @@
           gain.gain.exponentialRampToValueAtTime(volume, now + 0.025);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
           osc.connect(gain);
-          gain.connect(this.ctx.destination);
+          gain.connect(destination || this.ctx.destination);
           osc.start(now);
           osc.stop(now + duration + 0.03);
         } catch (error) {}
+      },
+
+      pluck(frequency, startTime, volume = 0.04) {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const now = startTime || this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(frequency, now);
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(1800, now);
+          filter.frequency.exponentialRampToValueAtTime(420, now + 0.42);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.master || this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 1);
+        } catch (error) {}
+      },
+
+      breath(frequency, startTime, volume = 0.018) {
+        this.tone(frequency, 1.6, volume, "sine", startTime, this.master || undefined);
+        this.tone(frequency * 2.01, 1.2, volume * 0.28, "sine", (startTime || this.ctx.currentTime) + 0.04, this.master || undefined);
+      },
+
+      drum(startTime, volume = 0.05) {
+        if (!this.enabled || !this.ctx) return;
+        const now = startTime || this.ctx.currentTime;
+        this.tone(62, 0.14, volume, "sine", now, this.master || undefined);
+        this.tone(42, 0.22, volume * 0.55, "triangle", now + 0.02, this.master || undefined);
+      },
+
+      scheduleTheme() {
+        if (!this.enabled || !this.ctx) return;
+        this.updateMusicMode();
+        const profile = this.profile();
+        const now = this.ctx.currentTime;
+        const phrase = [0, 2, 4, 3, 2, 5, 4, 1, 0, 2, 3, 5, 4, 2, 1, 0];
+        const step = this.musicStep % phrase.length;
+        const ratio = profile.scale[phrase[step] % profile.scale.length];
+        const base = profile.root * 2 * ratio;
+        const beat = profile.pulse / 1000;
+        this.pluck(base, now, profile.color === "dark" ? 0.032 : 0.044);
+        if (step % 4 === 0) this.breath(profile.root * 4 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.12, profile.color === "bright" ? 0.022 : 0.015);
+        if (profile.color === "dark" && step % 2 === 0) this.drum(now + 0.05, 0.055);
+        if (profile.color === "cold" && step % 4 === 2) this.tone(base * 1.5, 0.45, 0.018, "sine", now + beat * 0.45, this.master || undefined);
+        if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 0.7, 0.018, "sine", now + 0.28, this.master || undefined);
+        this.musicStep += 1;
       },
 
       play(kind) {
@@ -972,47 +1685,209 @@
 
     function sketchForState(scene) {
       const tone = state.virtue >= 65 ? "#7fc8a9" : state.virtue <= 35 ? "#d97869" : "#d8b35f";
-      const shadow = state.karma >= 30 ? "#d97869" : "#6f7967";
-      const sky = state.scene === "hell" || state.scene === "heartDemon" ? "#2b1d20" : "#171d16";
-      const stars = Array.from({ length: Math.min(7, state.realm + 1) }, (_, index) => {
-        const x = 36 + index * 26 + (hashText(`${state.turn}-${index}`) % 8);
-        const y = 28 + (hashText(`${state.scene}-${index}`) % 32);
-        return `<circle cx="${x}" cy="${y}" r="2" fill="${tone}" opacity="0.8"/>`;
+      const ink = state.karma >= 30 ? "#322025" : "#273126";
+      const glow = state.scene === "hell" || state.scene === "heartDemon" ? "#d97869" : tone;
+      const skyTop = state.scene === "hell" || state.scene === "heartDemon" ? "#25171b" : "#101711";
+      const skyBottom = state.scene === "ascend" || state.scene === "trueAscend" ? "#22372f" : "#1d241b";
+      const seed = hashText(`${state.scene}|${state.turn}|${state.life}|${state.realm}|${state.virtue}|${state.karma}`);
+
+      const dots = Array.from({ length: 18 }, (_, index) => {
+        const x = 24 + ((seed + index * 47) % 464);
+        const y = 18 + ((seed >> (index % 8)) + index * 29) % 120;
+        const r = 1 + ((seed + index) % 3) * 0.55;
+        const opacity = 0.22 + ((index % 5) * 0.08);
+        return `<circle cx="${x}" cy="${y}" r="${r}" fill="${index % 3 === 0 ? tone : "#f4efdf"}" opacity="${opacity}"/>`;
       }).join("");
-      const karmaLines = state.karma > 12
-        ? `<path d="M250 36 C220 84 286 110 246 158 S288 232 228 256" fill="none" stroke="#d97869" stroke-width="${Math.min(7, 1 + state.karma / 10)}" opacity="0.55"/>`
-        : "";
-      const halo = state.virtue > 60
-        ? `<circle cx="260" cy="126" r="54" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.45"/>`
-        : "";
-      const fragmentDoor = state.fragments >= 2
-        ? `<path d="M356 88 L414 58 L414 222 L356 196 Z" fill="none" stroke="#d8b35f" stroke-width="3"/><path d="M384 96 L384 200" stroke="#d8b35f" stroke-width="2" opacity="0.7"/>`
+
+      const clouds = Array.from({ length: 4 }, (_, index) => {
+        const x = 42 + index * 118 + ((seed + index * 17) % 24);
+        const y = 48 + ((seed + index * 31) % 42);
+        return `<path d="M${x} ${y} C${x + 22} ${y - 12} ${x + 42} ${y - 12} ${x + 62} ${y} C${x + 42} ${y + 10} ${x + 22} ${y + 10} ${x} ${y}" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.13"/>`;
+      }).join("");
+
+      const karmaThreads = state.karma > 10
+        ? Array.from({ length: Math.min(5, 1 + Math.floor(state.karma / 12)) }, (_, index) => {
+          const start = 74 + index * 76;
+          return `<path d="M${start} 18 C${start - 34} 74 ${start + 52} 104 ${start + 10} 164 S${start + 70} 226 ${start - 8} 272" fill="none" stroke="#d97869" stroke-width="${2 + index * 0.45}" opacity="${0.18 + index * 0.08}"/>`;
+        }).join("")
         : "";
 
-      const sceneGlyphs = {
-        birth: `<path d="M36 236 L138 96 L238 236" fill="none" stroke="${tone}" stroke-width="4"/><path d="M96 236 L178 126 L270 236" fill="none" stroke="#b9b39f" stroke-width="3" opacity="0.75"/>`,
-        sect: `<path d="M72 220 L72 132 L146 84 L220 132 L220 220" fill="none" stroke="${tone}" stroke-width="4"/><path d="M104 220 L104 156 L188 156 L188 220" fill="none" stroke="#b9b39f" stroke-width="3"/>`,
-        market: `<path d="M58 210 C96 130 154 130 194 210" fill="none" stroke="${shadow}" stroke-width="5"/><path d="M88 166 L178 166 M112 136 L154 206" stroke="#d8b35f" stroke-width="3" opacity="0.7"/>`,
-        demon: `<path d="M70 218 C94 132 146 104 208 142 C244 164 238 214 202 230" fill="none" stroke="${shadow}" stroke-width="4"/><circle cx="174" cy="156" r="5" fill="#d97869"/>`,
-        tribulation: `<path d="M178 36 L122 134 L174 126 L122 236 L250 106 L188 116 Z" fill="${tone}" opacity="0.18" stroke="${tone}" stroke-width="4"/>`,
-        heartDemon: `<path d="M98 220 C94 130 164 86 222 142 C280 86 350 130 346 220" fill="none" stroke="#d97869" stroke-width="5"/><path d="M206 126 C230 162 204 186 232 222" fill="none" stroke="#d97869" stroke-width="3"/>`,
-        hell: `<path d="M36 230 C92 180 106 98 172 126 C238 154 248 84 316 116 C374 144 374 202 454 232" fill="none" stroke="#d97869" stroke-width="5" opacity="0.75"/>`,
-        ascend: `<path d="M198 230 L198 76 L318 76 L318 230" fill="none" stroke="${tone}" stroke-width="4"/><path d="M228 104 C248 84 276 84 296 104" fill="none" stroke="#f4efdf" stroke-width="3" opacity="0.55"/>`,
-        breakWheel: `<circle cx="256" cy="148" r="82" fill="none" stroke="${tone}" stroke-width="4"/><path d="M176 148 L336 148 M256 68 L256 228" stroke="#b9b39f" stroke-width="3" opacity="0.65"/>`
+      const virtueHalo = state.virtue > 55
+        ? `<circle cx="260" cy="136" r="${42 + state.realm * 5}" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.36"/>
+           <circle cx="260" cy="136" r="${58 + state.realm * 4}" fill="none" stroke="#7fc8a9" stroke-width="1.5" opacity="0.18"/>`
+        : "";
+
+      const fragmentGate = state.fragments >= 2
+        ? `<g opacity="0.86">
+             <path d="M374 80 L430 48 L430 232 L374 202 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
+             <path d="M402 92 L402 206 M384 118 L420 98 M384 170 L420 194" stroke="#f4efdf" stroke-width="1.5" opacity="0.48"/>
+             <circle cx="402" cy="148" r="${3 + state.fragments}" fill="#d8b35f"/>
+           </g>`
+        : "";
+
+      const figure = `<g transform="translate(244 116)">
+          <ellipse cx="16" cy="88" rx="34" ry="9" fill="#000" opacity="0.18"/>
+          <circle cx="16" cy="17" r="11" fill="#f4efdf" opacity="0.9"/>
+          <path d="M6 31 C8 58 4 82 -4 106 M26 31 C24 58 28 82 36 106" fill="none" stroke="#f4efdf" stroke-width="3" stroke-linecap="round"/>
+          <path d="M16 30 C3 54 2 82 16 102 C30 82 29 54 16 30 Z" fill="${ink}" stroke="${tone}" stroke-width="2"/>
+          <path d="M5 54 C-22 66 -32 86 -42 104 M27 54 C54 66 64 86 74 104" fill="none" stroke="${tone}" stroke-width="3" stroke-linecap="round"/>
+          <path d="M-18 106 C2 94 30 94 50 106" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.55"/>
+        </g>`;
+
+      const sceneArt = {
+        birth: `<g>
+          <path d="M34 242 C78 188 106 126 142 82 C166 112 188 166 222 238" fill="url(#mountWash)" stroke="#7f8b77" stroke-width="2"/>
+          <path d="M118 242 C168 174 210 98 264 60 C304 126 352 178 404 242" fill="url(#mountWash2)" stroke="${tone}" stroke-width="2"/>
+          <path d="M62 226 C96 204 124 204 160 226 M320 224 C352 200 386 204 420 226" fill="none" stroke="#d8b35f" stroke-width="3" opacity="0.5"/>
+          <path d="M72 204 L108 176 L146 204 L146 238 L72 238 Z" fill="#20251d" stroke="#f4efdf" stroke-width="2" opacity="0.82"/>
+          <path d="M92 238 L92 214 L124 214 L124 238" fill="#151812" stroke="${tone}" stroke-width="2"/>
+        </g>`,
+        sect: `<g>
+          <path d="M50 232 L116 154 L182 232 Z M134 232 L230 104 L330 232 Z" fill="url(#mountWash)" stroke="#6f7967" stroke-width="2"/>
+          <path d="M76 222 L76 148 L156 98 L238 148 L238 222 Z" fill="#20251d" stroke="${tone}" stroke-width="3"/>
+          <path d="M52 150 L156 82 L262 150" fill="none" stroke="#d8b35f" stroke-width="5" stroke-linecap="round"/>
+          <path d="M112 222 L112 170 L202 170 L202 222 M136 170 L136 130 L178 130 L178 170" fill="#151812" stroke="#f4efdf" stroke-width="2"/>
+          <path d="M292 226 C312 184 344 166 382 170 C360 192 350 214 356 238" fill="#263226" stroke="#7fc8a9" stroke-width="2" opacity="0.7"/>
+        </g>`,
+        market: `<g>
+          <path d="M36 230 C72 144 138 108 206 138 C252 158 286 136 328 96 C352 150 386 194 474 230 Z" fill="#1b1717" stroke="#6f7967" stroke-width="2"/>
+          <path d="M68 222 L96 154 L132 222 Z M132 222 L170 130 L216 222 Z M214 222 L248 150 L292 222 Z" fill="#2a211d" stroke="#d8b35f" stroke-width="2" opacity="0.82"/>
+          <path d="M86 162 C116 174 140 174 168 158 M228 158 C258 170 286 170 316 156" fill="none" stroke="#d97869" stroke-width="3" opacity="0.5"/>
+          <circle cx="182" cy="126" r="18" fill="#d97869" opacity="0.18" stroke="#d97869" stroke-width="2"/>
+          <path d="M390 222 C382 178 412 148 444 162 C466 174 458 214 426 228" fill="#211b1c" stroke="#d97869" stroke-width="2"/>
+        </g>`,
+        demon: `<g>
+          <path d="M26 238 C70 196 74 130 136 126 C200 120 208 180 266 170 C322 158 346 104 414 118 C472 132 458 204 502 238 Z" fill="#20251d" stroke="#6f7967" stroke-width="2"/>
+          <path d="M78 226 C92 170 130 146 172 158 C212 168 226 210 198 232" fill="#273126" stroke="#d97869" stroke-width="3"/>
+          <path d="M130 156 L104 124 M166 158 L198 126" stroke="#d97869" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="142" cy="176" r="6" fill="#d97869"/><circle cx="176" cy="178" r="6" fill="#d97869"/>
+          <path d="M318 228 C306 188 338 156 376 162 C410 166 428 198 416 232" fill="none" stroke="#7fc8a9" stroke-width="4"/>
+        </g>`,
+        tribulation: `<g>
+          <path d="M24 92 C78 42 136 76 184 54 C242 28 284 72 338 48 C394 24 442 58 488 84" fill="none" stroke="#f4efdf" stroke-width="14" opacity="0.08"/>
+          <path d="M108 28 L66 126 L124 116 L84 238 L236 90 L164 102 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="4"/>
+          <path d="M304 32 L250 138 L318 124 L276 252 L452 82 L366 100 Z" fill="${tone}" opacity="0.22" stroke="${tone}" stroke-width="3"/>
+          <path d="M38 236 C96 210 152 212 206 236 C274 202 348 202 474 236" fill="none" stroke="#b9b39f" stroke-width="3" opacity="0.38"/>
+        </g>`,
+        heartDemon: `<g>
+          <path d="M44 232 C74 130 140 84 210 126 C254 70 336 86 386 154 C410 186 424 216 472 230" fill="#211719" stroke="#d97869" stroke-width="3"/>
+          <path d="M114 218 C104 148 154 110 208 150 C260 98 316 130 310 218" fill="none" stroke="#d97869" stroke-width="6"/>
+          <path d="M182 152 C220 178 188 206 226 236 M278 148 C244 178 284 206 250 236" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.35"/>
+          <circle cx="180" cy="150" r="7" fill="#d97869"/><circle cx="302" cy="150" r="7" fill="#d97869"/>
+        </g>`,
+        hell: `<g>
+          <path d="M0 248 C42 190 82 182 118 128 C154 76 218 158 254 104 C302 34 360 138 418 110 C462 90 488 160 512 196 L512 288 L0 288 Z" fill="#201316" stroke="#d97869" stroke-width="2" opacity="0.92"/>
+          <path d="M34 240 C78 198 110 202 144 230 S232 246 272 212 S360 176 470 230" fill="none" stroke="#d97869" stroke-width="7" opacity="0.35"/>
+          <path d="M96 260 C130 210 126 166 160 132 M388 260 C352 216 364 170 326 132" fill="none" stroke="#f4efdf" stroke-width="3" opacity="0.2"/>
+          <circle cx="256" cy="104" r="32" fill="#d97869" opacity="0.12" stroke="#d97869" stroke-width="3"/>
+        </g>`,
+        ascend: `<g>
+          <path d="M56 238 C126 206 164 218 222 196 C284 172 352 190 456 148" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.26"/>
+          <path d="M188 238 L188 78 C210 50 302 50 324 78 L324 238" fill="url(#jadeWash)" stroke="#7fc8a9" stroke-width="4"/>
+          <path d="M220 104 C240 82 274 82 294 104 M216 142 L298 142 M216 178 L298 178" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.55"/>
+          <path d="M350 104 C384 84 416 92 438 124 C410 122 386 136 372 162" fill="none" stroke="#d8b35f" stroke-width="3" opacity="0.6"/>
+        </g>`,
+        breakWheel: `<g>
+          <circle cx="256" cy="148" r="94" fill="url(#jadeWash)" stroke="${tone}" stroke-width="4" opacity="0.9"/>
+          <circle cx="256" cy="148" r="62" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.42"/>
+          <path d="M162 148 L350 148 M256 54 L256 242 M190 82 L322 214 M322 82 L190 214" stroke="#d8b35f" stroke-width="3" opacity="0.72"/>
+          <path d="M104 222 C166 192 196 222 256 196 C316 170 370 204 438 170" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.32"/>
+        </g>`
       };
 
-      const glyph = sceneGlyphs[state.scene] || sceneGlyphs.birth;
+      sceneArt.iceHeart = `<g>
+        <path d="M46 236 C94 204 116 164 172 172 C224 180 236 132 292 138 C354 144 384 194 464 216" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.25"/>
+        <path d="M72 224 L72 132 L152 90 L232 132 L232 224 Z" fill="#20251d" stroke="#7fc8a9" stroke-width="3"/>
+        <path d="M116 224 L116 166 L188 166 L188 224 M152 126 L152 204 M116 166 L188 166" stroke="#f4efdf" stroke-width="3" opacity="0.75"/>
+        <circle cx="344" cy="150" r="34" fill="url(#jadeWash)" stroke="#7fc8a9" stroke-width="2"/>
+        <path d="M326 150 L362 150 M344 132 L344 168" stroke="#f4efdf" stroke-width="4" stroke-linecap="round"/>
+      </g>`;
+      sceneArt.shadow = `<g>
+        <path d="M0 230 C82 176 118 198 178 142 C234 88 288 126 332 90 C384 48 440 104 512 74 L512 288 L0 288 Z" fill="#161719" stroke="#6f7967" stroke-width="2" opacity="0.95"/>
+        <path d="M84 230 C120 178 166 162 216 182 C276 206 320 164 390 144" fill="none" stroke="#d8b35f" stroke-width="2" opacity="0.35"/>
+        <path d="M142 210 C156 158 194 132 236 142 C214 166 210 196 226 230" fill="#1f2520" stroke="#d97869" stroke-width="3"/>
+        <path d="M102 180 L198 176 M126 150 L176 218" stroke="#f4efdf" stroke-width="2" opacity="0.45"/>
+      </g>`;
+      sceneArt.foxRoad = `<g>
+        <path d="M32 236 C92 190 122 204 174 178 C238 146 304 170 366 138 C416 112 456 132 498 104" fill="none" stroke="#d8b35f" stroke-width="4" opacity="0.2"/>
+        <path d="M74 224 C110 162 178 150 220 198 C252 230 312 224 346 178" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.48"/>
+        ${Array.from({ length: 9 }, (_, index) => `<path d="M${344 + index * 8} 184 C${384 + index * 4} ${112 + index * 4} ${424 - index * 5} ${116 + index * 9} ${450 - index * 7} 176" fill="none" stroke="#f4efdf" stroke-width="2" opacity="${0.18 + index * 0.04}"/>`).join("")}
+        <circle cx="346" cy="172" r="18" fill="#f4efdf" opacity="0.82"/><circle cx="338" cy="154" r="9" fill="#f4efdf" opacity="0.7"/><circle cx="354" cy="154" r="9" fill="#f4efdf" opacity="0.7"/>
+      </g>`;
+      sceneArt.coldShadow = sceneArt.heartDemon;
+      sceneArt.jadeClue = `<g>
+        <path d="M60 226 L122 132 L194 226 Z M166 226 L246 88 L342 226 Z" fill="url(#mountWash)" stroke="#6f7967" stroke-width="2"/>
+        <path d="M344 216 C320 170 340 128 386 124 C430 120 454 166 430 218" fill="#211719" stroke="#d8b35f" stroke-width="3"/>
+        <path d="M382 88 L420 132 L398 198 L350 178 L342 122 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
+        <path d="M360 126 L408 174 M410 130 L356 174" stroke="#d97869" stroke-width="3" opacity="0.62"/>
+      </g>`;
+      sceneArt.copperGate = `<g>
+        <path d="M38 236 C96 196 126 204 174 168 C230 126 286 146 342 106 C402 64 452 94 492 66" fill="none" stroke="#d97869" stroke-width="4" opacity="0.22"/>
+        <path d="M176 238 L176 74 C206 38 306 38 336 74 L336 238 Z" fill="#211719" stroke="#d97869" stroke-width="5"/>
+        <path d="M206 108 L306 108 M206 150 L306 150 M206 192 L306 192 M256 78 L256 238" stroke="#d8b35f" stroke-width="3" opacity="0.48"/>
+        <path d="M62 238 C116 218 156 218 208 238 M306 238 C360 214 408 216 470 238" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.28"/>
+      </g>`;
+      sceneArt.northSea = `<g>
+        <rect x="0" y="0" width="512" height="288" fill="#152029" opacity="0.26"/>
+        <path d="M28 238 C86 164 142 178 190 108 C242 30 310 146 366 86 C416 34 456 134 502 106" fill="url(#mountWash2)" stroke="#f4efdf" stroke-width="2" opacity="0.62"/>
+        <path d="M0 242 C76 226 142 236 210 218 S360 206 512 222" fill="none" stroke="#f4efdf" stroke-width="5" opacity="0.22"/>
+        <circle cx="356" cy="82" r="30" fill="#d8b35f" opacity="0.18" stroke="#d8b35f" stroke-width="2"/>
+        <path d="M340 82 C356 66 374 66 390 82" fill="none" stroke="#d8b35f" stroke-width="2" opacity="0.55"/>
+      </g>`;
+      sceneArt.greatCouncil = `<g>
+        <path d="M58 232 L58 142 L120 104 L182 142 L182 232 Z M330 232 L330 142 L392 104 L454 142 L454 232 Z" fill="#20251d" stroke="#d8b35f" stroke-width="2" opacity="0.76"/>
+        <path d="M142 230 C188 178 326 178 372 230" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.42"/>
+        ${[92, 138, 188, 324, 374, 420].map((x, i) => `<circle cx="${x}" cy="${188 + (i % 2) * 10}" r="12" fill="${i % 3 === 0 ? "#7fc8a9" : i % 3 === 1 ? "#d8b35f" : "#d97869"}" opacity="0.5"/>`).join("")}
+        <path d="M216 128 L296 128 L310 214 L202 214 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
+      </g>`;
+      sceneArt.memoryArchive = sceneArt.breakWheel;
+      sceneArt.afterBreak = sceneArt.breakWheel;
+      sceneArt.falseAscend = sceneArt.ascend;
+      sceneArt.trueAscend = sceneArt.ascend;
+      sceneArt.trueEnding = sceneArt.breakWheel;
+      sceneArt.sacrifice = sceneArt.copperGate;
+      sceneArt.death = sceneArt.birth;
+
+      const art = sceneArt[state.scene] || sceneArt.birth;
       return `<svg viewBox="0 0 512 288" role="img" aria-label="${scene.title}">
-        <rect width="512" height="288" fill="${sky}"/>
-        ${stars}
-        <path d="M0 248 C84 218 124 252 196 226 S330 230 512 206" fill="none" stroke="#b9b39f" stroke-width="2" opacity="0.3"/>
-        ${karmaLines}
-        ${halo}
-        ${glyph}
-        ${fragmentDoor}
-        <circle cx="260" cy="126" r="${10 + state.realm * 4}" fill="${tone}" opacity="0.18"/>
-        <path d="M248 116 L260 92 L272 116 L268 156 L252 156 Z" fill="none" stroke="#f4efdf" stroke-width="3"/>
-        <path d="M236 172 C252 190 278 190 294 172" fill="none" stroke="${tone}" stroke-width="3"/>
+        <defs>
+          <linearGradient id="skyWash" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="${skyTop}"/>
+            <stop offset="1" stop-color="${skyBottom}"/>
+          </linearGradient>
+          <linearGradient id="mountWash" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#334130" stop-opacity="0.88"/>
+            <stop offset="1" stop-color="#151812" stop-opacity="0.92"/>
+          </linearGradient>
+          <linearGradient id="mountWash2" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#263226"/>
+            <stop offset="1" stop-color="#151812"/>
+          </linearGradient>
+          <radialGradient id="goldWash" cx="50%" cy="46%" r="66%">
+            <stop offset="0" stop-color="#d8b35f" stop-opacity="0.42"/>
+            <stop offset="1" stop-color="#d8b35f" stop-opacity="0.06"/>
+          </radialGradient>
+          <radialGradient id="jadeWash" cx="50%" cy="46%" r="70%">
+            <stop offset="0" stop-color="#7fc8a9" stop-opacity="0.34"/>
+            <stop offset="1" stop-color="#7fc8a9" stop-opacity="0.04"/>
+          </radialGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="512" height="288" fill="url(#skyWash)"/>
+        <circle cx="404" cy="62" r="${18 + state.realm * 2}" fill="${glow}" opacity="0.12" filter="url(#softGlow)"/>
+        ${dots}
+        ${clouds}
+        <path d="M0 252 C58 224 96 238 146 216 C206 190 246 214 304 198 C374 178 424 198 512 168 L512 288 L0 288 Z" fill="#0d100d" opacity="0.46"/>
+        ${karmaThreads}
+        ${virtueHalo}
+        ${art}
+        ${fragmentGate}
+        <circle cx="260" cy="136" r="${18 + state.realm * 5}" fill="${tone}" opacity="0.13" filter="url(#softGlow)"/>
+        ${figure}
+        <path d="M18 266 C94 248 166 260 238 246 S384 234 494 250" fill="none" stroke="#f4efdf" stroke-width="1.5" opacity="0.18"/>
       </svg>`;
     }
 
@@ -1088,6 +1963,7 @@
       sceneTitle.className = scene.ending ? "ending" : "";
       sceneText.textContent = variedSceneText(scene, textOf(scene.text));
       if (sceneSketch) sceneSketch.innerHTML = sketchForState(scene);
+      audio.updateMusicMode();
 
       choices.innerHTML = "";
       availableChoices(scene).forEach(choice => {
