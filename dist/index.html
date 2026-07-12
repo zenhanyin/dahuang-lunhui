@@ -2500,6 +2500,22 @@
 
     function availableChoices(scene) {
       const base = sceneChoiceList(scene).filter(choice => !choice.requires || choice.requires(state));
+      if (!base.length && !scene.ending) {
+        return [{
+          text: state.scene === "afterBreak" ? "线索不足，先回人间补一段证词" : "暂退一步，重整本世线索",
+          to: state.scene === "afterBreak" ? nextStoryScene() : "afterBreak",
+          always: true,
+          advanceAct: false,
+          effect: s => {
+            s.years -= 1;
+            s.memory += 1;
+            s.virtue += 2;
+            s.log = state.scene === "afterBreak"
+              ? "这一幕的证词还不够。你没有硬闯，而是回到人间，把缺掉的名字重新问一遍。"
+              : "你暂时退开，把散乱的线索重新排好。";
+          }
+        }];
+      }
       if (state.scene !== "birth") return base;
 
       const fixed = base.filter(choice => choice.requires || choice.rebirth || choice.hardReset || choice.always);
