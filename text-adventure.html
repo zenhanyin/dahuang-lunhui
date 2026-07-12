@@ -1562,7 +1562,7 @@
         ? (statusLines.highKarma || "你的因果太重，魍魉席后的影子始终盯着你的手。")
         : state.virtue >= 120
           ? (statusLines.highVirtue || "你的名声已足以压住半座议厅，但真正的信任仍要靠下一步换来。")
-          : (statusLines.normal || "你尚未赢得所有人的信任，诸门只肯给你一次说明的机会。");
+          : (statusLines.normal || "你把门令摊在掌心，也隔着灯火观察递令的人。你还站在门槛外，先看清每一条路要付出的代价。");
       const chapter = currentChapter();
       if (chapter && chapter.text && chapter.text.normal) {
         return chapter.text.normal.replaceAll("{{status}}", status) + (act === 0 ? birthStatLine() : "");
@@ -2490,7 +2490,9 @@
         .slice(0, visibleOrigins)
         .map(item => item.choice);
 
-      return [...seededOrigins, ...fixed];
+      const priority = fixed.filter(choice => choice.always);
+      const gated = fixed.filter(choice => !choice.always);
+      return [...priority, ...seededOrigins, ...gated];
     }
 
     function nextStoryScene() {
