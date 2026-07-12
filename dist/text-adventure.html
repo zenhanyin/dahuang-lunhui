@@ -274,6 +274,7 @@
         <h2>这一世</h2>
         <ul>
           <li><span>世数</span><strong id="life"></strong></li>
+          <li><span>出身</span><strong id="origin"></strong></li>
           <li><span>境界</span><strong id="realm"></strong></li>
           <li><span>流派</span><strong id="path"></strong></li>
           <li><span>寿元</span><strong id="years"></strong></li>
@@ -341,6 +342,12 @@
       iceLedger: 0,
       fireOath: 0,
       moFeiyunProof: 0,
+      wandererCred: 0,
+      rootBone: 0,
+      mind: 0,
+      luck: 0,
+      debt: 0,
+      origin: "未定",
       path: "未定",
       turn: 0,
       act: 0,
@@ -1556,7 +1563,7 @@
           : (statusLines.normal || "你尚未赢得所有人的信任，诸门只肯给你一次说明的机会。");
       const chapter = currentChapter();
       if (chapter && chapter.text && chapter.text.normal) {
-        return chapter.text.normal.replaceAll("{{status}}", status);
+        return chapter.text.normal.replaceAll("{{status}}", status) + (act === 0 ? birthStatLine() : "");
       }
 
       if (act <= 0) {
@@ -1594,6 +1601,7 @@
       });
       if (config.talentToQi) s.qi += s.talent;
       if (config.setPath) s.path = config.setPath;
+      if (config.setOrigin) s.origin = config.setOrigin;
       if (config.log) s.log = config.log;
     }
 
@@ -1607,6 +1615,20 @@
       };
     }
 
+    function rollBirthStats(s = state) {
+      const roll = () => 1 + Math.floor(Math.random() * 10);
+      s.rootBone = roll();
+      s.mind = roll();
+      s.luck = roll();
+      s.debt = roll();
+      s.log = `出生数值：根骨 ${s.rootBone}，心性 ${s.mind}，机缘 ${s.luck}，尘债 ${s.debt}。这些数值会影响你能拜入哪些门派，或撞见哪些隐线。`;
+    }
+
+    function birthStatLine() {
+      if (!state.rootBone || !state.mind || !state.luck || !state.debt) return "";
+      return `\n\n【出生数值】根骨 ${state.rootBone}　心性 ${state.mind}　机缘 ${state.luck}　尘债 ${state.debt}`;
+    }
+
     function chapterChoices() {
       const act = state.act || 0;
       if (state.years <= 0) {
@@ -1614,7 +1636,19 @@
       }
       const chapter = currentChapter();
       if (chapter && Array.isArray(chapter.choices)) {
-        return chapter.choices.map(configChoice);
+        const choices = chapter.choices.map(configChoice);
+        if (state.scene === "birth" && act === 0) {
+          const rerollChoice = {
+            text: state.rootBone ? "重掷这一世出生数值" : "掷出这一世出生数值",
+            to: "birth",
+            always: true,
+            advanceAct: false,
+            effect: rollBirthStats
+          };
+          if (!state.rootBone) return [rerollChoice];
+          choices.unshift(rerollChoice);
+        }
+        return choices;
       }
 
       if (act <= 0) {
@@ -1738,6 +1772,10 @@
       ];
     }
 
+    scenes.birth.title = () => `第 ${state.life} 世：${chapterName()}`;
+    scenes.birth.text = () => chapterText();
+    scenes.birth.choices = () => chapterChoices();
+
     function cloneData(value) {
       if (typeof structuredClone === "function") return structuredClone(value);
       return JSON.parse(JSON.stringify(value));
@@ -1816,6 +1854,7 @@
     const sceneSketch = document.querySelector("#scene-sketch");
     const choices = document.querySelector("#choices");
     const life = document.querySelector("#life");
+    const origin = document.querySelector("#origin");
     const realm = document.querySelector("#realm");
     const path = document.querySelector("#path");
     const years = document.querySelector("#years");
@@ -2121,7 +2160,8 @@
         state.shadowTrust >= 3 ? "判词：影子也有底线。夜哭记下了你划掉的那些名字。" : "",
         state.foxBond >= 3 ? "判词：狐火曾为陌生人停步。令狐九尾离懂得人间又近了一寸。" : "",
         state.inkContract >= 3 ? "判词：机关鸟飞过战火，带回来的不止盐晶，还有愿意担责的人心。" : "",
-        state.fireOath >= 3 ? "判词：荒火没有烧穿底线。彤记住了你先撤凡人再破门的顺序。" : ""
+        state.fireOath >= 3 ? "判词：荒火没有烧穿底线。彤记住了你先撤凡人再破门的顺序。" : "",
+        state.wandererCred >= 4 ? "判词：你没有入任何一门，却替许多门派补上了他们没能看见的人间。" : ""
       ].filter(Boolean);
       const penalty = state.karma >= 40 || state.virtue < 35 || reward.hell
         ? "幽都判定：因果偏重，下一世开局更难，但记忆更锋利。"
@@ -2505,6 +2545,7 @@
       state.iceLedger = Math.max(0, old.iceLedger || 0);
       state.fireOath = Math.max(0, Math.floor((old.fireOath || 0) * 0.55));
       state.moFeiyunProof = Math.max(0, old.moFeiyunProof || 0);
+      state.wandererCred = Math.max(0, Math.floor((old.wandererCred || 0) * 0.55));
       state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
       state.karma = choice.hell ? 15 : 0;
       state.log = choice.hell
@@ -2595,6 +2636,7 @@
       });
 
       life.textContent = `第 ${state.life} 世`;
+      origin.textContent = state.origin || "未定";
       realm.textContent = realms[state.realm];
       path.textContent = state.path;
       years.textContent = `${Math.max(0, state.years)} 年`;

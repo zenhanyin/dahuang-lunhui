@@ -8,40 +8,43 @@ window.DAHUANG_STORY_CONFIG = {
       "choices": [
         {
           "text": "在西陵废墙下醒来，扶起第一个哭哑的孩子",
-          "to": "greatCouncil",
+          "to": "afterBreak",
           "effects": {
             "virtue": 8,
             "memory": 1,
             "years": -1
           },
-          "setPath": "天机营",
+          "setPath": "未定",
+          "setOrigin": "西陵废墙",
           "log": "孩子的手印沾在天机盾背面。你还不知道他的名字，却已经知道这一世不能只顾修行。"
         },
         {
           "text": "在江南药庐醒来，闻见药炉里混着血腥气",
-          "to": "iceHeart",
+          "to": "afterBreak",
           "effects": {
             "virtue": 6,
             "iceLedger": 1,
             "years": -1
           },
-          "setPath": "冰心堂",
+          "setPath": "未定",
+          "setOrigin": "江南药庐",
           "log": "清时把药账翻到最后一页。一个三年前死在西陵的人，被写成明日午时入炉。"
         },
         {
           "text": "在雷泽沉船边醒来，屏住呼吸等雾里脚步过去",
-          "to": "shadow",
+          "to": "afterBreak",
           "effects": {
             "karma": 3,
             "shadowTrust": 1,
             "memory": 1
           },
-          "setPath": "魍魉",
+          "setPath": "未定",
+          "setOrigin": "雷泽沉船",
           "log": "夜哭没有回头，只把一枚六翼令丢进水里。令牌没有沉，反而映出你的脸。"
         },
         {
           "text": "在云麓观星台醒来，接住一片带盐痕的残页",
-          "to": "jadeClue",
+          "to": "afterBreak",
           "effects": {
             "fragments": 1,
             "qi": 12,
@@ -49,59 +52,64 @@ window.DAHUANG_STORY_CONFIG = {
             "years": -1
           },
           "talentToQi": true,
-          "setPath": "云麓仙居",
+          "setPath": "未定",
+          "setOrigin": "云麓观星台",
           "log": "星图尽头不是九天，而是一片被抹去名字的海。莫非云在页角夹了一根白羽。"
         },
         {
           "text": "在弈剑雨亭醒来，听见剑匣里有第二个人的呼吸",
-          "to": "tribulation",
+          "to": "afterBreak",
           "effects": {
             "swordHeart": 1,
             "qingyangTrace": 1,
             "qi": 10
           },
           "talentToQi": true,
-          "setPath": "弈剑听雨阁",
+          "setPath": "未定",
+          "setOrigin": "弈剑雨亭",
           "log": "雨水从剑匣缝里往上流。弈剑客说：从黄泉到碧落，我只是路过人间。"
         },
         {
           "text": "在翎羽山林醒来，拆开机关鸟腹中的东海盐晶",
-          "to": "jadeClue",
+          "to": "afterBreak",
           "effects": {
             "inkContract": 1,
             "fragments": 1,
             "qi": 8
           },
           "talentToQi": true,
-          "setPath": "翎羽山庄",
+          "setPath": "未定",
+          "setOrigin": "翎羽山林",
           "log": "遗墨把机关鸟递给你，鸟腹里滚出一粒盐晶，晶面刻着你的上一世生辰。"
         },
         {
           "text": "在荒火旧营醒来，摸到试锋石裂缝里的黑羽",
-          "to": "copperGate",
+          "to": "afterBreak",
           "effects": {
             "fireOath": 1,
             "qi": 18,
             "karma": 5,
             "years": -1
           },
-          "setPath": "荒火教",
+          "setPath": "未定",
+          "setOrigin": "荒火旧营",
           "log": "彤把长刀插进地里，问你火是用来开路，还是用来烧尽挡路的人。"
         },
         {
           "text": "在青丘边境醒来，看书生把最后一块干粮递给孩子",
-          "to": "foxRoad",
+          "to": "afterBreak",
           "effects": {
             "foxBond": 1,
             "virtue": 7,
             "memory": 1
           },
-          "setPath": "青丘客",
+          "setPath": "未定",
+          "setOrigin": "青丘边境",
           "log": "书生皱着眉，像是不明白自己为什么停下。火光里，九道白影一闪即逝。"
         },
         {
           "text": "在北溟雪线醒来，替玄晖挡住第一道追魂符",
-          "to": "northSea",
+          "to": "afterBreak",
           "requires": {
             "karmaMax": 45
           },
@@ -111,12 +119,13 @@ window.DAHUANG_STORY_CONFIG = {
             "virtue": 4,
             "years": -1
           },
-          "setPath": "北溟客",
+          "setPath": "未定",
+          "setOrigin": "北溟雪线",
           "log": "追魂符落在雪上不燃。玄晖看了你很久，说：你认错人了，我只是路过。"
         },
         {
           "text": "在幽都井口醒来，划掉轮回簿上写错的死期",
-          "to": "hell",
+          "to": "afterBreak",
           "requires": {
             "karmaMin": 20
           },
@@ -125,43 +134,53 @@ window.DAHUANG_STORY_CONFIG = {
             "karma": -5,
             "years": -1
           },
-          "setPath": "幽都照影",
+          "setPath": "未定",
+          "setOrigin": "幽都井口",
           "log": "判官没有锁链，只把灯推到你面前。灯里照出的是你上一世没救走的人。"
         }
       ]
     },
     {
-      "name": "八门入局",
+      "name": "入门或远行",
       "text": {
-        "normal": "十二岁到十六岁之间，你终于被大荒某一扇门接住。\n\n有人递给你盾，有人递给你药杵，有人只把剑匣推到桌边，让你自己打开。\n\n{{status}}\n\n门里没有答案，只有第一条规矩。"
+        "normal": "十二岁到十六岁之间，许多门都向你开过一线。\n\n有人递来盾牌，有人递来药杵，也有人只把一张空白路引压在桌上。你不必立刻属于谁。\n\n{{status}}\n\n拜入一门，是一种活法；不入诸门，也是一种活法。"
       },
       "choices": [
         {
-          "text": "接过天机营残盾，把孩子手印刻进军册",
+          "text": "拜入天机营：把残盾和军册一起接下",
           "to": "greatCouncil",
+          "requires": {
+            "rootBoneMin": 5
+          },
           "effects": {
             "virtue": 10,
             "fragments": 1,
             "years": -1
           },
           "setPath": "天机营",
-          "log": "营官说军册只记战功。你把盾背翻给他看，满厅忽然没人说话。"
+          "log": "营官看了你的根骨，又看了盾背的孩子手印，终于把军册推到你面前。"
         },
         {
-          "text": "把冰心药账翻到黑页，逼长老说出入炉二字",
+          "text": "拜入冰心堂：从药童做起，先学救人再学用毒",
           "to": "iceHeart",
+          "requires": {
+            "mindMin": 4
+          },
           "effects": {
             "iceLedger": 2,
             "virtue": 8,
-            "karma": 3,
+            "karma": 2,
             "fragments": 1
           },
           "setPath": "冰心堂",
-          "log": "清时的寒霜爬上账页。被写进死册的活人，正在门外排队取药。"
+          "log": "清时把药杵递给你：手稳不稳，比灵力高不高更要紧。"
         },
         {
-          "text": "接下弈剑客三剑，换他开旧阵眼",
+          "text": "拜入弈剑听雨阁：接三剑，开旧阵眼",
           "to": "tribulation",
+          "requires": {
+            "mindMin": 6
+          },
           "effects": {
             "swordHeart": 2,
             "qingyangTrace": 1,
@@ -173,8 +192,11 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "第三剑没有落在你身上，而是斩开雨幕。阵眼下露出四字：青阳降居。"
         },
         {
-          "text": "帮云麓弟子藏起白羽，先保住莫非云证词",
+          "text": "拜入云麓仙居：替莫非云先藏住白羽证词",
           "to": "jadeClue",
+          "requires": {
+            "luckMin": 4
+          },
           "effects": {
             "moFeiyunProof": 2,
             "virtue": 6,
@@ -184,8 +206,11 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "莫非云把白羽压在残页上。羽尖指向的不是太虚，是云麓一枚旧私印。"
         },
         {
-          "text": "入太虚镜室，让邪影先照你自己的脸",
+          "text": "拜入太虚观：入镜室，让邪影先照自己的脸",
           "to": "heartDemon",
+          "requires": {
+            "mindMin": 5
+          },
           "effects": {
             "shadowTrust": 1,
             "memory": 1,
@@ -195,8 +220,11 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "镜中邪影没有扑来，只学你的声音问：若被污名的是你，你还信门规吗？"
         },
         {
-          "text": "在雷泽沉船下取回六翼令，不问夜哭血脉",
+          "text": "拜入魍魉：取回六翼令，但不问夜哭血脉",
           "to": "shadow",
+          "requires": {
+            "debtMin": 4
+          },
           "effects": {
             "shadowTrust": 2,
             "karma": 4,
@@ -206,8 +234,11 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "长老们在岸上争血统。你潜进水底，只看见令牌旁有一道替人挡刀的旧痕。"
         },
         {
-          "text": "替遗墨修复剑炉机关，让机关鸟飞向东海",
+          "text": "拜入翎羽山庄：修剑炉机关，让机关鸟飞向东海",
           "to": "jadeClue",
+          "requires": {
+            "luckMin": 5
+          },
           "effects": {
             "inkContract": 2,
             "fragments": 1,
@@ -219,8 +250,11 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "机关鸟起飞前回头看了遗墨一眼，像一个不善告别的人。"
         },
         {
-          "text": "陪彤劈开试锋石，拒绝放出荧惑殿里的邪靡",
+          "text": "拜入荒火教：劈开试锋石，却不放出邪靡",
           "to": "copperGate",
+          "requires": {
+            "rootBoneMin": 6
+          },
           "effects": {
             "fireOath": 2,
             "virtue": 5,
@@ -231,29 +265,59 @@ window.DAHUANG_STORY_CONFIG = {
           "log": "石裂三寸，地底传来笑声。彤握紧刀柄，说这把火还不到交给疯子的时候。"
         },
         {
-          "text": "让令狐九尾做天机编外斥候，别拆穿他的狐尾",
+          "text": "不拜门派，只做诸门客卿：哪里缺人就往哪里去",
           "to": "foxRoad",
+          "requires": {
+            "luckMin": 3
+          },
           "effects": {
-            "foxBond": 2,
+            "wandererCred": 2,
             "virtue": 8,
             "memory": 1
           },
-          "setPath": "天机营",
-          "log": "他把尾影藏进袖里，偏偏在妖魔冲阵时忘了藏。九道狐火照亮盾墙。"
+          "setPath": "诸门客卿",
+          "log": "你没有接任何门帖，只收下一张空白路引。第一封信，要送去城外药棚。"
         },
         {
-          "text": "偷读玄华名剑录残页，把剑名记进识海",
-          "to": "tribulation",
+          "text": "做山海游侠：不入诸门，替被遗漏的人作证",
+          "to": "greatCouncil",
+          "effects": {
+            "wandererCred": 3,
+            "virtue": 6,
+            "karma": -2,
+            "memory": 1
+          },
+          "setPath": "山海游侠",
+          "log": "八封门帖摆在桌上，你只拿走压帖的石子。石子下面，藏着一个难民写错的名字。"
+        },
+        {
+          "text": "带着高机缘追北溟脚印，暂不定归属",
+          "to": "northSea",
           "requires": {
-            "memoryMin": 1
+            "luckMin": 8
           },
           "effects": {
-            "swordHeart": 1,
-            "fragments": 1,
-            "karma": 2
+            "xuanhuiBond": 1,
+            "sunCinders": 1,
+            "wandererCred": 1,
+            "years": -1
           },
-          "setPath": "弈剑听雨阁",
-          "log": "残页割破手指。血落在上邪二字旁，纸页里传来黄泉水声。"
+          "setPath": "未定",
+          "log": "雪线外有人回头看你一眼。你还没入门，却先欠下一场同行。"
+        },
+        {
+          "text": "尘债太重，先去幽都井口问清自己的死期",
+          "to": "hell",
+          "requires": {
+            "debtMin": 8
+          },
+          "effects": {
+            "memory": 2,
+            "karma": -6,
+            "wandererCred": 1
+          },
+          "setPath": "未定",
+          "log": "井水映出四个死期，其中三个已经被人改过。"
         }
       ]
     },

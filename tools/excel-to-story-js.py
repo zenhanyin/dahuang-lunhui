@@ -108,6 +108,8 @@ def build_config(workbook_path: Path):
             choice["talentToQi"] = True
         if scalar(row.get("SetPath", "")) != "":
             choice["setPath"] = str(row["SetPath"])
+        if scalar(row.get("SetOrigin", "")) != "":
+            choice["setOrigin"] = str(row["SetOrigin"])
         if scalar(row.get("Log", "")) != "":
             choice["log"] = str(row["Log"])
         if parse_bool(row.get("AdvanceAct", "")):
