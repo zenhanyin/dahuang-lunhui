@@ -181,6 +181,21 @@
       color: var(--bad);
     }
 
+    .audio-toggle {
+      width: 100%;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .audio-toggle strong {
+      color: var(--good);
+      font-weight: 700;
+    }
+
     @media (max-width: 800px) {
       body {
         padding: 0;
@@ -244,6 +259,14 @@
         <h2>记录</h2>
         <p id="log" class="log"></p>
       </section>
+
+      <section class="side-block">
+        <h2>声音</h2>
+        <button id="audio-toggle" class="audio-toggle" type="button">
+          <span>音效 / 音乐</span>
+          <strong id="audio-state">关</strong>
+        </button>
+      </section>
     </aside>
   </main>
 
@@ -266,7 +289,12 @@
       log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
     };
 
-    let state = structuredClone(freshLife);
+    function cloneData(value) {
+      if (typeof structuredClone === "function") return structuredClone(value);
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    let state = cloneData(freshLife);
 
     const scenes = {
       birth: {
@@ -755,19 +783,141 @@
     const talent = document.querySelector("#talent");
     const fragments = document.querySelector("#fragments");
     const log = document.querySelector("#log");
+    const audioToggle = document.querySelector("#audio-toggle");
+    const audioState = document.querySelector("#audio-state");
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    const audio = {
+      ctx: null,
+      enabled: false,
+      drones: [],
+      timer: null,
+
+      async start() {
+        if (!AudioContextClass) {
+          if (audioState) audioState.textContent = "不支持";
+          return;
+        }
+
+        try {
+          if (!this.ctx) this.ctx = new AudioContextClass();
+          if (this.ctx.state === "suspended") await this.ctx.resume();
+          this.enabled = true;
+          this.startMusic();
+          this.play("start");
+          this.updateLabel();
+        } catch (error) {
+          this.enabled = false;
+          this.updateLabel();
+        }
+      },
+
+      stop() {
+        this.enabled = false;
+        this.stopMusic();
+        this.updateLabel();
+      },
+
+      toggle() {
+        if (this.enabled) this.stop();
+        else this.start();
+      },
+
+      updateLabel() {
+        if (audioState) audioState.textContent = this.enabled ? "开" : "关";
+      },
+
+      startMusic() {
+        if (!this.ctx || this.drones.length) return;
+        const now = this.ctx.currentTime;
+        const master = this.ctx.createGain();
+        master.gain.setValueAtTime(0.035, now);
+        master.connect(this.ctx.destination);
+
+        [110, 165, 220].forEach((frequency, index) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = index === 1 ? "triangle" : "sine";
+          osc.frequency.setValueAtTime(frequency, now);
+          gain.gain.setValueAtTime(index === 0 ? 0.52 : 0.22, now);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start();
+          this.drones.push({ osc, gain, master });
+        });
+
+        this.timer = window.setInterval(() => {
+          if (!this.enabled || !this.ctx) return;
+          const t = this.ctx.currentTime;
+          const note = [330, 392, 440, 523][Math.floor(Math.random() * 4)];
+          this.tone(note, 0.65, 0.025, "sine", t);
+        }, 5200);
+      },
+
+      stopMusic() {
+        if (this.timer) window.clearInterval(this.timer);
+        this.timer = null;
+        this.drones.forEach(({ osc, gain }) => {
+          try {
+            const now = this.ctx.currentTime;
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setTargetAtTime(0, now, 0.08);
+            osc.stop(now + 0.22);
+          } catch (error) {}
+        });
+        this.drones = [];
+      },
+
+      tone(frequency, duration = 0.16, volume = 0.06, type = "sine", startTime) {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const now = startTime || this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(frequency, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.03);
+        } catch (error) {}
+      },
+
+      play(kind) {
+        if (!this.enabled || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const patterns = {
+          click: [[220, 0], [330, 0.045]],
+          start: [[196, 0], [294, 0.09], [392, 0.18]],
+          break: [[330, 0], [495, 0.08], [660, 0.16]],
+          rebirth: [[147, 0], [220, 0.11], [330, 0.24]],
+          ending: [[392, 0], [523, 0.13], [784, 0.34]],
+          danger: [[110, 0], [98, 0.12], [82, 0.24]]
+        };
+        (patterns[kind] || patterns.click).forEach(([frequency, offset]) => {
+          this.tone(frequency, 0.18, kind === "danger" ? 0.07 : 0.05, kind === "danger" ? "sawtooth" : "sine", now + offset);
+        });
+      }
+    };
+
+    if (audioToggle) audioToggle.addEventListener("click", () => audio.toggle());
 
     function textOf(value) {
       return typeof value === "function" ? value() : value;
     }
 
     function availableChoices(scene) {
-      return scene.choices.filter(choice => !choice.requires || choice.requires(state));
+      return (scene.choices || []).filter(choice => !choice.requires || choice.requires(state));
     }
 
     function rebirth(choice) {
-      const old = structuredClone(state);
+      audio.play(choice.hell ? "danger" : "rebirth");
+      const old = cloneData(state);
       const bonus = choice.bonus || {};
-      state = structuredClone(freshLife);
+      state = cloneData(freshLife);
       state.life = old.life + 1;
       state.memory = Math.max(0, old.memory + 1 + (bonus.memory || 0) - (choice.hell ? 2 : 0));
       state.talent = Math.max(0, Math.floor(old.talent * 0.55) + Math.floor(state.memory / 3) - (choice.hell ? 2 : 0));
@@ -781,11 +931,13 @@
     }
 
     function hardReset() {
-      state = structuredClone(freshLife);
+      audio.play("rebirth");
+      state = cloneData(freshLife);
       render();
     }
 
     function choose(choice) {
+      audio.play("click");
       if (choice.hardReset) {
         hardReset();
         return;
@@ -807,11 +959,23 @@
         state.log = "寿元走到尽头。好在你已经学会如何把失败带回下一世。";
       }
 
+      if (scenes[state.scene].ending) {
+        audio.play(state.scene === "hell" ? "danger" : "ending");
+      } else if (state.scene === "afterBreak") {
+        audio.play("break");
+      } else if (state.scene === "heartDemon") {
+        audio.play("danger");
+      }
+
       render();
     }
 
     function render() {
-      const scene = scenes[state.scene];
+      const scene = scenes[state.scene] || scenes.birth;
+      if (!scenes[state.scene]) {
+        state.scene = "birth";
+        state.log = "轮回出现裂隙，但你稳住了识海，重新回到山脚。";
+      }
       sceneTitle.textContent = scene.title;
       sceneTitle.className = scene.ending ? "ending" : "";
       sceneText.textContent = textOf(scene.text);
