@@ -373,7 +373,7 @@
         title: "Dahuang: Wheel of Rebirth",
         subtitle: "Awaken in Dahuang. Survive this life first.",
         language: "Language",
-        translationNote: "Built-in lightweight translation. Chinese remains the source text.",
+        translationNote: "Full text is translated on demand and cached locally. Chinese remains the source text.",
         thisLife: "This Life",
         lifeCount: "Lives",
         origin: "Birthplace",
@@ -400,7 +400,7 @@
         title: "大荒輪廻録",
         subtitle: "大荒に目覚めた。まずはこの一生を生き延びる。",
         language: "言語",
-        translationNote: "内蔵の簡易翻訳です。中国語が原文です。",
+        translationNote: "全文を必要に応じて翻訳し、端末内に保存します。中国語が原文です。",
         thisLife: "この一世",
         lifeCount: "世数",
         origin: "生まれ",
@@ -427,7 +427,7 @@
         title: "대황 윤회록",
         subtitle: "대황에서 깨어났다. 우선 이번 생을 살아남아라.",
         language: "언어",
-        translationNote: "내장 경량 번역입니다. 중국어가 원문입니다.",
+        translationNote: "본문은 필요할 때 번역되고 기기에 저장됩니다. 중국어가 원문입니다.",
         thisLife: "이번 생",
         lifeCount: "생",
         origin: "출생지",
@@ -501,11 +501,20 @@
       ]
     };
 
-    const TRANSLATION_PREFIX = {
-      en: "[Auto translation] ",
-      ja: "【簡易翻訳】",
-      ko: "[간이 번역] "
+    const TRANSLATION_LOADING = {
+      en: "Translating...",
+      ja: "翻訳中...",
+      ko: "번역 중..."
     };
+
+    const TRANSLATION_FAILED = {
+      en: "Translation unavailable. Showing original text.",
+      ja: "翻訳を取得できません。原文を表示します。",
+      ko: "번역을 가져올 수 없어 원문을 표시합니다."
+    };
+
+    const translationCache = new Map();
+    const translationPending = new Set();
 
     function readSavedLanguage() {
       try {
@@ -530,15 +539,58 @@
     function translateText(value) {
       const text = String(value ?? "");
       if (currentLanguage === "zh" || !text) return text;
-      let output = text;
-      for (const [from, to] of TRANSLATION_GLOSSARY[currentLanguage] || []) {
-        output = output.split(from).join(to);
-      }
-      return `${TRANSLATION_PREFIX[currentLanguage] || ""}${output}`;
+      const key = `${currentLanguage}\u0000${text}`;
+      if (translationCache.has(key)) return translationCache.get(key);
+      queueTranslation(currentLanguage, text, key);
+      return TRANSLATION_LOADING[currentLanguage] || "Translating...";
     }
 
     function translateValue(value) {
       return translateText(value);
+    }
+
+    function readCachedTranslation(key) {
+      try {
+        return window.localStorage && window.localStorage.getItem(`dahuang-translation:${key}`);
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function writeCachedTranslation(key, value) {
+      try {
+        window.localStorage && window.localStorage.setItem(`dahuang-translation:${key}`, value);
+      } catch (error) {}
+    }
+
+    function queueTranslation(language, text, key) {
+      const cached = readCachedTranslation(key);
+      if (cached) {
+        translationCache.set(key, cached);
+        setTimeout(render, 0);
+        return;
+      }
+      if (translationPending.has(key)) return;
+      translationPending.add(key);
+      fetch("/api/translate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ lang: language, text })
+      })
+        .then(response => response.ok ? response.json() : Promise.reject(new Error("bad response")))
+        .then(data => {
+          const translated = String(data && data.text || "").trim();
+          if (!translated) throw new Error("empty translation");
+          translationCache.set(key, translated);
+          writeCachedTranslation(key, translated);
+        })
+        .catch(() => {
+          translationCache.set(key, `${TRANSLATION_FAILED[language] || "Translation unavailable."}\n\n${text}`);
+        })
+        .finally(() => {
+          translationPending.delete(key);
+          if (language === currentLanguage) render();
+        });
     }
 
     const freshLife = {

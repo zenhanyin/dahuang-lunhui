@@ -163,11 +163,52 @@ async function statsPage(env) {
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
 }
 
+function targetLanguage(lang) {
+  if (lang === "en") return "en";
+  if (lang === "ja") return "ja";
+  if (lang === "ko") return "ko";
+  return "";
+}
+
+async function translateText(request) {
+  if (request.method !== "POST") {
+    return jsonResponse({ ok: false, error: "method_not_allowed" }, { status: 405 });
+  }
+  let payload = {};
+  try {
+    payload = await request.json();
+  } catch (error) {
+    return jsonResponse({ ok: false, error: "bad_json" }, { status: 400 });
+  }
+  const target = targetLanguage(payload.lang);
+  const sourceText = textValue(payload.text, 4800);
+  if (!target || !sourceText) return jsonResponse({ ok: false, error: "bad_request" }, { status: 400 });
+
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
+    encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(sourceText);
+  const response = await fetch(url, {
+    headers: {
+      "accept": "application/json,text/plain,*/*",
+      "user-agent": "Mozilla/5.0"
+    }
+  });
+  if (!response.ok) return jsonResponse({ ok: false, error: "translate_failed" }, { status: 502 });
+  const data = await response.json();
+  const translated = Array.isArray(data && data[0])
+    ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
+    : "";
+  return jsonResponse({ ok: true, text: translated || sourceText });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/track") {
       return recordAnalytics(request, env);
+    }
+
+    if (url.pathname === "/api/translate") {
+      return translateText(request);
     }
 
     if ((url.pathname === "/stats" || url.pathname === "/api/stats") && url.searchParams.get("key") !== statsKey) {
