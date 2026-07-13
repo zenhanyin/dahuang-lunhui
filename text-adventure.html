@@ -239,6 +239,25 @@
       font-weight: 700;
     }
 
+    .language-select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font: inherit;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+
+    .language-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     @media (max-width: 800px) {
       body {
         padding: 0;
@@ -303,6 +322,17 @@
           <strong id="audio-state">关</strong>
         </button>
       </section>
+
+      <section class="side-block">
+        <h2 data-i18n="language">语言</h2>
+        <select id="language-select" class="language-select" aria-label="语言">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+        </select>
+        <p class="language-note" data-i18n="translationNote">翻译为内置轻量版本，中文为原始文本。</p>
+      </section>
     </aside>
   </main>
 
@@ -310,6 +340,206 @@
   <script>
     (() => {
     const realms = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "渡劫", "飞升"];
+    const I18N = {
+      zh: {
+        htmlLang: "zh-CN",
+        title: "大荒轮回录",
+        subtitle: "在大荒醒来，先活过这一世",
+        language: "语言",
+        translationNote: "翻译为内置轻量版本，中文为原始文本。",
+        thisLife: "这一世",
+        lifeCount: "世数",
+        origin: "出生地",
+        realm: "境界",
+        path: "流派",
+        years: "寿元",
+        cultivation: "修为",
+        qi: "灵力",
+        virtue: "道德",
+        karma: "因果",
+        trace: "行迹",
+        sound: "声音",
+        audioLabel: "大荒主题音乐 / 音效",
+        on: "开",
+        off: "关",
+        unsupported: "不支持",
+        year: "年",
+        life: n => `第 ${n} 世`,
+        unknown: "未定",
+        artLabel: "当前道途画面"
+      },
+      en: {
+        htmlLang: "en",
+        title: "Dahuang: Wheel of Rebirth",
+        subtitle: "Awaken in Dahuang. Survive this life first.",
+        language: "Language",
+        translationNote: "Built-in lightweight translation. Chinese remains the source text.",
+        thisLife: "This Life",
+        lifeCount: "Lives",
+        origin: "Birthplace",
+        realm: "Realm",
+        path: "Path",
+        years: "Lifespan",
+        cultivation: "Cultivation",
+        qi: "Spirit",
+        virtue: "Virtue",
+        karma: "Karma",
+        trace: "Trail",
+        sound: "Sound",
+        audioLabel: "Dahuang Theme / SFX",
+        on: "On",
+        off: "Off",
+        unsupported: "Unsupported",
+        year: "yrs",
+        life: n => `Life ${n}`,
+        unknown: "Undecided",
+        artLabel: "Current journey image"
+      },
+      ja: {
+        htmlLang: "ja",
+        title: "大荒輪廻録",
+        subtitle: "大荒に目覚めた。まずはこの一生を生き延びる。",
+        language: "言語",
+        translationNote: "内蔵の簡易翻訳です。中国語が原文です。",
+        thisLife: "この一世",
+        lifeCount: "世数",
+        origin: "生まれ",
+        realm: "境地",
+        path: "流派",
+        years: "寿元",
+        cultivation: "修行",
+        qi: "霊力",
+        virtue: "徳",
+        karma: "因果",
+        trace: "足跡",
+        sound: "音",
+        audioLabel: "大荒テーマ / 効果音",
+        on: "入",
+        off: "切",
+        unsupported: "未対応",
+        year: "年",
+        life: n => `第 ${n} 世`,
+        unknown: "未定",
+        artLabel: "現在の道程の画"
+      },
+      ko: {
+        htmlLang: "ko",
+        title: "대황 윤회록",
+        subtitle: "대황에서 깨어났다. 우선 이번 생을 살아남아라.",
+        language: "언어",
+        translationNote: "내장 경량 번역입니다. 중국어가 원문입니다.",
+        thisLife: "이번 생",
+        lifeCount: "생",
+        origin: "출생지",
+        realm: "경지",
+        path: "유파",
+        years: "수명",
+        cultivation: "수련",
+        qi: "영력",
+        virtue: "도덕",
+        karma: "인과",
+        trace: "행적",
+        sound: "소리",
+        audioLabel: "대황 테마 / 효과음",
+        on: "켜짐",
+        off: "꺼짐",
+        unsupported: "미지원",
+        year: "년",
+        life: n => `${n}번째 생`,
+        unknown: "미정",
+        artLabel: "현재 여정 이미지"
+      }
+    };
+
+    const TRANSLATION_GLOSSARY = {
+      en: [
+        ["大荒轮回录", "Dahuang: Wheel of Rebirth"], ["大荒", "Dahuang"], ["轮回", "rebirth cycle"],
+        ["这一世", "this life"], ["第 ", "Life "], [" 世", ""], ["出生地", "birthplace"],
+        ["凡人", "Mortal"], ["炼气", "Qi Refining"], ["筑基", "Foundation"], ["金丹", "Golden Core"],
+        ["元婴", "Nascent Soul"], ["化神", "Spirit Transformation"], ["渡劫", "Tribulation"], ["飞升", "Ascension"],
+        ["天机营", "Tianji Camp"], ["冰心堂", "Bingxin Hall"], ["弈剑听雨阁", "Yijian Rain Pavilion"],
+        ["云麓仙居", "Yunlu Hermitage"], ["太虚观", "Taixu Temple"], ["魍魉", "Wangliang"],
+        ["翎羽山庄", "Lingyu Manor"], ["荒火营地", "Wildfire Camp"], ["游侠", "wanderer"],
+        ["铜门", "bronze gate"], ["幽都", "Youdu"], ["神界", "divine realm"], ["人间", "the mortal world"],
+        ["玄晖", "Xuanhui"], ["金乌", "Golden Crow"], ["青阳", "Qingyang"], ["少昊", "Shaohao"], ["莫非云", "Mo Feiyun"],
+        ["雪线", "snowline"], ["水镜", "water mirror"], ["药庐", "medicine hut"], ["药账", "medicine ledger"],
+        ["军册", "military register"], ["星灯", "star lamp"], ["旧令", "old token"], ["机关鸟", "mechanical bird"],
+        ["盐晶", "salt crystal"], ["雨亭", "rain pavilion"], ["剑", "sword"], ["灯", "lamp"],
+        ["你", "you"], ["有人", "someone"], ["没有", "not"], ["先", "first"], ["选择", "choose"],
+        ["相信", "trust"], ["开口", "speak"], ["离开", "leave"], ["醒来", "wake"], ["记忆", "memory"],
+        ["道德", "virtue"], ["因果", "karma"], ["灵力", "spirit"], ["寿元", "lifespan"], ["未定", "undecided"]
+      ],
+      ja: [
+        ["大荒轮回录", "大荒輪廻録"], ["大荒", "大荒"], ["轮回", "輪廻"],
+        ["这一世", "この一世"], ["第 ", "第 "], [" 世", " 世"], ["出生地", "生まれ"],
+        ["凡人", "凡人"], ["炼气", "練気"], ["筑基", "築基"], ["金丹", "金丹"], ["元婴", "元嬰"],
+        ["化神", "化神"], ["渡劫", "渡劫"], ["飞升", "飛昇"], ["天机营", "天機営"], ["冰心堂", "氷心堂"],
+        ["弈剑听雨阁", "弈剣聴雨閣"], ["云麓仙居", "雲麓仙居"], ["太虚观", "太虚観"], ["魍魉", "魍魎"],
+        ["翎羽山庄", "翎羽山荘"], ["荒火营地", "荒火営地"], ["游侠", "遊侠"], ["铜门", "青銅の門"],
+        ["幽都", "幽都"], ["神界", "神界"], ["人间", "人の世"], ["玄晖", "玄暉"], ["金乌", "金烏"],
+        ["青阳", "青陽"], ["少昊", "少昊"], ["莫非云", "莫非雲"], ["雪线", "雪線"], ["水镜", "水鏡"],
+        ["药庐", "薬廬"], ["药账", "薬帳"], ["军册", "軍冊"], ["星灯", "星灯"], ["旧令", "古い令牌"],
+        ["机关鸟", "機巧鳥"], ["盐晶", "塩晶"], ["雨亭", "雨亭"], ["剑", "剣"], ["灯", "灯"],
+        ["你", "あなた"], ["有人", "誰か"], ["没有", "ない"], ["先", "まず"], ["选择", "選ぶ"],
+        ["相信", "信じる"], ["开口", "口を開く"], ["离开", "離れる"], ["醒来", "目覚める"], ["记忆", "記憶"],
+        ["道德", "徳"], ["因果", "因果"], ["灵力", "霊力"], ["寿元", "寿元"], ["未定", "未定"]
+      ],
+      ko: [
+        ["大荒轮回录", "대황 윤회록"], ["大荒", "대황"], ["轮回", "윤회"],
+        ["这一世", "이번 생"], ["第 ", ""], [" 世", "번째 생"], ["出生地", "출생지"],
+        ["凡人", "범인"], ["炼气", "연기"], ["筑基", "축기"], ["金丹", "금단"], ["元婴", "원영"],
+        ["化神", "화신"], ["渡劫", "도겁"], ["飞升", "비승"], ["天机营", "천기영"], ["冰心堂", "빙심당"],
+        ["弈剑听雨阁", "혁검청우각"], ["云麓仙居", "운록선거"], ["太虚观", "태허관"], ["魍魉", "망량"],
+        ["翎羽山庄", "영우산장"], ["荒火营地", "황화영지"], ["游侠", "유협"], ["铜门", "청동문"],
+        ["幽都", "유도"], ["神界", "신계"], ["人间", "인간계"], ["玄晖", "현휘"], ["金乌", "금오"],
+        ["青阳", "청양"], ["少昊", "소호"], ["莫非云", "막비운"], ["雪线", "설선"], ["水镜", "수경"],
+        ["药庐", "약려"], ["药账", "약장부"], ["军册", "군책"], ["星灯", "별등"], ["旧令", "옛 령패"],
+        ["机关鸟", "기관새"], ["盐晶", "소금 결정"], ["雨亭", "비 내리는 정자"], ["剑", "검"], ["灯", "등"],
+        ["你", "너"], ["有人", "누군가"], ["没有", "없다"], ["先", "먼저"], ["选择", "선택"],
+        ["相信", "믿다"], ["开口", "입을 열다"], ["离开", "떠나다"], ["醒来", "깨어나다"], ["记忆", "기억"],
+        ["道德", "도덕"], ["因果", "인과"], ["灵力", "영력"], ["寿元", "수명"], ["未定", "미정"]
+      ]
+    };
+
+    const TRANSLATION_PREFIX = {
+      en: "[Auto translation] ",
+      ja: "【簡易翻訳】",
+      ko: "[간이 번역] "
+    };
+
+    function readSavedLanguage() {
+      try {
+        return window.localStorage && window.localStorage.getItem("dahuang-language");
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function saveLanguage(language) {
+      try {
+        window.localStorage && window.localStorage.setItem("dahuang-language", language);
+      } catch (error) {}
+    }
+
+    let currentLanguage = readSavedLanguage() || "zh";
+
+    function ui(key) {
+      return (I18N[currentLanguage] && I18N[currentLanguage][key]) || I18N.zh[key] || key;
+    }
+
+    function translateText(value) {
+      const text = String(value ?? "");
+      if (currentLanguage === "zh" || !text) return text;
+      let output = text;
+      for (const [from, to] of TRANSLATION_GLOSSARY[currentLanguage] || []) {
+        output = output.split(from).join(to);
+      }
+      return `${TRANSLATION_PREFIX[currentLanguage] || ""}${output}`;
+    }
+
+    function translateValue(value) {
+      return translateText(value);
+    }
 
     const freshLife = {
       scene: "birth",
@@ -903,6 +1133,9 @@
     const sceneText = document.querySelector("#scene-text");
     const sceneSketch = document.querySelector("#scene-sketch");
     const choices = document.querySelector("#choices");
+    const appTitle = document.querySelector("h1");
+    const subtitle = document.querySelector(".subtitle");
+    const languageSelect = document.querySelector("#language-select");
     const life = document.querySelector("#life");
     const origin = document.querySelector("#origin");
     const realm = document.querySelector("#realm");
@@ -917,6 +1150,15 @@
     const audioState = document.querySelector("#audio-state");
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
+    if (languageSelect) {
+      languageSelect.value = I18N[currentLanguage] ? currentLanguage : "zh";
+      languageSelect.addEventListener("change", () => {
+        currentLanguage = languageSelect.value;
+        saveLanguage(currentLanguage);
+        render();
+      });
+    }
+
     const audio = {
       ctx: null,
       enabled: false,
@@ -929,7 +1171,7 @@
 
       async start() {
         if (!AudioContextClass) {
-          if (audioState) audioState.textContent = "不支持";
+          if (audioState) audioState.textContent = ui("unsupported");
           return;
         }
 
@@ -967,7 +1209,7 @@
       },
 
       updateLabel() {
-        if (audioState) audioState.textContent = this.enabled ? "\u5f00" : "\u5173";
+        if (audioState) audioState.textContent = this.enabled ? ui("on") : ui("off");
       },
 
       profile() {
@@ -1470,22 +1712,56 @@ function rebirth(choice) {
       render();
     }
 
+    function applyStaticLanguage() {
+      if (document.documentElement) document.documentElement.lang = ui("htmlLang");
+      document.title = ui("title");
+      if (appTitle) appTitle.textContent = ui("title");
+      if (subtitle) subtitle.textContent = ui("subtitle");
+      if (sceneSketch && sceneSketch.setAttribute) sceneSketch.setAttribute("aria-label", ui("artLabel"));
+      if (document.querySelectorAll) document.querySelectorAll("[data-i18n]").forEach(node => {
+        node.textContent = ui(node.dataset.i18n);
+      });
+      const blocks = document.querySelectorAll ? document.querySelectorAll(".side-block") : [];
+      if (blocks[0]) {
+        blocks[0].querySelector("h2").textContent = ui("thisLife");
+        const labels = blocks[0].querySelectorAll("li span");
+        [ui("lifeCount"), ui("origin"), ui("realm"), ui("path"), ui("years")].forEach((label, index) => {
+          if (labels[index]) labels[index].textContent = label;
+        });
+      }
+      if (blocks[1]) {
+        blocks[1].querySelector("h2").textContent = ui("cultivation");
+        const labels = blocks[1].querySelectorAll("li span");
+        [ui("qi"), ui("virtue"), ui("karma")].forEach((label, index) => {
+          if (labels[index]) labels[index].textContent = label;
+        });
+      }
+      if (blocks[2]) blocks[2].querySelector("h2").textContent = ui("trace");
+      if (blocks[3]) {
+        blocks[3].querySelector("h2").textContent = ui("sound");
+        const audioLabel = blocks[3].querySelector(".audio-toggle span");
+        if (audioLabel) audioLabel.textContent = ui("audioLabel");
+      }
+      audio.updateLabel();
+    }
+
     function render() {
+      applyStaticLanguage();
       const scene = scenes[state.scene] || scenes.birth;
       if (!scenes[state.scene]) {
         state.scene = "birth";
         state.log = "轮回出现裂隙，但你稳住了识海，重新回到山脚。";
       }
-      sceneTitle.textContent = textOf(scene.title);
+      sceneTitle.textContent = translateText(textOf(scene.title));
       sceneTitle.className = scene.ending ? "ending" : "";
-      sceneText.textContent = variedSceneText(scene, textOf(scene.text));
+      sceneText.textContent = translateText(variedSceneText(scene, textOf(scene.text)));
       const summary = endingSummary(scene);
       if (summary) {
         sceneText.innerHTML = "";
-        sceneText.append(document.createTextNode(variedSceneText(scene, textOf(scene.text))));
+        sceneText.append(document.createTextNode(translateText(variedSceneText(scene, textOf(scene.text)))));
         const summaryBox = document.createElement("div");
         summaryBox.className = "life-summary";
-        summaryBox.textContent = summary;
+        summaryBox.textContent = translateText(summary);
         sceneText.append(summaryBox);
       }
       if (sceneSketch) sceneSketch.innerHTML = artworkForState(scene);
@@ -1496,7 +1772,7 @@ function rebirth(choice) {
         if (choice.once && state.flags[choice.once]) return;
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = choice.text;
+        button.textContent = translateText(choice.text);
         button.addEventListener("click", () => {
           audio.ensureStarted();
           choose(choice);
@@ -1504,17 +1780,17 @@ function rebirth(choice) {
         choices.appendChild(button);
       });
 
-      life.textContent = `第 ${state.life} 世`;
-      origin.textContent = state.origin || "未定";
-      realm.textContent = realms[state.realm];
-      path.textContent = state.path;
-      years.textContent = `${Math.max(0, state.years)} 年`;
+      life.textContent = ui("life")(state.life);
+      origin.textContent = translateValue(state.origin || ui("unknown"));
+      realm.textContent = translateValue(realms[state.realm]);
+      path.textContent = translateValue(state.path);
+      years.textContent = `${Math.max(0, state.years)} ${ui("year")}`;
       qi.textContent = state.qi;
       virtue.textContent = state.virtue;
       virtue.className = state.virtue < 35 ? "warning" : "";
       karma.textContent = state.karma;
       karma.className = state.karma > 35 ? "warning" : "";
-      log.textContent = state.log;
+      log.textContent = translateText(state.log);
 
       const nextThreshold = 28 + state.realm * 22 + Math.max(0, 50 - state.virtue) + Math.max(0, state.karma);
       qiBar.style.width = `${Math.min(100, Math.round((state.qi / Math.max(1, nextThreshold)) * 100))}%`;
