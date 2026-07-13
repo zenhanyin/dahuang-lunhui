@@ -1,13 +1,13 @@
 window.DAHUANG_STORY_CONFIG = {
   "chapters": [
     {
-      "name": "这一世缘起何处",
+      "name": "这一世从何处醒来",
       "text": {
-        "normal": "你睁眼时，手心攥着一小片温热的铜锈。\n\n窗外不是同一个清晨。有人在废墙下哭，有人在雾里点灯，也有人把药炉搬到你床前。\n\n{{status}}\n\n先活下去。至于这一世会遇见谁，还要等你走出去。"
+        "normal": "你睁眼时，掌心压着一小片温热的铜锈。\n\n身体像刚从很深的水里浮上来。骨节发酸，心口却有一缕热意，仿佛这一世的根骨、心性、机缘和旧债正在慢慢归位。\n\n{{status}}\n\n先别急着看窗外。你要先摸清这副身骨，看看它能承住多少风雨。"
       },
       "choices": [
         {
-          "text": "在西陵废墙下醒来，扶起第一个哭哑的孩子",
+          "text": "在西陵废墙下醒来",
           "to": "afterBreak",
           "effects": {
             "virtue": 8,
@@ -16,10 +16,10 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "setPath": "未定",
           "setOrigin": "西陵废墙",
-          "log": "孩子的手印沾在天机盾背面。你还不知道他的名字，却已经知道这一世不能只顾修行。"
+          "log": "孩子的手印留在旧盾背面。你把盾翻过来，先听见墙外有人在哭。"
         },
         {
-          "text": "在江南药庐醒来，闻见药炉里混着血腥气",
+          "text": "在江南药庐醒来",
           "to": "afterBreak",
           "effects": {
             "virtue": 6,
@@ -28,10 +28,10 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "setPath": "未定",
           "setOrigin": "江南药庐",
-          "log": "清时把药账翻到最后一页。一个三年前死在西陵的人，被写成明日午时入炉。"
+          "log": "药炉快熄了。床边放着一张无字药签，纸角还带着血腥味。"
         },
         {
-          "text": "在雷泽沉船边醒来，屏住呼吸等雾里脚步过去",
+          "text": "在雷泽沉船边醒来",
           "to": "afterBreak",
           "effects": {
             "karma": 3,
@@ -40,10 +40,10 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "setPath": "未定",
           "setOrigin": "雷泽沉船",
-          "log": "夜哭没有回头，只把一枚六翼令丢进水里。令牌没有沉，反而映出你的脸。"
+          "log": "雾里有人把半枚旧令丢进水里。令牌没有沉，只映出你的脸。"
         },
         {
-          "text": "在云麓观星台醒来，接住一片带盐痕的残页",
+          "text": "在望星台醒来",
           "to": "afterBreak",
           "effects": {
             "fragments": 1,
@@ -53,11 +53,11 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "talentToQi": true,
           "setPath": "未定",
-          "setOrigin": "云麓观星台",
-          "log": "星图尽头不是九天，而是一片被抹去名字的海。莫非云在页角夹了一根白羽。"
+          "setOrigin": "望星台",
+          "log": "星图尽头不是天，是一片被潮声擦过的黑。你捡到一根白羽。"
         },
         {
-          "text": "在弈剑雨亭醒来，听见剑匣里有第二个人的呼吸",
+          "text": "在旧雨亭醒来",
           "to": "afterBreak",
           "effects": {
             "swordHeart": 1,
@@ -66,11 +66,11 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "talentToQi": true,
           "setPath": "未定",
-          "setOrigin": "弈剑雨亭",
-          "log": "雨水从剑匣缝里往上流。弈剑客说：从黄泉到碧落，我只是路过人间。"
+          "setOrigin": "旧雨亭",
+          "log": "雨水从亭檐往上流。柱子上刻着一句旧话，你只认得其中半句。"
         },
         {
-          "text": "在翎羽山林醒来，拆开机关鸟腹中的东海盐晶",
+          "text": "在白林边醒来",
           "to": "afterBreak",
           "effects": {
             "inkContract": 1,
@@ -79,11 +79,11 @@ window.DAHUANG_STORY_CONFIG = {
           },
           "talentToQi": true,
           "setPath": "未定",
-          "setOrigin": "翎羽山林",
-          "log": "遗墨把机关鸟递给你，鸟腹里滚出一粒盐晶，晶面刻着你的上一世生辰。"
+          "setOrigin": "白林边",
+          "log": "一只破损的机关鸟倒在树根边。鸟腹里滚出一粒盐晶，你先把它们收进袖中。"
         },
         {
-          "text": "在荒火旧营醒来，摸到试锋石裂缝里的黑羽",
+          "text": "在焦土旧营醒来",
           "to": "afterBreak",
           "effects": {
             "fireOath": 1,
@@ -91,12 +91,13 @@ window.DAHUANG_STORY_CONFIG = {
             "karma": 5,
             "years": -1
           },
+          "talentToQi": true,
           "setPath": "未定",
-          "setOrigin": "荒火旧营",
-          "log": "彤把长刀插进地里，问你火是用来开路，还是用来烧尽挡路的人。"
+          "setOrigin": "焦土旧营",
+          "log": "试锋石裂开三寸。地底传来笑声，你把耳朵移开。"
         },
         {
-          "text": "在青丘边境醒来，看书生把最后一块干粮递给孩子",
+          "text": "在青丘野渡醒来",
           "to": "afterBreak",
           "effects": {
             "foxBond": 1,
@@ -104,14 +105,810 @@ window.DAHUANG_STORY_CONFIG = {
             "memory": 1
           },
           "setPath": "未定",
-          "setOrigin": "青丘边境",
-          "log": "书生皱着眉，像是不明白自己为什么停下。火光里，九道白影一闪即逝。"
+          "setOrigin": "青丘野渡",
+          "log": "渡口没有船。一个书生把最后半块干粮递给孩子，又匆匆走进雾里。"
         },
         {
-          "text": "在北溟雪线醒来，替玄晖挡住第一道追魂符",
+          "text": "在北边雪线醒来",
+          "to": "afterBreak",
+          "effects": {
+            "xuanhuiBond": 1,
+            "sunCinders": 1,
+            "virtue": 4,
+            "years": -1
+          },
+          "setPath": "未定",
+          "setOrigin": "北边雪线",
+          "log": "追魂符落在雪上没有燃。远处有人回头看了你一眼，又把脸藏进风里。"
+        },
+        {
+          "text": "在旧井口醒来",
+          "to": "afterBreak",
+          "effects": {
+            "memory": 2,
+            "karma": -5,
+            "years": -1
+          },
+          "setPath": "未定",
+          "setOrigin": "旧井口",
+          "log": "井口没有锁链，只有一盏灯被推到你面前。灯里照出你没救走的人。"
+        },
+        {
+          "text": "在白水渡口醒来",
+          "to": "afterBreak",
+          "effects": {
+            "virtue": 5,
+            "wandererCred": 1,
+            "memory": 1
+          },
+          "setPath": "未定",
+          "setOrigin": "白水渡口",
+          "log": "渡船还没靠岸，船夫却已经知道你要过河。他问你带不带旧账。"
+        },
+        {
+          "text": "在赤水河滩醒来",
+          "to": "afterBreak",
+          "effects": {
+            "qi": 10,
+            "karma": 2,
+            "fragments": 1
+          },
+          "talentToQi": true,
+          "setPath": "未定",
+          "setOrigin": "赤水河滩",
+          "log": "河沙里埋着半片铜符，摸上去像晒过很久。水下有人敲了三下石头。"
+        },
+        {
+          "text": "在鹿鸣古道醒来",
+          "to": "afterBreak",
+          "effects": {
+            "luck": 1,
+            "virtue": 4,
+            "years": -1
+          },
+          "setPath": "未定",
+          "setOrigin": "鹿鸣古道",
+          "log": "古道两侧没有行人，只有鹿蹄印一路通向山外。你忽然不急着拜入任何山门。"
+        },
+        {
+          "text": "在海边盐滩醒来",
+          "to": "afterBreak",
+          "effects": {
+            "fragments": 1,
+            "qingyangTrace": 1,
+            "karma": 1
+          },
+          "setPath": "未定",
+          "setOrigin": "海边盐滩",
+          "log": "潮水退去后，盐壳下露出一行旧字。海风磨平了大半，只剩一个字还清楚。"
+        }
+      ]
+    },
+    {
+      "name": "择路之前",
+      "text": {
+        "normal": "十二岁到十六岁之间，你走到许多山门与营帐之前。\n\n守门人把木牌推到你面前，药庐的童子在阶下等你回话。桌角还压着一张空白路引，墨没有干。\n\n{{status}}\n\n你不必马上归属谁。先决定今晚住在哪里。"
+      },
+      "choices": [
+        {
+          "text": "去天机营报到",
+          "to": "afterBreak",
+          "effects": {
+            "virtue": 6,
+            "fragments": 1,
+            "years": -1
+          },
+          "setPath": "天机营",
+          "log": "守门校尉递来一碗冷水，又把没写完的军册推到你面前。你先学会看名字，也学会看名字后面的伤。"
+        },
+        {
+          "text": "去冰心堂药庐帮忙",
+          "to": "afterBreak",
+          "effects": {
+            "iceLedger": 2,
+            "virtue": 8,
+            "karma": 1
+          },
+          "setPath": "冰心堂",
+          "log": "药庐少年把药杵放进你手里，让你先听清三个人的咳声。药炉旁没有人急着问你会不会救人。"
+        },
+        {
+          "text": "去弈剑听雨阁试剑",
+          "to": "afterBreak",
+          "effects": {
+            "swordHeart": 2,
+            "qingyangTrace": 1,
+            "qi": 18,
+            "years": -1
+          },
+          "talentToQi": true,
+          "setPath": "弈剑听雨阁",
+          "log": "雨亭剑客让你在雨里站到天亮。你没有拔剑，只记住雨落在鞘上的轻响。"
+        },
+        {
+          "text": "去云麓仙居守星灯",
+          "to": "afterBreak",
+          "effects": {
+            "moFeiyunProof": 1,
+            "virtue": 5,
+            "fragments": 1
+          },
+          "setPath": "云麓仙居",
+          "log": "观星的人把一根白羽夹进书页里。那夜星灯没有灭，你也没有问白羽从哪里来。"
+        },
+        {
+          "text": "去太虚观扫镜室",
+          "to": "afterBreak",
+          "effects": {
+            "shadowTrust": 1,
+            "memory": 1,
+            "karma": -1
+          },
+          "setPath": "太虚观",
+          "log": "镜室里积着一层灰。你扫到最后才发现，镜中的影子总比你慢半步。"
+        },
+        {
+          "text": "去旧巷领夜牌",
+          "to": "afterBreak",
+          "effects": {
+            "shadowTrust": 2,
+            "karma": 4,
+            "fragments": 1
+          },
+          "setPath": "魍魉",
+          "log": "递牌的人手很稳。夜牌入手微凉，你听见巷子深处有人把门闩放下。"
+        },
+        {
+          "text": "去翎羽山庄修机关鸟",
+          "to": "afterBreak",
+          "effects": {
+            "inkContract": 2,
+            "fragments": 1,
+            "qi": 8,
+            "years": -1
+          },
+          "talentToQi": true,
+          "setPath": "翎羽山庄",
+          "log": "机关师把最小的一只机关鸟推给你。鸟腹里卡着盐晶，你先学会怎样不弄断它的翅骨。"
+        },
+        {
+          "text": "去荒火营搬炭",
+          "to": "afterBreak",
+          "effects": {
+            "fireOath": 2,
+            "virtue": 4,
+            "qi": 18,
+            "karma": 2
+          },
+          "talentToQi": true,
+          "setPath": "荒火营地",
+          "log": "炉边女子站在火光后看你搬炭。你没有丢下木筐，她才把挡路的人拨开。"
+        },
+        {
+          "text": "随商队过渡",
+          "to": "afterBreak",
+          "effects": {
+            "wandererCred": 2,
+            "virtue": 6,
+            "memory": 1
+          },
+          "setPath": "游侠",
+          "log": "车辕上的书生把账簿丢给你。商队要过河，你先学会数车，也学会数没上车的人。"
+        },
+        {
+          "text": "留在城里做杂役",
+          "to": "afterBreak",
+          "effects": {
+            "wandererCred": 3,
+            "virtue": 5,
+            "karma": -2,
+            "memory": 1
+          },
+          "setPath": "游侠",
+          "log": "老船夫把扫帚递给你。门里的人说话很轻，杂役却常常听见最先漏出来的那一句。"
+        }
+      ]
+    },
+    {
+      "name": "雨夜有人敲门",
+      "text": {
+        "normal": "你刚选定落脚处，还没认全这个院落里的人。\n\n入夜后，雨把街上的脚印冲淡。药庐后门传来压低的咳声，城墙外有孩子在哭，巷口那盏灯灭了又亮。\n\n{{status}}\n\n门没有锁。你可以出去，也可以假装没有听见。"
+      },
+      "choices": [
+        {
+          "text": "去药庐后门",
           "to": "afterBreak",
           "requires": {
-            "karmaMax": 45
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 1,
+            "virtue": 12,
+            "karma": -3,
+            "years": -1
+          },
+          "log": "药庐少年扶着咳血的人，袖口全湿了。你没有问那人犯过什么错，只先扶住门。"
+        },
+        {
+          "text": "去城墙下",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|游侠|荒火营地"
+          },
+          "effects": {
+            "foxBond": 2,
+            "virtue": 9,
+            "years": -1
+          },
+          "log": "有人蹲在墙下，正把湿透的铃铛塞回孩子手里。你把外衣披过去。"
+        },
+        {
+          "text": "去巷口看那盏灯",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "魍魉|太虚观|游侠"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "virtue": 4,
+            "karma": 2,
+            "fragments": 1
+          },
+          "log": "灯灭时，墙上多出第二个人影。持刀的人没有回头，只用刀鞘敲了敲地面。"
+        },
+        {
+          "text": "守住桌上的军册与铜锈",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|游侠"
+          },
+          "effects": {
+            "virtue": 8,
+            "fragments": 1
+          },
+          "log": "窗外有人伸手来拿军册。你按住桌沿，听见门外有人低声叹气。"
+        },
+        {
+          "text": "跟着机关鸟上屋檐",
+          "to": "afterBreak",
+          "requires": {
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "inkContract": 2,
+            "virtue": 8,
+            "fragments": 1,
+            "years": -1
+          },
+          "log": "机关鸟飞得歪斜，却总能避开巡夜人的灯。它把你带到一片破瓦前。"
+        },
+        {
+          "text": "把铜锈藏进袖中",
+          "to": "afterBreak",
+          "requires": {
+            "path": "云麓仙居"
+          },
+          "effects": {
+            "moFeiyunProof": 1,
+            "qi": 14,
+            "karma": 4
+          },
+          "talentToQi": true,
+          "log": "铜锈贴着皮肤发热。观星的人没有看你，只把书页往灯下压了压。"
+        },
+        {
+          "text": "去雨亭听剑声",
+          "to": "afterBreak",
+          "requires": {
+            "path": "弈剑听雨阁"
+          },
+          "effects": {
+            "swordHeart": 2,
+            "qingyangTrace": 1,
+            "qi": 12
+          },
+          "talentToQi": true,
+          "log": "亭中无人，剑声却从脚下传来。有人把伞留在亭外，人已经不见了。"
+        },
+        {
+          "text": "沿雪味去找点灯的人",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|游侠"
+          },
+          "effects": {
+            "xuanhuiBond": 1,
+            "sunCinders": 1,
+            "years": -1
+          },
+          "log": "雨里夹着雪味。你走了很久，才看见前方有人点灯；那人没有报名字。"
+        },
+        {
+          "text": "先叫醒没被点名的人",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|游侠|荒火营地"
+          },
+          "effects": {
+            "virtue": 10,
+            "wandererCred": 1,
+            "karma": -2
+          },
+          "log": "有人骂你多管闲事。可火烧起来时，最先冲进巷子的也是一个你白天见过的人。"
+        },
+        {
+          "text": "装作没看见镜里的影子",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "太虚观|魍魉"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "memory": 1,
+            "karma": 6
+          },
+          "log": "脚步声停在床前很久。你闭着眼，听见门外的铃轻轻响了一下。"
+        },
+        {
+          "text": "送一包冷针到药庐",
+          "to": "afterBreak",
+          "requires": {
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 2,
+            "virtue": 6,
+            "karma": -1,
+            "years": -1
+          },
+          "log": "递针的人只说若屋里的人还在喘气，就别先问他站在哪边。"
+        },
+        {
+          "text": "把挡箭木车推到巷口",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|荒火营地"
+          },
+          "effects": {
+            "virtue": 8,
+            "wandererCred": 1,
+            "qi": 8,
+            "years": -1
+          },
+          "talentToQi": true,
+          "log": "推车的人没有说谢，只把最轻的一面木盾递给你，说别让孩子看见火光。"
+        },
+        {
+          "text": "在镜室外停一会儿",
+          "to": "afterBreak",
+          "requires": {
+            "path": "太虚观"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "moFeiyunProof": 1,
+            "karma": 2
+          },
+          "log": "隔着门有人问：如果影子不背叛人，人还会不会背叛影子？你没有立刻回答。"
+        },
+        {
+          "text": "收起一封没寄出的信",
+          "to": "afterBreak",
+          "requires": {
+            "path": "云麓仙居"
+          },
+          "effects": {
+            "moFeiyunProof": 1,
+            "virtue": 3,
+            "karma": 1
+          },
+          "log": "写信的人看见你手里的信，神色微变。他让你别拆，只替他压在星灯下面。"
+        },
+        {
+          "text": "翻看军册缺页",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "virtue": 6,
+            "wandererCred": 1,
+            "karma": -1
+          },
+          "log": "校尉把缺页摊在灯下，只让你先数伤号，不许先数功劳。"
+        },
+        {
+          "text": "去北墙补巡灯",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "xuanhuiBond": 1,
+            "virtue": 5,
+            "years": -1
+          },
+          "log": "北墙的风里夹着雪味。你把灯重新挂好，看见墙外有一行很浅的脚印。"
+        },
+        {
+          "text": "把伤号名册重新誊一遍",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "virtue": 8,
+            "memory": 1,
+            "years": -1
+          },
+          "log": "你把名字誊到天亮，才发现有三个人在两份册子里都被划掉了。"
+        },
+        {
+          "text": "先守住军械库门",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "qi": 10,
+            "karma": 2
+          },
+          "talentToQi": true,
+          "log": "门外有人低声说只是借一副弩机。你没有开门，只把门闩又推紧了一寸。"
+        },
+        {
+          "text": "在雨亭檐下听完三声剑响",
+          "to": "afterBreak",
+          "requires": {
+            "path": "弈剑听雨阁"
+          },
+          "effects": {
+            "swordHeart": 1,
+            "qi": 10,
+            "years": -1
+          },
+          "talentToQi": true,
+          "log": "你没有追进雨里，只在檐下听完三声剑响。第三声落下时，剑鞘上的水珠往北滚了一寸。"
+        },
+        {
+          "text": "替剑架擦去雨水",
+          "to": "afterBreak",
+          "requires": {
+            "path": "弈剑听雨阁"
+          },
+          "effects": {
+            "virtue": 5,
+            "swordHeart": 1,
+            "karma": -1
+          },
+          "log": "剑架上的旧痕被你一点点擦出来。有人经过门外，没有进来，只留下一句：别让剑先替你选路。"
+        },
+        {
+          "text": "拆开机关鸟腹中的细线",
+          "to": "afterBreak",
+          "requires": {
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "inkContract": 1,
+            "qi": 8
+          },
+          "talentToQi": true,
+          "log": "细线缠得很紧，你拆到最后才看见里面还夹着一粒潮湿盐晶。机关师让你先别声张。"
+        },
+        {
+          "text": "把坏掉的木翼收进匣里",
+          "to": "afterBreak",
+          "requires": {
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "inkContract": 1,
+            "virtue": 6,
+            "years": -1
+          },
+          "log": "木翼边缘有被火燎过的黑痕。你把它收进匣里，听见匣底轻轻响了一声。"
+        },
+        {
+          "text": "替星灯换一根短芯",
+          "to": "afterBreak",
+          "requires": {
+            "path": "云麓仙居"
+          },
+          "effects": {
+            "moFeiyunProof": 1,
+            "virtue": 5,
+            "years": -1
+          },
+          "log": "短芯亮起来时，书页里的白羽没有动，窗外的云却往低处压了压。"
+        },
+        {
+          "text": "把空白星图压回书页",
+          "to": "afterBreak",
+          "requires": {
+            "path": "云麓仙居"
+          },
+          "effects": {
+            "moFeiyunProof": 1,
+            "memory": 1,
+            "karma": 1
+          },
+          "log": "星图上没有墨迹，纸背却有盐水干过的皱痕。观星的人让你明日再看。"
+        },
+        {
+          "text": "把药炉边的水重新温上",
+          "to": "afterBreak",
+          "requires": {
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 1,
+            "virtue": 6
+          },
+          "log": "水热起来以前，后门的咳声又轻了一点。童子低声说，今晚不能只看药方。"
+        },
+        {
+          "text": "替药童记下三次咳声",
+          "to": "afterBreak",
+          "requires": {
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 1,
+            "memory": 1,
+            "karma": -1
+          },
+          "log": "你把三次咳声记在纸角。药童看了很久，说这不是同一种病。"
+        },
+        {
+          "text": "擦去镜脚旁的新灰",
+          "to": "afterBreak",
+          "requires": {
+            "path": "太虚观"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "memory": 1
+          },
+          "log": "灰被擦开后，镜中多出一道很淡的门缝。你没有伸手去碰。"
+        },
+        {
+          "text": "把夜牌藏回袖中",
+          "to": "afterBreak",
+          "requires": {
+            "path": "魍魉"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "karma": 2,
+            "qi": 6
+          },
+          "talentToQi": true,
+          "log": "夜牌贴着袖口发凉。巷口有人走过，你听见他故意踩碎了一片瓦。"
+        }
+      ]
+    },
+    {
+      "name": "灯下整理",
+      "text": {
+        "normal": "雨停以后，你终于有空坐下来，把昨夜看见的事从头理一遍。\n\n桌上没有多少东西，只有掌心那片铜锈，还有昨夜留下的一点痕迹。你把它们按在灯下，不急着替它们起名字。\n\n{{status}}\n\n你没有急着向任何人交代。先把来路理清，再决定下一步该问谁。"
+      },
+      "choices": [
+        {
+          "text": "把无字药签浸进水里",
+          "to": "afterBreak",
+          "requires": {
+            "iceLedgerMin": 1,
+            "path": "冰心堂"
+          },
+          "effects": {
+            "fragments": 1,
+            "qi": 12,
+            "karma": 2
+          },
+          "talentToQi": true,
+          "log": "药签背面慢慢浮出三个时辰。药庐少年看着水面，手停了一下。"
+        },
+        {
+          "text": "把湿透的羽片放到灯下",
+          "to": "afterBreak",
+          "requires": {
+            "moFeiyunProofMin": 1,
+            "path": "云麓仙居"
+          },
+          "effects": {
+            "iceLedger": 2,
+            "virtue": 8
+          },
+          "log": "观星的人没有立刻接。他看着羽片上的盐痕，像在确认一件不该发生的事。"
+        },
+        {
+          "text": "把断掉的剑穗挂回墙上",
+          "to": "afterBreak",
+          "requires": {
+            "swordHeartMin": 1,
+            "path": "弈剑听雨阁"
+          },
+          "effects": {
+            "moFeiyunProof": 2,
+            "virtue": 6,
+            "fragments": 1
+          },
+          "log": "雨亭剑客把剑穗挂回墙上。它自己转了半圈，指向北边。"
+        },
+        {
+          "text": "把旧令扣在桌面",
+          "to": "afterBreak",
+          "requires": {
+            "shadowTrustMin": 1,
+            "pathIn": "魍魉|太虚观"
+          },
+          "effects": {
+            "swordHeart": 2,
+            "qingyangTrace": 2,
+            "qi": 10
+          },
+          "talentToQi": true,
+          "log": "旧令投下的影子不止一枚。持刀的人看了一眼影子，换了握刀的手。"
+        },
+        {
+          "text": "把旧令推到持刀的人面前",
+          "to": "afterBreak",
+          "requires": {
+            "shadowTrustMin": 1,
+            "path": "魍魉"
+          },
+          "effects": {
+            "shadowTrust": 2,
+            "karma": 3
+          },
+          "log": "那人没有伸手接，只把刀鞘横在桌边。旧令的影子落在刀鞘上，像一条没有走完的路。"
+        },
+        {
+          "text": "让机关鸟自己选择",
+          "to": "afterBreak",
+          "requires": {
+            "inkContractMin": 1,
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "virtue": 10,
+            "wandererCred": 1,
+            "karma": -2
+          },
+          "log": "机关鸟啄了啄盐晶，又啄了啄你的袖口。机关师低声说：它记得路。"
+        },
+        {
+          "text": "把盐晶放到机关鸟旁",
+          "to": "afterBreak",
+          "requires": {
+            "inkContractMin": 1,
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "inkContract": 2,
+            "fragments": 1
+          },
+          "log": "机关鸟忽然安静下来，翅骨里的细线一根根绷直。机关师低声说：它认得这粒盐晶。"
+        },
+        {
+          "text": "先收起掌心那片铜锈",
+          "to": "afterBreak",
+          "effects": {
+            "memory": 1,
+            "karma": 6,
+            "qi": 8
+          },
+          "talentToQi": true,
+          "log": "没有人敢拦你。可走出屋门时，你背后多了一道影子。"
+        },
+        {
+          "text": "把机关鸟交还回去",
+          "to": "afterBreak",
+          "requires": {
+            "inkContractMin": 1,
+            "path": "翎羽山庄"
+          },
+          "effects": {
+            "inkContract": 3,
+            "fragments": 1,
+            "virtue": 4
+          },
+          "log": "机关师接过机关鸟，先检查它有没有受惊，再问你盐晶是从哪里滚出来的。"
+        },
+        {
+          "text": "请镜室里的人看一眼灰痕",
+          "to": "afterBreak",
+          "requires": {
+            "shadowTrustMin": 1,
+            "path": "太虚观"
+          },
+          "effects": {
+            "shadowTrust": 1,
+            "memory": 1,
+            "karma": -1
+          },
+          "log": "镜室里的人没有擦镜，只在灰上添了一笔。镜中的影子忽然安静下来。"
+        },
+        {
+          "text": "请药庐里两个人同看药签",
+          "to": "afterBreak",
+          "requires": {
+            "iceLedgerMin": 1,
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 3,
+            "virtue": 8,
+            "karma": -2
+          },
+          "log": "一个人看时辰，一个人看药味。两人谁也没先说话，却同时把药炉挪近了些。"
+        },
+        {
+          "text": "请校尉看一眼铜锈上的旧痕",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|荒火营地|游侠"
+          },
+          "effects": {
+            "wandererCred": 1,
+            "virtue": 8,
+            "karma": -1
+          },
+          "log": "校尉用指节碰了碰铜锈边缘，说这种痕迹不像战场留下的，更像有人曾经想把门重新合上。"
+        },
+        {
+          "text": "把缺页夹回军册",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "fragments": 1,
+            "virtue": 8,
+            "karma": -1
+          },
+          "log": "缺页夹回去时，铜锈在案上轻轻一响。校尉没有问你从哪里找到它，只问还差几个人。"
+        },
+        {
+          "text": "请校尉先看伤号名册",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "virtue": 10,
+            "wandererCred": 1,
+            "karma": -2
+          },
+          "log": "校尉看完名册，先把刀放下。他说这不是军功簿，是活人簿。"
+        },
+        {
+          "text": "把巡灯图钉在北墙上",
+          "to": "afterBreak",
+          "requires": {
+            "path": "天机营"
+          },
+          "effects": {
+            "xuanhuiBond": 1,
+            "sunCinders": 1,
+            "fragments": 1
+          },
+          "log": "巡灯图贴上墙时，最北边那一点墨迹慢慢渗开，像雪里有人回头。"
+        }
+      ]
+    },
+    {
+      "name": "雪线之外",
+      "text": {
+        "normal": "这几夜里反复出现的方向，最后都指向北方雪线。\n\n你顺着风走到雪线外。雪地里有一串脚印，旁边落着不融的金灰；更远处立着一座太古铜门，门前有灯。\n\n{{status}}\n\n你还不知道铜门后是什么，只知道雪线不是终点。有人已经在风里等了很久。"
+      },
+      "choices": [
+        {
+          "text": "走向雪地里点灯的人",
+          "to": "afterBreak",
+          "requires": {
+            "xuanhuiBondMin": 1
           },
           "effects": {
             "xuanhuiBond": 2,
@@ -119,1017 +916,615 @@ window.DAHUANG_STORY_CONFIG = {
             "virtue": 4,
             "years": -1
           },
-          "setPath": "未定",
-          "setOrigin": "北溟雪线",
-          "log": "追魂符落在雪上不燃。玄晖看了你很久，说：你认错人了，我只是路过。"
+          "log": "灯旁的人没有回头，只把一件斗篷丢给你。你终于听见旁人叫他玄晖。"
         },
         {
-          "text": "在幽都井口醒来，划掉轮回簿上写错的死期",
+          "text": "陪车辕上的书生绕开太古铜门",
           "to": "afterBreak",
           "requires": {
-            "karmaMin": 20
+            "wandererCredMin": 1
           },
           "effects": {
-            "memory": 2,
-            "karma": -5,
-            "years": -1
-          },
-          "setPath": "未定",
-          "setOrigin": "幽都井口",
-          "log": "判官没有锁链，只把灯推到你面前。灯里照出的是你上一世没救走的人。"
-        }
-      ]
-    },
-    {
-      "name": "择路或远行",
-      "text": {
-        "normal": "十二岁到十六岁之间，你带着那段缘起走到诸门之前。\n\n有人递来盾牌，有人递来药杵，也有人只把一张空白路引压在桌上。缘起只是你醒来的地方，不是要你立刻归属于谁。\n\n{{status}}\n\n拜入一门，是一种选择；不入诸门，也是一种选择。"
-      },
-      "choices": [
-        {
-          "text": "拜入天机营：把残盾和军册一起接下",
-          "to": "greatCouncil",
-          "requires": {
-            "rootBoneMin": 5
-          },
-          "effects": {
-            "virtue": 10,
-            "fragments": 1,
-            "years": -1
-          },
-          "setPath": "天机营",
-          "log": "营官看了你的根骨，又看了盾背的孩子手印，终于把军册推到你面前。"
-        },
-        {
-          "text": "拜入冰心堂：从药童做起，先学救人再学用毒",
-          "to": "iceHeart",
-          "requires": {
-            "mindMin": 4
-          },
-          "effects": {
-            "iceLedger": 2,
-            "virtue": 8,
-            "karma": 2,
-            "fragments": 1
-          },
-          "setPath": "冰心堂",
-          "log": "清时把药杵递给你：手稳不稳，比灵力高不高更要紧。"
-        },
-        {
-          "text": "拜入弈剑听雨阁：接三剑，开旧阵眼",
-          "to": "tribulation",
-          "requires": {
-            "mindMin": 6
-          },
-          "effects": {
-            "swordHeart": 2,
-            "qingyangTrace": 1,
-            "qi": 22,
-            "years": -1
-          },
-          "talentToQi": true,
-          "setPath": "弈剑听雨阁",
-          "log": "第三剑没有落在你身上，而是斩开雨幕。阵眼下露出四字：青阳降居。"
-        },
-        {
-          "text": "拜入云麓仙居：替莫非云先藏住白羽证词",
-          "to": "jadeClue",
-          "requires": {
-            "luckMin": 4
-          },
-          "effects": {
-            "moFeiyunProof": 2,
-            "virtue": 6,
-            "fragments": 1
-          },
-          "setPath": "云麓仙居",
-          "log": "莫非云把白羽压在残页上。羽尖指向的不是太虚，是云麓一枚旧私印。"
-        },
-        {
-          "text": "拜入太虚观：入镜室，让邪影先照自己的脸",
-          "to": "heartDemon",
-          "requires": {
-            "mindMin": 5
-          },
-          "effects": {
-            "shadowTrust": 1,
-            "memory": 1,
-            "karma": -2
-          },
-          "setPath": "太虚观",
-          "log": "镜中邪影没有扑来，只学你的声音问：若被污名的是你，你还信门规吗？"
-        },
-        {
-          "text": "拜入魍魉：取回六翼令，但不问夜哭血脉",
-          "to": "shadow",
-          "requires": {
-            "debtMin": 4
-          },
-          "effects": {
-            "shadowTrust": 2,
-            "karma": 4,
-            "fragments": 1
-          },
-          "setPath": "魍魉",
-          "log": "长老们在岸上争血统。你潜进水底，只看见令牌旁有一道替人挡刀的旧痕。"
-        },
-        {
-          "text": "拜入翎羽山庄：修剑炉机关，让机关鸟飞向东海",
-          "to": "jadeClue",
-          "requires": {
-            "luckMin": 5
-          },
-          "effects": {
-            "inkContract": 2,
-            "fragments": 1,
-            "qi": 10,
-            "years": -1
-          },
-          "talentToQi": true,
-          "setPath": "翎羽山庄",
-          "log": "机关鸟起飞前回头看了遗墨一眼，像一个不善告别的人。"
-        },
-        {
-          "text": "拜入荒火教：劈开试锋石，却不放出邪靡",
-          "to": "copperGate",
-          "requires": {
-            "rootBoneMin": 6
-          },
-          "effects": {
-            "fireOath": 2,
-            "virtue": 5,
-            "qi": 20,
+            "sunCinders": 2,
+            "qi": 16,
             "karma": 2
           },
-          "setPath": "荒火教",
-          "log": "石裂三寸，地底传来笑声。彤握紧刀柄，说这把火还不到交给疯子的时候。"
-        },
-        {
-          "text": "不拜门派，只做诸门客卿：哪里缺人就往哪里去",
-          "to": "foxRoad",
-          "requires": {
-            "luckMin": 3
-          },
-          "effects": {
-            "wandererCred": 2,
-            "virtue": 8,
-            "memory": 1
-          },
-          "setPath": "诸门客卿",
-          "log": "你没有接任何门帖，只收下一张空白路引。第一封信，要送去城外药棚。"
-        },
-        {
-          "text": "做山海游侠：不入诸门，替被遗漏的人作证",
-          "to": "greatCouncil",
-          "effects": {
-            "wandererCred": 3,
-            "virtue": 6,
-            "karma": -2,
-            "memory": 1
-          },
-          "setPath": "山海游侠",
-          "log": "八封门帖摆在桌上，你只拿走压帖的石子。石子下面，藏着一个难民写错的名字。"
-        },
-        {
-          "text": "带着高机缘追北溟脚印，暂不定归属",
-          "to": "northSea",
-          "requires": {
-            "luckMin": 8
-          },
-          "effects": {
-            "xuanhuiBond": 1,
-            "sunCinders": 1,
-            "wandererCred": 1,
-            "years": -1
-          },
-          "setPath": "未定",
-          "log": "雪线外有人回头看你一眼。你还没入门，却先欠下一场同行。"
-        },
-        {
-          "text": "尘债太重，先去幽都井口问清自己的死期",
-          "to": "hell",
-          "requires": {
-            "debtMin": 8
-          },
-          "effects": {
-            "memory": 2,
-            "karma": -6,
-            "wandererCred": 1
-          },
-          "setPath": "未定",
-          "log": "井水映出四个死期，其中三个已经被人改过。"
-        }
-      ]
-    },
-    {
-      "name": "人间有故人",
-      "text": {
-        "normal": "第一次下山，雨从屋檐滴到刀鞘上。\n\n你在城门、药庐、山道和雪线边遇见不同的人。他们都像路过，却都没有真的走开。\n\n{{status}}\n\n这一回，先听谁把话说完？"
-      },
-      "choices": [
-        {
-          "text": "把魂灯还给清时，让他先救敌将再审情报",
-          "to": "iceHeart",
-          "requires": {
-            "iceLedgerMin": 1
-          },
-          "effects": {
-            "iceLedger": 1,
-            "virtue": 14,
-            "karma": -4,
-            "years": -1
-          },
-          "log": "清时没有道谢。他只是把毒针收回袖中，替敌将把断气接了回来。"
-        },
-        {
-          "text": "把莫非云的白羽交给冷喻，而不是交给诸门",
-          "to": "jadeClue",
-          "requires": {
-            "moFeiyunProofMin": 1
-          },
-          "effects": {
-            "moFeiyunProof": 1,
-            "shadowTrust": 1,
-            "virtue": 8,
-            "karma": -3
-          },
-          "log": "冷喻没有哭。她把白羽压在旧药瓶下，瓶底云麓私印终于露出来。"
-        },
-        {
-          "text": "陪令狐九尾守一夜城门，看他学会害怕",
-          "to": "foxRoad",
-          "requires": {
-            "foxBondMin": 1
-          },
-          "effects": {
-            "foxBond": 2,
-            "virtue": 10,
-            "years": -1
-          },
-          "log": "天快亮时，他问你：若我今日怕死，还算不算懂了人间感情？"
-        },
-        {
-          "text": "替玄晖把手从火里拉出来，别问他是不是神子",
-          "to": "northSea",
-          "effects": {
-            "xuanhuiBond": 2,
-            "sunCinders": 1,
-            "virtue": 5
-          },
-          "log": "火没有烧他，却把你的掌心烫出一圈残日。他低声说：神子也会冷。"
-        },
-        {
-          "text": "与夜哭分一张暗杀名单，划掉孩子和药师的名字",
-          "to": "shadow",
-          "requires": {
-            "shadowTrustMin": 1
-          },
-          "effects": {
-            "shadowTrust": 2,
-            "virtue": 6,
-            "karma": 2,
-            "fragments": 1
-          },
-          "log": "夜哭看着那两道墨痕，第一次说：影子不是谁都杀。"
-        },
-        {
-          "text": "让遗墨机关鸟带走难民，而不是追踪神域使者",
-          "to": "jadeClue",
-          "requires": {
-            "inkContractMin": 1
-          },
-          "effects": {
-            "inkContract": 2,
-            "virtue": 12,
-            "fragments": 1,
-            "years": -1
-          },
-          "log": "机关鸟载不动所有人。遗墨拆下自己的剑炉，把第二只鸟拼到天亮。"
-        },
-        {
-          "text": "陪彤封住荧惑殿，把邪靡的笑声锁回地底",
-          "to": "copperGate",
-          "requires": {
-            "fireOathMin": 1
-          },
-          "effects": {
-            "fireOath": 2,
-            "virtue": 8,
-            "qi": 18,
-            "karma": -2
-          },
           "talentToQi": true,
-          "log": "彤背对殿门站了很久。她说荒火可以输，但不能把人间交给一场疯火。"
+          "log": "车辕上的书生没有逞强。雪线外还有活人等着回家，你跟他一起绕开铜门，把人往回带。"
         },
         {
-          "text": "跟弈剑客走到黄泉渡口，问他为何总说路过",
-          "to": "hell",
+          "text": "陪雨亭剑客把断剑穗埋进雪里",
+          "to": "afterBreak",
           "requires": {
             "swordHeartMin": 2
           },
           "effects": {
-            "swordHeart": 2,
-            "qingyangTrace": 1,
-            "memory": 1
+            "wandererCred": 1,
+            "virtue": 8,
+            "years": -1
           },
-          "log": "他擦剑的手停了一下：因为停得太久，就会以为黄泉和碧落都比人间重要。"
+          "log": "雪下传来一声轻响，像有人终于把剑放下。你第一次听见旁人叫他青阳。"
         },
         {
-          "text": "把冷喻旧案写进云麓星图，逼观星台亮出私印",
-          "to": "greatCouncil",
+          "text": "沿冰下潮声前行",
+          "to": "afterBreak",
           "requires": {
-            "moFeiyunProofMin": 2
+            "moFeiyunProofMin": 1
           },
           "effects": {
-            "moFeiyunProof": 1,
-            "virtue": 10,
-            "karma": 4,
-            "fragments": 1
+            "swordHeart": 2,
+            "qingyangTrace": 1,
+            "karma": -2
           },
-          "log": "星图亮起时，云麓长老先拔剑斩镜。你看见他怕的不是魔女，是证词。"
+          "log": "潮声从冰下传来。观星的人把白羽压在掌心，提醒你别走太快。"
         },
         {
-          "text": "在北溟雪夜听玄晖讲射日之后",
-          "to": "northSea",
+          "text": "接过校尉递来的旧盾",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|荒火营地|游侠"
+          },
+          "effects": {
+            "fragments": 1,
+            "moFeiyunProof": 1,
+            "years": -1
+          },
+          "log": "盾面很冷，背后的手印却像刚留下不久。校尉把它交给你，你听见风里有人在喊。"
+        },
+        {
+          "text": "回身替伤者挡住风雪",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|冰心堂|荒火营地|游侠"
+          },
+          "effects": {
+            "virtue": 12,
+            "karma": -4,
+            "wandererCred": 1
+          },
+          "log": "后来的人走得很慢。你没有催，只把风挡在前面，让他们一个个走过雪线。"
+        },
+        {
+          "text": "陪点灯的人在雪里停一停",
+          "to": "afterBreak",
           "requires": {
             "xuanhuiBondMin": 2
           },
           "effects": {
-            "xuanhuiBond": 2,
-            "sunCinders": 2,
-            "memory": 1,
+            "xuanhuiBond": 3,
+            "sunCinders": 1,
+            "virtue": 5,
             "years": -1
           },
-          "log": "他说十日坠落时，他才知道贵为神明也会被写进别人的命数。"
+          "log": "点灯的人停在风里很久。他没有解释金灰，只问你冷不冷。旁人低声叫他玄晖。"
         },
         {
-          "text": "用记忆点记住所有人的名字，而不是只记线索",
-          "to": "death",
+          "text": "把商队带回避风处",
+          "to": "afterBreak",
           "requires": {
-            "memoryMin": 4,
-            "virtueMin": 70
+            "wandererCredMin": 1
           },
           "effects": {
-            "memory": 2,
-            "virtue": 6,
-            "years": -99
+            "foxBond": 3,
+            "wandererCred": 1,
+            "virtue": 8,
+            "years": -1
           },
-          "log": "这一世你没有走到铜门前。但下一世，你会更早认出他们。"
-        }
-      ]
-    },
-    {
-      "name": "玄华名剑录",
-      "text": {
-        "normal": "弈剑旧阁的雨下了三日。\n\n剑匣自己开了一线，里面不是剑光，而是一卷被虫蛀穿的旧录。纸页潮湿，边角还沾着干血。\n\n{{status}}\n\n你伸手时，匣中传来第二个人的呼吸。"
-      },
-      "choices": [
-        {
-          "text": "翻开朱曦素影页，追问弈剑从何而来",
-          "to": "tribulation",
-          "requires": {
-            "swordHeartMin": 1
-          },
-          "effects": {
-            "swordHeart": 1,
-            "qingyangTrace": 1,
-            "qi": 18
-          },
-          "talentToQi": true,
-          "log": "创派之剑没有剑鸣，只有广成子旧印。黄帝帝师四字，被雨水泡得发白。"
+          "log": "车辕上的书生数错了三次人数，最后干脆把每个人的名字都念了一遍。"
         },
         {
-          "text": "拓下轩辕剑残纹，查黄帝为何飞升东海",
-          "to": "jadeClue",
+          "text": "听雨亭剑客说一句旧话",
+          "to": "afterBreak",
           "requires": {
-            "qingyangTraceMin": 1
+            "swordHeartMin": 2
           },
           "effects": {
+            "swordHeart": 3,
             "qingyangTrace": 2,
-            "fragments": 1,
-            "qi": 12,
-            "years": -1
+            "qi": 8
           },
           "talentToQi": true,
-          "log": "残纹尽头接着东海潮声。少昊的名字在水里一闪，像被谁故意抹去。"
+          "log": "雨亭剑客说完那句旧话就闭了嘴。雪落在剑鞘上，没有化。"
         },
         {
-          "text": "借天策剑立约，让天机和冰心先互认账册",
-          "to": "greatCouncil",
-          "requires": {
-            "iceLedgerMin": 1
-          },
-          "effects": {
-            "virtue": 12,
-            "fragments": 1,
-            "iceLedger": 1
-          },
-          "log": "剑没有出鞘，只横在两本册子之间。先低头的是拿军令的人。"
-        },
-        {
-          "text": "追查黑玄剑，看看玉玑子把谁写成棋子",
-          "to": "heartDemon",
-          "effects": {
-            "fragments": 1,
-            "karma": 8,
-            "memory": 1
-          },
-          "log": "黑玄剑影里没有狂笑，只有一张排满名字的棋盘。最边上，是你的字迹。"
-        },
-        {
-          "text": "拾起上邪残锋，听见七夜离开人间那一夜",
-          "to": "hell",
-          "effects": {
-            "memory": 1,
-            "karma": 5,
-            "fragments": 1
-          },
-          "log": "残锋贴近耳边时，黄泉水忽然涨潮。有人抱剑发誓，终有一日踏破九黎。"
-        },
-        {
-          "text": "用桃木剑斩开邪影污名，不许诸门再称冷喻为天生魔女",
-          "to": "jadeClue",
+          "text": "沿着白羽走一段",
+          "to": "afterBreak",
           "requires": {
             "moFeiyunProofMin": 2
           },
           "effects": {
-            "virtue": 14,
-            "shadowTrust": 1,
-            "fragments": 1
+            "moFeiyunProof": 2,
+            "virtue": 5,
+            "fragments": 1,
+            "years": -1
           },
-          "log": "桃木剑轻得像玩具，却斩断了药瓶上的假封条。满厅没有一个人敢笑。"
+          "log": "白羽落在冰面上，指向潮声更深的地方。观星的人没有回头，只抬手让你慢些。"
         },
         {
-          "text": "读墨罂剑页，查情毒如何从云麓流进太虚",
-          "to": "iceHeart",
+          "text": "把药箱背过雪线",
+          "to": "afterBreak",
+          "requires": {
+            "path": "冰心堂"
+          },
+          "effects": {
+            "iceLedger": 1,
+            "virtue": 6,
+            "years": -1
+          },
+          "log": "药箱压得肩头发疼。你没问雪线后有什么，只先确认药瓶没有碎。"
+        },
+        {
+          "text": "沿剑鞘声找避风处",
+          "to": "afterBreak",
+          "requires": {
+            "path": "弈剑听雨阁"
+          },
+          "effects": {
+            "swordHeart": 1,
+            "virtue": 4,
+            "years": -1
+          },
+          "log": "风雪里有一声很轻的鞘响。你没有拔剑，只带着后来的人往声音稀薄处走。"
+        },
+        {
+          "text": "把星灯藏进袖中",
+          "to": "afterBreak",
+          "requires": {
+            "path": "云麓仙居"
+          },
           "effects": {
             "moFeiyunProof": 1,
-            "iceLedger": 1,
-            "karma": 3,
-            "fragments": 1
-          },
-          "log": "情毒二字下压着两枚印：一枚云麓，一枚太虚。莫非云的白羽夹在中间。"
-        },
-        {
-          "text": "让七星龙渊照见九天祭席，不急着拔剑",
-          "to": "ascend",
-          "requires": {
-            "swordHeartMin": 3,
-            "qingyangTraceMin": 2
-          },
-          "effects": {
-            "swordHeart": 2,
-            "fragments": 1,
-            "karma": 4
-          },
-          "log": "龙渊映出的不是神座，是一排空名。每个空名旁都放着一盏人间魂灯。"
-        },
-        {
-          "text": "试铸朱天炎狱剑，确认九天神剑是否全是仿品",
-          "to": "copperGate",
-          "requires": {
-            "realmMin": 2
-          },
-          "effects": {
-            "qi": 24,
-            "fragments": 1,
-            "karma": 8,
-            "years": -1
-          },
-          "talentToQi": true,
-          "log": "火里浮出的神纹歪了一笔。弈剑客笑了：仿得这么急，看来九天也会怕。"
-        },
-        {
-          "text": "拒绝夺剑，只把名剑录抄给下一世的自己",
-          "to": "death",
-          "requires": {
-            "yearsMin": 1
-          },
-          "effects": {
-            "memory": 3,
-            "swordHeart": 1,
-            "fragments": 1,
-            "years": -99
-          },
-          "log": "你合上剑录时，听见剑匣里那第二道呼吸终于平稳下来。"
-        }
-      ]
-    },
-    {
-      "name": "北溟与东海",
-      "text": {
-        "normal": "北溟雪线尽头，潮声从冰下传来。\n\n雪地里有一串脚印，脚印旁落着不融的金灰。远处的门关着，门前有灯。\n\n{{status}}\n\n你还不知道门后是谁，只知道有人已经等得太久。"
-      },
-      "choices": [
-        {
-          "text": "把青阳痕带到东海残碑前，问少昊为何禅让颛顼",
-          "to": "jadeClue",
-          "requires": {
-            "qingyangTraceMin": 3
-          },
-          "effects": {
-            "qingyangTrace": 2,
-            "fragments": 2,
-            "years": -1
-          },
-          "log": "残碑没有回答，只把黄帝飞升那日的潮声还给你。"
-        },
-        {
-          "text": "陪玄晖去幽都门前等颛顼开门",
-          "to": "hell",
-          "requires": {
-            "xuanhuiBondMin": 4
-          },
-          "effects": {
-            "xuanhuiBond": 2,
-            "sunCinders": 1,
             "memory": 1,
-            "karma": -4
-          },
-          "log": "门没有开。玄晖站到雪停，仍没有低头。你第一次觉得沉默也是一种拒绝。"
-        },
-        {
-          "text": "把上邪残锋交给幽都判官，换轮回簿一页",
-          "to": "hell",
-          "requires": {
-            "karmaMin": 25
-          },
-          "effects": {
-            "memory": 2,
-            "karma": -8,
-            "fragments": 1
-          },
-          "log": "判官收下残锋，却没有笑。他说黄泉不缺恨，缺的是肯认账的人。"
-        },
-        {
-          "text": "让金乌灰落在东海潮宫，照出十日坠落的座次",
-          "to": "heartDemon",
-          "requires": {
-            "sunCindersMin": 3
-          },
-          "effects": {
-            "sunCinders": 2,
-            "fragments": 1,
-            "karma": 8
-          },
-          "log": "潮宫地面亮起十个空圈。玄晖只看第一个，像看一张早被烧掉的家谱。"
-        },
-        {
-          "text": "请令狐九尾带青丘狐火护送凡人过雪线",
-          "to": "foxRoad",
-          "requires": {
-            "foxBondMin": 2
-          },
-          "effects": {
-            "foxBond": 1,
-            "virtue": 16,
-            "karma": -4,
             "years": -1
           },
-          "log": "狐火不烫，落在孩子肩上像一小片春天。九尾却冻得脸色发白。"
+          "log": "星灯被袖口遮住以后，反倒显出一圈灰白的边。你记下它偏转的方向。"
         },
         {
-          "text": "让夜哭潜入幽都边市，查谁改过你的死期",
-          "to": "shadow",
+          "text": "沿镜影避开裂冰",
+          "to": "afterBreak",
           "requires": {
-            "shadowTrustMin": 3
+            "path": "太虚观"
           },
           "effects": {
             "shadowTrust": 1,
-            "memory": 2,
-            "karma": 6,
-            "fragments": 1
+            "memory": 1,
+            "karma": -1
           },
-          "log": "夜哭回来时袖口结霜。他只带回一句话：你的死期，不止被改过一次。"
+          "log": "冰面上的影子先一步停住。你照着它的停顿绕开裂纹，没有问它为什么知道。"
         },
         {
-          "text": "借荒火战阵撬开铜门外环，但先撤走城外凡人",
-          "to": "copperGate",
+          "text": "把夜牌压在雪下",
+          "to": "afterBreak",
           "requires": {
-            "fireOathMin": 2,
-            "virtueMin": 60
+            "path": "魍魉"
           },
           "effects": {
-            "fireOath": 1,
-            "qi": 32,
-            "virtue": 8,
-            "karma": 6,
-            "fragments": 1
+            "shadowTrust": 1,
+            "virtue": 4,
+            "years": -1
           },
-          "talentToQi": true,
-          "log": "火线绕城三匝，没有烧到一间民屋。彤看着你，终于点头。"
+          "log": "夜牌在雪下仍旧发凉。你把它压稳，才发现身后的脚步声少了一道。"
         },
         {
-          "text": "让遗墨机关鸟飞入九天门缝，带回祭席名单",
-          "to": "ascend",
+          "text": "让机关鸟试探风向",
+          "to": "afterBreak",
           "requires": {
-            "inkContractMin": 3
+            "path": "翎羽山庄"
           },
           "effects": {
             "inkContract": 1,
-            "fragments": 2,
-            "karma": 5
+            "qi": 10,
+            "years": -1
           },
-          "log": "机关鸟只回来半只。残翼里夹着一张名单，第一行写着：无名人间。"
+          "log": "机关鸟贴着雪面飞出半圈，木翼被风刮得发响。它没有坠下，只把最急的一阵风带了回来。"
         },
         {
-          "text": "用冰心魂灯照东海侍童，问神域祭品是否自愿",
-          "to": "iceHeart",
+          "text": "用炉灰标出退路",
+          "to": "afterBreak",
           "requires": {
-            "iceLedgerMin": 3,
-            "virtueMin": 65
+            "path": "荒火营地"
           },
           "effects": {
-            "iceLedger": 1,
-            "virtue": 12,
-            "karma": -6,
-            "fragments": 1
+            "fireOath": 1,
+            "virtue": 5,
+            "years": -1
           },
-          "log": "侍童哭得很小声。他说自愿两个字，是神使替他写的。"
-        },
-        {
-          "text": "闭关炼化盐晶与残日，硬推境界去看飞升真假",
-          "to": "tribulation",
-          "requires": {
-            "realmMin": 3
-          },
-          "effects": {
-            "qi": 42,
-            "karma": 6,
-            "years": -2
-          },
-          "talentToQi": true,
-          "log": "丹田里一半潮声，一半日火。雷云压下时，你听见九天有人翻页。"
+          "log": "炉灰落在雪上，很快被风吹浅。你还是一段段标下去，至少后来的人知道该往哪边退。"
         }
       ]
     },
     {
-      "name": "水镜前的证词",
+      "name": "水镜前",
       "text": {
-        "normal": "你把这一世带回来的东西摆在水镜前。\n\n药账、白羽、残锋、盐晶、六翼令，每一样都很轻，放在桌上却压得众人沉默。\n\n{{status}}\n\n现在轮到他们解释了。"
+        "normal": "从雪线回来后，没有人再把雪线外的遭遇当成偶然。\n\n水镜被搬到厅中。灯影落在镜面上，映出的不是答案，而是每个人刚才避开过的停顿。\n\n{{status}}\n\n这一次，不是你独自追问命运。你只能先看谁愿意开口。"
       },
       "choices": [
         {
-          "text": "把药账、白羽、六翼令一起按在水镜上",
-          "to": "greatCouncil",
+          "text": "先让药庐少年开口",
+          "to": "afterBreak",
           "requires": {
-            "iceLedgerMin": 2,
-            "moFeiyunProofMin": 2,
-            "shadowTrustMin": 2
+            "path": "冰心堂"
           },
           "effects": {
-            "virtue": 18,
-            "karma": -8,
+            "iceLedger": 2,
+            "virtue": 10,
+            "karma": -3
+          },
+          "log": "药庐少年低头很久，终于先报出自己的名字：清时。药账里另一个没写上的名字，也被他一并说出。"
+        },
+        {
+          "text": "先让持刀的人开口",
+          "to": "afterBreak",
+          "requires": {
+            "path": "魍魉"
+          },
+          "effects": {
+            "shadowTrust": 2,
+            "karma": 2,
             "fragments": 1
           },
-          "log": "水镜没有碎。碎的是三位长老脸上的镇定。"
+          "log": "持刀的人没有辩解，只说自己叫夜哭。随后，他把袖中的第二枚令牌放上桌。"
         },
         {
-          "text": "请弈剑客以七星龙渊斩开黄泉到碧落的路影",
-          "to": "breakWheel",
+          "text": "先让观星的人开口",
+          "to": "afterBreak",
           "requires": {
-            "swordHeartMin": 5,
-            "qingyangTraceMin": 4,
-            "fragmentsMin": 4
+            "path": "云麓仙居"
           },
           "effects": {
-            "virtue": 15,
-            "memory": 2,
+            "moFeiyunProof": 2,
+            "inkContract": 1,
             "fragments": 1
           },
-          "log": "剑光落下时，黄泉和碧落同时后退一步。人间第一次不在中间。"
+          "log": "观星的人把星图推到水镜前。你这才听见旁人叫他莫非云，而星图的缺口正对着东边。"
         },
         {
-          "text": "公开九天仿剑证据，逼神使承认祭席不是荣耀",
-          "to": "ascend",
+          "text": "先让雨亭剑客开口",
+          "to": "afterBreak",
           "requires": {
-            "fragmentsMin": 4
+            "path": "弈剑听雨阁"
           },
           "effects": {
-            "karma": 6,
-            "virtue": 8,
-            "memory": 1
+            "swordHeart": 2,
+            "qingyangTrace": 2,
+            "qi": 12
           },
-          "log": "神使说不出话。因为朱天炎狱剑上的错纹，和他腰间那把一模一样。"
+          "talentToQi": true,
+          "log": "雨亭剑客说自己叫青阳，也说自己只路过人间。可他说这句话时，手一直按着剑鞘。"
         },
         {
-          "text": "让玄晖亲手烧掉东皇归位诏，不替他做选择",
-          "to": "northSea",
+          "text": "不审谁，先救城外的人",
+          "to": "afterBreak",
           "requires": {
-            "xuanhuiBondMin": 6,
-            "sunCindersMin": 5
-          },
-          "effects": {
-            "xuanhuiBond": 2,
-            "sunCinders": 1,
-            "virtue": 12,
-            "karma": -4
-          },
-          "log": "诏书烧得很慢。玄晖看着火，像终于确认自己不是另一件法器。"
-        },
-        {
-          "text": "把冷喻旧案交给太虚与云麓共审，不准任何一派灭口",
-          "to": "greatCouncil",
-          "requires": {
-            "moFeiyunProofMin": 3,
-            "virtueMin": 60
+            "path": "游侠"
           },
           "effects": {
             "virtue": 14,
-            "karma": -5,
-            "fragments": 1
+            "wandererCred": 2,
+            "years": -1
           },
-          "log": "莫非云站在堂下，声音不高，却每个字都像白羽落在刀锋上。"
+          "log": "水镜前少了你的声音，城外却多了几盏灯。车辕上的书生第一次没有笑。"
         },
         {
-          "text": "用魍魉暗网散布假祭名，引出真正改簿之人",
-          "to": "shadow",
+          "text": "先看水镜里的停顿",
+          "to": "afterBreak",
+          "effects": {
+            "memory": 2,
+            "karma": 8,
+            "qi": 12
+          },
+          "talentToQi": true,
+          "log": "你没有急着把任何东西交出去，只按住掌心那片铜锈。水镜里的影子也跟着停住，像在等你先开口。"
+        },
+        {
+          "text": "请药庐补完那本账",
+          "to": "afterBreak",
           "requires": {
-            "shadowTrustMin": 3,
-            "karmaMax": 60
+            "path": "冰心堂",
+            "iceLedgerMin": 3
           },
           "effects": {
-            "karma": 8,
-            "fragments": 2,
+            "iceLedger": 3,
+            "virtue": 10,
+            "karma": -3
+          },
+          "log": "另一个药庐弟子接过笔。清时第一次没有抢话，药账上终于多出一个活人的名字。"
+        },
+        {
+          "text": "先把两边名册对一遍",
+          "to": "afterBreak",
+          "requires": {
+            "pathIn": "天机营|荒火营地|游侠"
+          },
+          "effects": {
+            "wandererCred": 2,
+            "foxBond": 1,
+            "virtue": 10,
+            "years": -1
+          },
+          "log": "军册和商队账簿对不上。你没有急着问责，而是沿着缺口又找回三个被漏掉的人。"
+        },
+        {
+          "text": "让镜里镜外各说一句真话",
+          "to": "afterBreak",
+          "requires": {
+            "path": "太虚观"
+          },
+          "effects": {
+            "shadowTrust": 2,
+            "karma": -2,
             "memory": 1
           },
-          "log": "假名传出去一夜，三界各有一盏灯灭。夜哭说，鱼上钩了。"
+          "log": "镜里的人没有急着辩解，镜外的人也没有立刻退开。两句话落下后，水镜里的影子终于稳了一寸。"
         },
         {
-          "text": "以天策剑重立诸门证词，先救人再问罪",
-          "to": "greatCouncil",
+          "text": "让第二枚令牌翻过来",
+          "to": "afterBreak",
           "requires": {
-            "virtueMin": 75
+            "path": "魍魉",
+            "shadowTrustMin": 3
           },
           "effects": {
-            "virtue": 20,
-            "karma": -6,
+            "shadowTrust": 3,
+            "karma": 1,
             "fragments": 1
           },
-          "log": "有人不服，有人沉默。可城外伤者被抬进来时，所有争吵都短了一截。"
+          "log": "夜哭把令牌翻过来，背面没有血，只有一道被旧刀磨平的刻痕。"
         },
         {
-          "text": "让心魔代你入梦九天，但回来后先审自己",
-          "to": "heartDemon",
+          "text": "拆开机关鸟腹中的盐晶",
+          "to": "afterBreak",
           "requires": {
-            "karmaMin": 35
+            "path": "翎羽山庄"
           },
           "effects": {
-            "memory": 2,
-            "karma": 10,
-            "fragments": 1
-          },
-          "log": "心魔带回祭席，也带回一张和你相同的脸。你让它坐下，把灯点亮。"
-        },
-        {
-          "text": "若因果已压过道心，主动入幽都照见本心",
-          "to": "hell",
-          "requires": {
-            "karmaMin": 65
-          },
-          "effects": {
-            "memory": 2,
-            "karma": -12
-          },
-          "log": "幽都没有惩罚你，只让你把每个被你省略的人名重新念一遍。"
-        },
-        {
-          "text": "寿元将尽，把所有证据封进轮回记忆",
-          "to": "death",
-          "requires": {
-            "yearsMin": 1
-          },
-          "effects": {
-            "memory": 4,
+            "inkContract": 3,
             "fragments": 1,
-            "years": -99
+            "virtue": 5
           },
-          "log": "这一世你没赢。但下一世睁眼前，你已经听见铜门里有人开始害怕。"
+          "log": "机关师拆得很慢，像怕弄疼那只鸟。盐晶里落出一粒细小的铜屑，你第一次听见有人叫他遗墨。"
         }
       ]
     },
     {
-      "name": "天命收束",
+      "name": "铜门之前",
       "text": {
-        "normal": "铜门前没有风。\n\n你听见身后有人拔剑，有人点灯，有人低声念你的名字。门上的铜锈一点点发热。\n\n这一世走到这里，已经没有旁观的位置。"
+        "normal": "水镜没有给出答案，只把一线冷光投向北方。\n\n太古铜门前没有风。你听见身后有人压低呼吸，也有人把手按在兵刃、灯柄或药箱上。铜门上的锈痕一点点发热。\n\n你仍然不知道铜门后会有什么。可你知道，退回去的人也会被它追上。"
       },
       "choices": [
         {
-          "text": "以诸门证词重订三界旧契：人间不是路",
-          "to": "breakWheel",
+          "text": "推开铜门前先回头看一眼",
+          "to": "trueAscend",
           "requires": {
-            "fragmentsMin": 6,
-            "virtueMin": 80
-          },
-          "effects": {
-            "virtue": 20,
-            "memory": 2
-          },
-          "log": "铜门前的地面裂开，却没有吞人。黄泉和碧落第一次各退回自己的边界。"
-        },
-        {
-          "text": "带玄晖与金乌烬上前，写下神子也有选择命运的权利",
-          "to": "breakWheel",
-          "requires": {
-            "xuanhuiBondMin": 7,
-            "sunCindersMin": 6,
             "virtueMin": 70
           },
           "effects": {
-            "virtue": 18,
+            "virtue": 8,
+            "memory": 1
+          },
+          "log": "你回头时，看见有人终于敢在铜门前把灯举高。"
+        },
+        {
+          "text": "把铜锈贴在铜门缝上",
+          "to": "breakWheel",
+          "requires": {
+            "fragmentsMin": 4
+          },
+          "effects": {
             "fragments": 1,
             "memory": 2
           },
-          "log": "玄晖没有登回神座。他把最后一缕金乌火放进人间共同守着的灯里。"
+          "log": "铜锈贴上铜门缝，里面传来一声很轻的叹息。"
         },
         {
-          "text": "请弈剑客出最后一剑：黄泉碧落皆路过",
-          "to": "breakWheel",
+          "text": "用剑鞘抵住铜门",
+          "to": "sacrifice",
           "requires": {
-            "swordHeartMin": 6,
-            "qingyangTraceMin": 5,
-            "fragmentsMin": 5
-          },
-          "effects": {
-            "virtue": 15,
-            "memory": 3
-          },
-          "log": "剑光没有斩神，也没有斩鬼，只斩断那条把人间写成通路的旧线。"
-        },
-        {
-          "text": "以高德行登九天，公开祭席后的旧账",
-          "to": "ascend",
-          "requires": {
-            "realmMin": 5,
-            "virtueMin": 90,
-            "karmaMax": 45
-          }
-        },
-        {
-          "text": "带着因果强行飞升，赌九天不敢拒你",
-          "to": "ascend",
-          "requires": {
-            "realmMin": 6,
-            "karmaMin": 45
-          },
-          "effects": {
-            "karma": 18,
-            "qi": 40
-          },
-          "talentToQi": true,
-          "log": "九天门开了。可门内第一张祭席，正好空着你的名字。"
-        },
-        {
-          "text": "强迫玄晖归位东皇，以十日之火焚开天门",
-          "to": "ascend",
-          "requires": {
-            "sunCindersMin": 6,
-            "karmaMin": 35
-          },
-          "effects": {
-            "qi": 60,
-            "karma": 24,
-            "xuanhuiBond": -3
-          },
-          "talentToQi": true,
-          "log": "十日同升，天门大开。可你分不清那是飞升，还是又一次把他献上祭席。"
-        },
-        {
-          "text": "牺牲本世修为，换诸门凡人全数撤离",
-          "to": "death",
-          "requires": {
-            "virtueMin": 100
-          },
-          "effects": {
-            "memory": 3,
-            "fragments": 1,
-            "qi": -80,
-            "years": -99
-          },
-          "log": "你把胜利留给别人，把答案留给下一世。"
-        },
-        {
-          "text": "若因果压过道心，入幽都重走人间",
-          "to": "hell",
-          "requires": {
-            "karmaMin": 65
-          }
-        },
-        {
-          "text": "什么都不争，只把真相刻进轮回记忆",
-          "to": "death",
-          "effects": {
-            "memory": 2,
-            "fragments": 1,
-            "years": -99
-          },
-          "log": "你选择下一世再来，但不是空手而来。"
-        },
-        {
-          "text": "以八门派、幽都、青丘、东海共证，结束献祭式轮回",
-          "to": "breakWheel",
-          "requires": {
-            "fragmentsMin": 7,
-            "virtueMin": 75,
-            "xuanhuiBondMin": 5,
+            "path": "弈剑听雨阁",
             "swordHeartMin": 4
           },
           "effects": {
-            "virtue": 24,
-            "memory": 3,
-            "karma": -10
+            "virtue": 6,
+            "memory": 1
           },
-          "log": "不是你一个人推开铜门。所有被当成路的人，都在这一刻向前一步。"
+          "log": "剑没有出鞘。铜门却停了一息。"
+        },
+        {
+          "text": "独自走进铜门",
+          "to": "falseAscend",
+          "requires": {
+            "qiMin": 160
+          },
+          "effects": {
+            "memory": 2,
+            "karma": 8
+          },
+          "log": "铜门后的光太亮，你听不清身后的人在喊什么。"
+        },
+        {
+          "text": "在铜门前多守一夜",
+          "to": "death",
+          "effects": {
+            "virtue": 4,
+            "memory": 1,
+            "years": -99
+          },
+          "log": "你没有推开铜门，也没有离开。风从铜门缝里吹出来，你把最近的一盏灯护到天亮。"
+        },
+        {
+          "text": "退后，先把人带走",
+          "to": "death",
+          "effects": {
+            "virtue": 10,
+            "memory": 1,
+            "years": -99
+          },
+          "log": "你没有打开铜门。至少这一夜，城里还有人活着。"
+        },
+        {
+          "text": "把药账留在灯下",
+          "to": "medicineEnding",
+          "requires": {
+            "path": "冰心堂",
+            "iceLedgerMin": 4
+          },
+          "effects": {
+            "virtue": 10,
+            "memory": 1
+          },
+          "log": "你把药账摊开，先写活人的名字。铜门后的光还在，可屋里的灯也没有灭。"
+        },
+        {
+          "text": "把旧令放到铜门缝前",
+          "to": "shadowEnding",
+          "requires": {
+            "path": "魍魉",
+            "shadowTrustMin": 4
+          },
+          "effects": {
+            "memory": 2,
+            "fragments": 1,
+            "karma": -2
+          },
+          "log": "旧令贴着铜门缝落下，影子终于停住。你听见有人在灯外慢慢松开刀柄。"
+        },
+        {
+          "text": "不进铜门，沿渡口送人",
+          "to": "wandererEnding",
+          "requires": {
+            "path": "游侠",
+            "wandererCredMin": 4
+          },
+          "effects": {
+            "virtue": 12,
+            "memory": 1
+          },
+          "log": "你转身去数车、数船、数还没上路的人。铜门后的光追不上最后一辆车。"
+        },
+        {
+          "text": "把雪灯交还给等候的人",
+          "to": "lampEnding",
+          "requires": {
+            "pathIn": "天机营|游侠",
+            "xuanhuiBondMin": 4
+          },
+          "effects": {
+            "sunCinders": 1,
+            "virtue": 8,
+            "memory": 2
+          },
+          "log": "你把灯递回雪里。点灯的人没有问你记不记得他，只把灯举得更高。"
         }
       ]
     }
   ],
   "statusLines": {
-    "highKarma": "你的因果太重，灯影总比人影多半寸；若再强行登天，幽都会先让你把名字念完。",
-    "highVirtue": "你救过的人开始替你作证。诸门仍有私心，但已经没人敢说众生只是数字。",
-    "normal": "你把门令摊在掌心，也隔着灯火观察递令的人。你还站在门槛外，先看清每一条路要付出的代价。"
+    "normal": "你还没有确定谁可信。",
+    "highVirtue": "有人愿意把背后交给你，但你知道这份信任很薄。",
+    "highKarma": "你手上沾过太多旧事，连灯火都离你远了一点。"
   },
   "artPools": {
     "birth": [
       "assets/xiling-ruins.webp",
-      "assets/underworld-ledger.webp",
-      "assets/fox-road.webp"
-    ],
-    "greatCouncil": [
-      "assets/great-council.webp",
-      "assets/sect-new-pact.webp"
-    ],
-    "iceHeart": [
-      "assets/iceheart-hall.webp",
-      "assets/sect-new-pact.webp"
-    ],
-    "shadow": [
-      "assets/leize-shadow.webp",
-      "assets/cold-shadow.webp"
-    ],
-    "foxRoad": [
       "assets/fox-road.webp",
-      "assets/xiling-ruins.webp"
+      "assets/leize-shadow.webp",
+      "assets/wanderer-ferry.webp",
+      "assets/birth-old-well.webp",
+      "assets/birth-sea-salt.webp"
     ],
-    "jadeClue": [
+    "afterBreak:1": [
+      "assets/sect-gates-v2.webp",
+      "assets/sect-new-pact.webp",
+      "assets/birth-old-well.webp"
+    ],
+    "afterBreak:2": [
+      "assets/rain-three-paths.webp",
+      "assets/iceheart-hall.webp",
+      "assets/leize-shadow.webp",
+      "assets/medicine-ledger-night.webp"
+    ],
+    "afterBreak:3": [
+      "assets/relic-table.webp",
+      "assets/copper-gate.webp",
       "assets/east-sea-tide-palace.webp",
-      "assets/copper-gate.webp",
-      "assets/sect-new-pact.webp"
+      "assets/shadow-token-door.webp"
     ],
-    "copperGate": [
-      "assets/copper-gate.webp",
-      "assets/east-sea-godrealm.webp",
-      "assets/tribulation.webp"
-    ],
-    "northSea": [
-      "assets/beiming-pact.webp",
+    "afterBreak:4": [
       "assets/beiming-road.webp",
-      "assets/xuanhui-beiming.webp"
+      "assets/xuanhui-beiming.webp",
+      "assets/wanderer-ferry.webp",
+      "assets/snow-lamp-return.webp"
     ],
-    "tribulation": [
-      "assets/tribulation.webp",
-      "assets/great-council.webp"
+    "afterBreak:5": [
+      "assets/water-mirror-council.webp",
+      "assets/great-council.webp",
+      "assets/medicine-ledger-night.webp"
     ],
-    "heartDemon": [
-      "assets/heart-trial.webp",
-      "assets/underworld-ledger.webp",
-      "assets/xuanhui-beiming.webp"
+    "afterBreak:6": [
+      "assets/bronze-gate-v2.webp",
+      "assets/copper-gate.webp",
+      "assets/shadow-token-door.webp"
     ],
-    "hell": [
-      "assets/underworld-ledger.webp",
-      "assets/hell-rebirth.webp",
-      "assets/xuanhui-beiming.webp"
+    "afterBreak:wanderer": [
+      "assets/wanderer-ferry.webp",
+      "assets/fox-road.webp",
+      "assets/rain-three-paths.webp",
+      "assets/ferry-dawn-crowd.webp"
     ],
-    "ascend": [
+    "trueAscend": [
       "assets/true-ascend.webp",
-      "assets/east-sea-tide-palace.webp"
+      "assets/great-council.webp",
+      "assets/ferry-dawn-crowd.webp"
     ],
     "breakWheel": [
+      "assets/bronze-gate-v2.webp",
       "assets/copper-gate.webp",
-      "assets/sect-new-pact.webp",
-      "assets/true-ascend.webp"
+      "assets/east-sea-godrealm.webp",
+      "assets/shadow-token-door.webp"
     ],
-    "afterBreak": [
-      "assets/sect-new-pact.webp",
-      "assets/beiming-pact.webp",
-      "assets/east-sea-tide-palace.webp"
-    ],
-    "trueEnding": [
-      "assets/true-ascend.webp"
+    "breakWheel:wanderer": [
+      "assets/wanderer-ferry.webp",
+      "assets/ferry-dawn-crowd.webp"
     ],
     "sacrifice": [
-      "assets/copper-gate.webp"
+      "assets/bronze-gate-v2.webp",
+      "assets/tribulation.webp",
+      "assets/snow-lamp-return.webp"
+    ],
+    "falseAscend": [
+      "assets/copper-gate.webp",
+      "assets/heart-trial.webp"
     ],
     "death": [
       "assets/xiling-ruins.webp",
-      "assets/underworld-ledger.webp"
+      "assets/beiming-road.webp",
+      "assets/hell-rebirth.webp",
+      "assets/birth-old-well.webp"
     ],
-    "memoryArchive": [
-      "assets/copper-gate.webp",
-      "assets/underworld-ledger.webp"
+    "hell": [
+      "assets/hell-rebirth.webp",
+      "assets/cold-shadow.webp",
+      "assets/birth-old-well.webp"
     ],
-    "sect": [
-      "assets/xiling-ruins.webp"
+    "medicineEnding": [
+      "assets/iceheart-hall.webp",
+      "assets/relic-table.webp",
+      "assets/medicine-ledger-night.webp"
+    ],
+    "shadowEnding": [
+      "assets/cold-shadow.webp",
+      "assets/rain-three-paths.webp",
+      "assets/shadow-token-door.webp"
+    ],
+    "wandererEnding": [
+      "assets/wanderer-ferry.webp",
+      "assets/fox-road.webp",
+      "assets/ferry-dawn-crowd.webp"
+    ],
+    "lampEnding": [
+      "assets/xuanhui-beiming.webp",
+      "assets/beiming-road.webp",
+      "assets/snow-lamp-return.webp"
     ]
   }
 };

@@ -262,7 +262,7 @@
   <main>
     <section class="story" aria-live="polite">
       <h1>大荒轮回录</h1>
-      <p class="subtitle">在大荒诸门与幽都裂隙之间，带着记忆重走天命</p>
+      <p class="subtitle">在大荒醒来，先活过这一世</p>
       <h2 id="scene-title"></h2>
       <p id="scene-text"></p>
       <div id="scene-sketch" class="sketch" aria-label="当前道途简笔画"></div>
@@ -274,7 +274,7 @@
         <h2>这一世</h2>
         <ul>
           <li><span>世数</span><strong id="life"></strong></li>
-          <li><span>缘起</span><strong id="origin"></strong></li>
+          <li><span>出生地</span><strong id="origin"></strong></li>
           <li><span>境界</span><strong id="realm"></strong></li>
           <li><span>流派</span><strong id="path"></strong></li>
           <li><span>寿元</span><strong id="years"></strong></li>
@@ -283,7 +283,7 @@
 
       <section class="side-block">
         <h2>修为</h2>
-        <div class="meter" aria-label="修为进度"><span id="qi-bar"></span></div>
+        <div class="meter" aria-label="修为长短"><span id="qi-bar"></span></div>
         <ul>
           <li><span>灵力</span><strong id="qi"></strong></li>
           <li><span>道德</span><strong id="virtue"></strong></li>
@@ -292,18 +292,7 @@
       </section>
 
       <section class="side-block">
-        <h2>轮回记忆</h2>
-        <ul>
-          <li><span>记忆点</span><strong id="memory"></strong></li>
-          <li><span>悟性</span><strong id="talent"></strong></li>
-          <li><span>天命碎片</span><strong id="fragments"></strong></li>
-          <li><span>玄晖缘</span><strong id="xuanhui-bond"></strong></li>
-          <li><span>金乌烬</span><strong id="sun-cinders"></strong></li>
-        </ul>
-      </section>
-
-      <section class="side-block">
-        <h2>记录</h2>
+        <h2>行迹</h2>
         <p id="log" class="log"></p>
       </section>
 
@@ -352,1188 +341,130 @@
       path: "未定",
       turn: 0,
       act: 0,
+      currentRelics: {},
+      currentNames: {},
+      lastActionText: "",
+      lastActionLog: "",
+      lastActionAct: -1,
+      echoes: {},
       flags: {},
-      log: "你在山脚小村醒来，脑海里残留着不属于孩童的旧梦。"
+      log: "你刚刚醒来，掌心里还留着一点陌生的温度。"
     };
 
-    const scenes = {
-      birth: {
-        title: "山脚重生",
-        text: () => `第 ${state.life} 世，你又在同一个清晨醒来。\n\n窗外青山如洗，村口老槐树下有一位白发道人摆摊算命。你记得前世许多片段：有人正道登天，有人邪法速成，也有人因道德亏损，飞升时坠入幽冥，被迫重走人间。\n\n这一次，你要怎样开局？`,
-        choices: [
-          {
-            text: "拜入青云观，走稳健正修",
-            to: "sect",
-            effect: s => {
-              s.path = "正修";
-              s.qi += 16 + s.talent;
-              s.virtue += 10;
-              s.years += 2;
-              s.log = "青云观传你吐纳法。慢一些，但根基清明。";
-            }
-          },
-          {
-            text: "向散修换血煞功，走偏锋邪修",
-            to: "market",
-            effect: s => {
-              s.path = "邪修";
-              s.qi += 26 + s.talent;
-              s.karma += 8;
-              s.virtue -= 6;
-              s.log = "血煞功不必伤人也能修，只是更容易被欲念牵引。";
-            }
-          },
-          {
-            text: "用记忆点换开局悟性",
-            to: "birth",
-            requires: s => s.memory >= 3,
-            effect: s => {
-              s.memory -= 3;
-              s.talent += 5;
-              s.log = "你把一段轮回记忆炼成直觉。下一次吐纳，天地像慢了半拍。";
-            }
-          },
-          {
-            text: "追问白发道人：轮回是谁布下的？",
-            to: "oldMan",
-            requires: s => s.fragments >= 2 || s.life >= 3,
-            effect: s => {
-              s.log = "道人看了你很久：能问到这里，说明你已经不止活过一次。";
-            }
-          }
-        ]
-      },
-
-      oldMan: {
-        title: "老槐树下",
-        text: "白发道人摊开掌心，里面不是铜钱，而是一枚裂开的天命印。\n\n他说：所谓轮回，并非天罚。三千年前仙界断路，有人把凡间做成炉，把一次次人生做成柴，想炼出一个能补天的人。\n\n你可以顺着炉火变强，也可以在足够强时打破炉壁。",
-        choices: [
-          {
-            text: "收下天命印碎片",
-            to: "birth",
-            once: "oldManShard",
-            effect: s => {
-              s.fragments += 1;
-              s.memory += 1;
-              s.log = "碎片融入识海。你隐约看见飞升门后，并不全是光。";
-            }
-          },
-          { text: "暂时离开", to: "birth" }
-        ]
-      },
-
-      sect: {
-        title: "青云观",
-        text: "你在观中修行十年。师兄弟争夺内门名额，山下又传来妖潮将至的消息。\n\n正修讲克己守心，但不是软弱。真正的正，是强大之后仍肯护人。",
-        choices: [
-          {
-            text: "苦修破境",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 30 + s.talent;
-              s.years -= 2;
-              s.log = "你闭关苦修，灵台澄澈。";
-            }
-          },
-          {
-            text: "下山护村，积累功德",
-            to: "demon",
-            effect: s => {
-              s.virtue += 18;
-              s.qi += 12 + s.talent;
-              s.years -= 1;
-              s.log = "你救下许多凡人，也看见修士力量该落向哪里。";
-            }
-          },
-          {
-            text: "偷看禁卷，研究邪法的边界",
-            to: "forbidden",
-            effect: s => {
-              s.path = "兼修";
-              s.qi += 20 + s.talent;
-              s.karma += 4;
-              s.log = "禁卷不只记载恶，也记载人心的险。你决定只取术，不取贪。";
-            }
-          }
-        ]
-      },
-
-      market: {
-        title: "黑市洞府",
-        text: "邪修集市藏在雨夜山腹。这里出售速成法、替劫符、夺灵阵，也有人只把邪法当作刀，绝不砍向无辜者。\n\n力量来得越快，越需要自己握紧方向。",
-        choices: [
-          {
-            text: "修血煞功，但只炼凶兽血气",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 34 + s.talent;
-              s.karma += 6;
-              s.virtue += 3;
-              s.years -= 2;
-              s.log = "你避开伤人捷径，进境仍快，只是心魔更早找上门。";
-            }
-          },
-          {
-            text: "买下替劫符，留给无辜者",
-            to: "demon",
-            effect: s => {
-              s.qi += 10 + s.talent;
-              s.virtue += 15;
-              s.karma -= 4;
-              s.years -= 1;
-              s.log = "黑市商人笑你亏本。可你知道，有些账不在灵石里算。";
-            }
-          },
-          {
-            text: "贪快吞服三枚赤魂丹",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 46 + s.talent;
-              s.virtue -= 16;
-              s.karma += 18;
-              s.years -= 3;
-              s.log = "药力汹涌如火，你听见自己的欲望在丹田里说话。";
-            }
-          }
-        ]
-      },
-
-      forbidden: {
-        title: "禁卷残页",
-        text: "残页上写着一句话：正邪不在法，在用法之人。\n\n你发现所谓邪法本源是古仙补天术的残缺部分。它能吞浊气、炼怨念，若无人约束，也能吞人心。",
-        choices: [
-          {
-            text: "立誓只炼怨浊，不夺生魂",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 25 + s.talent;
-              s.virtue += 8;
-              s.karma -= 2;
-              s.fragments += 1;
-              s.log = "誓言落下时，天命印微微发热。";
-            }
-          },
-          {
-            text: "把残页交给师门共同研究",
-            to: "sectTruth",
-            effect: s => {
-              s.virtue += 16;
-              s.qi += 14 + s.talent;
-              s.log = "长老没有毁掉残页，只问你：若法可救人，何必先给它定罪？";
-            }
-          }
-        ]
-      },
-
-      demon: {
-        title: "山下妖潮",
-        text: "妖潮并非天灾，而是有人抽走山脉灵脉，逼灵兽失巢。你站在村口，看见上一世害死你的魔修也在救孩子。\n\n故事从来没有简单到只分黑白。",
-        choices: [
-          {
-            text: "救人优先，放过那名魔修",
-            to: "sectTruth",
-            effect: s => {
-              s.virtue += 16;
-              s.karma -= 5;
-              s.qi += 15 + s.talent;
-              s.log = "魔修临走前丢给你半枚天命印碎片。";
-              s.fragments += 1;
-            }
-          },
-          {
-            text: "追查抽灵脉的幕后人",
-            to: "sectTruth",
-            effect: s => {
-              s.qi += 24 + s.talent;
-              s.years -= 2;
-              s.log = "线索指向仙盟。所谓正道魁首，正在偷凡间的未来。";
-              s.fragments += 1;
-            }
-          },
-          {
-            text: "借妖潮磨炼战力",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 38 + s.talent;
-              s.karma += 7;
-              s.virtue -= 4;
-              s.years -= 2;
-              s.log = "你没有害人，但你开始把灾难看成台阶。这个念头很危险。";
-            }
-          }
-        ]
-      },
-
-      sectTruth: {
-        title: "仙盟密令",
-        text: "你终于查到真相：仙盟每百年挑选“可飞升者”，不是为了送他们成仙，而是送去仙界裂隙当燃料。\n\n白发道人、魔修、青云观长老，都曾是炉中薪柴。轮回让你变强，也在筛选你的心。",
-        choices: [
-          {
-            text: "公开密令，联合正邪修士",
-            to: "tribulation",
-            effect: s => {
-              s.virtue += 20;
-              s.qi += 20 + s.talent;
-              s.karma -= 8;
-              s.fragments += 1;
-              s.log = "越来越多人站到你身后。正邪不是阵营，选择才是。";
-            }
-          },
-          {
-            text: "独自潜入仙盟夺天梯钥",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 42 + s.talent;
-              s.karma += 10;
-              s.years -= 2;
-              s.log = "你赢得很快，也失去很快。孤身入局，心魔最爱这种时刻。";
-            }
-          }
-        ]
-      },
-
-      tribulation: {
-        title: "破境雷劫",
-        text: () => `雷云压下，你的修为抵达瓶颈。\n\n当前灵力：${state.qi}。灵力越高，破境越稳；道德越低，天劫越重；因果越深，心魔越强。`,
-        choices: [
-          {
-            text: "迎雷破境",
-            to: "afterBreak",
-            effect: s => {
-              const threshold = 28 + s.realm * 22 + Math.max(0, 50 - s.virtue) + Math.max(0, s.karma);
-              if (s.qi >= threshold) {
-                s.realm += 1;
-                s.qi = Math.max(0, s.qi - threshold + 8);
-                s.years += 5;
-                s.memory += 1;
-                s.log = `你扛过雷劫，踏入${realms[s.realm]}。这次经验化作 1 点轮回记忆。`;
-              } else {
-                s.scene = "death";
-                s.log = "雷光落下，你知道还差一点。下一世，你会记住这一道雷。";
-              }
-            }
-          },
-          {
-            text: "沉心补德，先化解因果",
-            to: "afterBreak",
-            effect: s => {
-              s.virtue += 12;
-              s.karma = Math.max(0, s.karma - 10);
-              s.qi += 6 + s.talent;
-              s.years -= 1;
-              s.log = "你没有急着变强。很多时候，慢一步才走得更远。";
-            }
-          },
-          {
-            text: "以邪法吞雷，强行提速",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 38 + s.talent;
-              s.karma += 14;
-              s.virtue -= 10;
-              s.log = "雷霆被你炼入血脉。力量是真的，代价也是真的。";
-            }
-          }
-        ]
-      },
-
-      afterBreak: {
-        title: "道途抉择",
-        text: () => `你如今是${realms[state.realm]}修士。轮回记忆越积越厚，前世失败正在变成今生的台阶。\n\n若继续修行，你可能飞升、坠入幽冥，或者揭开天命炉的终局。`,
-        choices: [
-          {
-            text: "继续这一世",
-            to: "sect",
-            requires: s => s.realm < 5 && s.years > 0,
-            effect: s => {
-              s.years -= 1;
-              s.log = "你收拾行囊，再入尘世。";
-            }
-          },
-          {
-            text: "尝试飞升",
-            to: "ascend",
-            requires: s => s.realm >= 5
-          },
-          {
-            text: "直面天命炉，打破轮回",
-            to: "breakWheel",
-            requires: s => s.fragments >= 4 && s.realm >= 4
-          },
-          {
-            text: "寿元耗尽，坦然入轮回",
-            to: "death",
-            requires: s => s.years <= 0
-          }
-        ]
-      },
-
-      heartDemon: {
-        title: "心魔问道",
-        text: "心魔不是另一个你，而是你每次想走捷径时留下的影子。\n\n它问：既然轮回能重来，为什么还要珍惜这一世的人？",
-        choices: [
-          {
-            text: "承认贪念，但不让它掌舵",
-            to: "tribulation",
-            effect: s => {
-              s.virtue += 10;
-              s.karma = Math.max(0, s.karma - 8);
-              s.memory += 1;
-              s.log = "你没有否认黑暗，只是把灯重新点亮。";
-            }
-          },
-          {
-            text: "以意志镇压心魔",
-            to: "afterBreak",
-            effect: s => {
-              s.qi += 20 + s.talent;
-              s.karma += 5;
-              s.log = "你暂时赢了，但镇压不是化解。";
-            }
-          },
-          {
-            text: "任由心魔接管",
-            to: "hell",
-            effect: s => {
-              s.virtue -= 30;
-              s.karma += 30;
-              s.log = "你得到了力量，也把自己从人间的牵挂里拔了出来。";
-            }
-          }
-        ]
-      },
-
-      ascend: {
-        title: "飞升门前",
-        text: () => `天门打开，金光照落。可门后传来锁链声。\n\n你的道德为 ${state.virtue}，因果为 ${state.karma}。道德越低，飞升越像审判；因果越深，越容易被打入幽冥重走人间。`,
-        choices: [
-          {
-            text: "踏入天门",
-            to: "ascendResult",
-            effect: s => {
-              const burden = Math.max(0, 65 - s.virtue) + s.karma;
-              if (burden >= 55) {
-                s.scene = "hell";
-                s.log = "天门金光一转成黑。你不是飞升，而是被因果拖入幽冥。";
-              } else if (s.fragments >= 4 && s.virtue >= 60) {
-                s.scene = "trueAscend";
-                s.log = "你看穿天门后的裂隙，终于有资格选择自己的飞升。";
-              } else {
-                s.scene = "falseAscend";
-                s.log = "你飞升了，却发现自己只是被送上更高处的炉台。";
-              }
-            }
-          },
-          {
-            text: "退回人间，先补全因果",
-            to: "sect",
-            effect: s => {
-              s.virtue += 8;
-              s.karma = Math.max(0, s.karma - 8);
-              s.log = "能退一步的人，往往比只会往前冲的人更接近大道。";
-            }
-          }
-        ]
-      },
-
-      breakWheel: {
-        title: "天命炉底",
-        text: "四枚天命碎片合一，照出炉底真相：仙界裂隙需要燃料，但并非必须烧人。\n\n若有人愿意把正修的守心、邪修的炼浊、轮回的记忆合成新法，就能补天而不献祭众生。",
-        choices: [
-          {
-            text: "以众生功德补天，终止轮回",
-            to: "trueEnding",
-            requires: s => s.virtue >= 70 && s.realm >= 4
-          },
-          {
-            text: "以自身为钥，封炉一世",
-            to: "sacrifice",
-            requires: s => s.virtue >= 45
-          },
-          {
-            text: "强夺天命炉，成为新炉主",
-            to: "hell",
-            effect: s => {
-              s.virtue -= 40;
-              s.karma += 50;
-              s.log = "你赢过了旧炉主，却变成了下一道枷锁。幽冥已经在等你。";
-            }
-          }
-        ]
-      },
-
-      trueAscend: {
-        title: "结局：清明飞升",
-        text: "你没有被天门吞没，而是带着人间万千因果穿门而过。\n\n仙界裂隙前，你立下新规：飞升不是献祭，强者不该把弱者当作柴薪。从此正邪各修其法，同受一条底线约束：不伤无辜，不弃人间。",
-        ending: true,
-        choices: [
-          { text: "带着更多记忆再入轮回", rebirth: true },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      falseAscend: {
-        title: "结局：炉上仙",
-        text: "你登上仙界，却发现脚下是无数前辈烧尽后的灰。\n\n这一世不算失败。你记住了天门后的真相。下一世，你会更早寻找天命碎片。",
-        ending: true,
-        choices: [
-          { text: "带着真相重生", rebirth: true, bonus: { memory: 3, fragments: 1 } },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      trueEnding: {
-        title: "真结局：万世不再为炉",
-        text: "你把轮回记忆还给所有曾被炉火吞没的人。\n\n正修守住底线，邪修炼化浊气，凡人不再被当成命数里的消耗。天裂仍在，但补天终于不需要牺牲无辜者。\n\n你没有成为传说里的神。你只是让后来者不必一次次重生，才有资格活成自己。",
-        ending: true,
-        choices: [
-          { text: "以新天道再开一局", hardReset: true }
-        ]
-      },
-
-      sacrifice: {
-        title: "结局：一世封炉",
-        text: "你没有足够功德补天，只能以自身为钥，封住天命炉一世。\n\n人间获得百年喘息。百年后，也许会有另一个带着记忆的人醒来，接过你没走完的路。",
-        ending: true,
-        choices: [
-          { text: "下一世接续此愿", rebirth: true, bonus: { memory: 2, virtue: 8 } },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      death: {
-        title: "结局：身死道未消",
-        text: "这一世到此为止。死亡像一扇旧门，门后仍是那个山脚清晨。\n\n你失去了修为，却留下经验。轮回并不温柔，但它允许你把失败变成下一次的力量。",
-        ending: true,
-        choices: [
-          { text: "带着记忆重生", rebirth: true, bonus: { memory: 2 } },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      hell: {
-        title: "结局：幽冥重走人间",
-        text: "因果沉重，道德亏损，天门化作幽冥。\n\n你没有被永久惩罚，只是被迫从最艰难的人间再走一遍：少一点天赋，多一点债。只有重新理解力量为何而用，才可能再次靠近飞升。",
-        ending: true,
-        choices: [
-          { text: "从幽冥转生", rebirth: true, hell: true },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      ascendResult: {
-        title: "天门之后",
-        text: "天门正在判断你的因果。",
-        choices: []
-      }
-    };
+    const scenes = {};
 
     Object.keys(scenes).forEach(key => delete scenes[key]);
     Object.assign(scenes, {
       birth: {
-        title: "西陵旧梦",
-        text: () => `第 ${state.life} 世，你在西陵城外醒来。\n\n太古铜门的黑影仍悬在北方，城墙上残留着妖魔攻城后的焦痕。上一世，你见过云麓火落、天机断阵、冰心药庐满地灯盏，也见过自称玄晖的旅人孤身往北溟去。\n\n这一世，你仍带着记忆。你知道大荒不是简单的正邪之争：有人以邪影自保，有妖为人守城，有神子坠泥仍不肯低头。你要先把自己交给哪一条路？`,
-        choices: [
-          {
-            text: "入天机营，先守住西陵百姓",
-            to: "sect",
-            effect: s => {
-              s.path = "天机营";
-              s.qi += 16 + s.talent;
-              s.virtue += 14;
-              s.years += 2;
-              s.log = "铁甲很沉，但城门后的哭声更沉。你学会把盾立在人前。";
-            }
-          },
-          {
-            text: "赴冰心堂，学医也学毒",
-            to: "iceHeart",
-            effect: s => {
-              s.path = "冰心堂";
-              s.qi += 14 + s.talent;
-              s.virtue += 10;
-              s.log = "冰心长老说：药可救人，毒也可止恶，难的是下手时心要清醒。";
-            }
-          },
-          {
-            text: "往雷泽寻魍魉，学暗影里的刀",
-            to: "shadow",
-            effect: s => {
-              s.path = "魍魉";
-              s.qi += 24 + s.talent;
-              s.karma += 7;
-              s.log = "雷泽雾深，影之主留下的试炼不问出身，只问你为何拔刀。";
-            }
-          },
-          {
-            text: "用记忆点换一次大荒旧闻",
-            to: "memoryArchive",
-            requires: s => s.memory >= 3,
-            effect: s => {
-              s.memory -= 3;
-              s.talent += 4;
-              s.log = "你把上一世的碎梦串成线：铜门、幽都、登神大典，似乎从来不是三件事。";
-            }
-          },
-          {
-            text: "上云麓仙居，查三卷天书残页",
-            to: "jadeClue",
-            effect: s => {
-              s.path = "云麓仙居";
-              s.qi += 22 + s.talent;
-              s.karma += 3;
-              s.fragments += 1;
-              s.log = "云麓火光照见一页残书：神明并非永远站在天上。";
-            }
-          },
-          {
-            text: "去翎羽山庄，向遗墨学机关术",
-            to: "greatCouncil",
-            effect: s => {
-              s.path = "翎羽山庄";
-              s.qi += 18 + s.talent;
-              s.virtue += 6;
-              s.fragments += 1;
-              s.log = "遗墨的机关鸟落在你肩上，铜门裂纹被拓成一张会动的图。";
-            }
-          },
-          {
-            text: "直接北上，追随玄晖问幽都",
-            to: "northSea",
-            effect: s => {
-              s.path = "北溟孤旅";
-              s.qi += 26 + s.talent;
-              s.karma += 5;
-              s.years -= 2;
-              s.log = "风雪比传闻更冷。你看见一个背负太阳旧名的人，仍向北走。";
-            }
-          }
-        ]
-      },
-
-      memoryArchive: {
-        title: "旧闻成线",
-        text: "你在梦中看见三段旧史：绝地天通后，神与人被迫分途；九天登神大典让凡人仰望天阶，也让某些神明学会俯视人间；北溟幽都之王守着铜门，像守着一段不能让世人知道的真相。\n\n醒来时，你掌心多了一枚淡金色裂纹。它不像法器，更像一段被命运删去的注脚。",
-        choices: [
-          {
-            text: "记下铜门裂纹",
-            to: "birth",
-            once: "memoryArchiveShard",
-            effect: s => {
-              s.fragments += 1;
-              s.qi += 8 + s.talent;
-              s.log = "天命碎片并不发光，只在你提到北溟时微微发烫。";
-            }
-          },
-          { text: "回到西陵城外", to: "birth" }
-        ]
-      },
-
-      sect: {
-        title: "天机残阵",
-        text: "天机营的营旗被烟熏得发黑。普通士卒一边修城墙，一边把最后的干粮分给逃难者。\n\n你想起人物志里那只青丘九尾狐：他本来只想理解人间感情，却在长合镇看见天机将士以盾挡妖，终于明白“情”有时就是站在别人前面。",
-        choices: [
-          {
-            text: "护送难民去长合镇",
-            to: "foxRoad",
-            effect: s => {
-              s.virtue += 18;
-              s.qi += 12 + s.talent;
-              s.years -= 1;
-              s.log = "你护住了一队孩子。有人问你的名字，你只说：下一世还会来的。";
-            }
-          },
-          {
-            text: "修复天机断阵，准备再守一次城",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 30 + s.talent;
-              s.virtue += 6;
-              s.years -= 2;
-              s.log = "阵眼亮起时，你听见城墙深处有上古金铁之声回应。";
-            }
-          },
-          {
-            text: "追查是谁故意放开铜门防线",
-            to: "jadeClue",
-            effect: s => {
-              s.qi += 18 + s.talent;
-              s.fragments += 1;
-              s.log = "线索指向一枚碎裂玉符，上面残留着云麓与太虚两脉都不愿承认的咒痕。";
-            }
-          }
-        ]
-      },
-
-      iceHeart: {
-        title: "冰心药庐",
-        text: "江南药庐灯火通明。伤者从西陵一路送来，有天机士卒，有云麓弟子，也有被妖魔裹挟的化生魔。\n\n冰心堂内部仍在争论医毒之界：若毒能让一支妖魔小队昏睡，算救人还是伤生？若药只能救一人，你要先救无辜者，还是救握有情报的敌将？",
-        choices: [
-          {
-            text: "以医术救人，不问阵营",
-            to: "foxRoad",
-            effect: s => {
-              s.virtue += 20;
-              s.qi += 10 + s.talent;
-              s.karma = Math.max(0, s.karma - 5);
-              s.log = "一个化生魔醒来后没有道谢，只低声说：北溟有人也不想开战。";
-            }
-          },
-          {
-            text: "炼迷魂毒，阻止下一波攻城",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 26 + s.talent;
-              s.karma += 5;
-              s.virtue += 5;
-              s.log = "毒雾没有夺命，却让你明白：手段越锋利，越要有人守着边界。";
-            }
-          },
-          {
-            text: "追随冷喻旧案，查邪影真言",
-            to: "coldShadow",
-            effect: s => {
-              s.path = "太虚邪影";
-              s.qi += 24 + s.talent;
-              s.karma += 6;
-              s.log = "冷喻的故事像一根刺：被称为魔女的人，未必从一开始就想伤人。";
-            }
-          }
-        ]
-      },
-
-      shadow: {
-        title: "雷泽影试",
-        text: "雷泽湿雾像一张没有边缘的网。魍魉长老让你在沉船旧地等一夜，若天亮前仍没有暴露呼吸，才算入门。\n\n夜半，你看见一道黑影在月下练刀。那不是鬼，是夜哭留下的影步残象。影之主的传承不只教人杀，也教人明白哪些目标不能碰。",
-        choices: [
-          {
-            text: "只接刺杀妖魔统领的任务",
-            to: "copperGate",
-            effect: s => {
-              s.qi += 34 + s.talent;
-              s.karma += 6;
-              s.virtue += 6;
-              s.log = "刀从阴影里出，却没有落向无辜者。雷泽长老第一次正眼看你。";
-            }
-          },
-          {
-            text: "偷取六翼令，强行掌控情报网",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 42 + s.talent;
-              s.karma += 18;
-              s.virtue -= 12;
-              s.log = "情报来得太快，快到你开始把人命看成棋子。";
-            }
-          },
-          {
-            text: "追踪夜哭旧路，查玉玑子与七夜的盟约",
-            to: "jadeClue",
-            effect: s => {
-              s.qi += 22 + s.talent;
-              s.fragments += 1;
-              s.log = "你发现所谓盟约里有一页被撕去，撕口残留北溟寒气。";
-            }
-          }
-        ]
-      },
-
-      foxRoad: {
-        title: "长合镇狐火",
-        text: "长合镇外，难民队伍被妖魔斥候截住。一个书生模样的男子站在路边，袖中却有九道白影微微摇动。\n\n他自称令狐九尾，说自己仍不太理解人类为何愿意替陌生人挡刀。但当第一面天机盾牌倒下时，他抬手放出狐火，火光温柔，却足以逼退群魔。",
-        choices: [
-          {
-            text: "与令狐九尾并肩护送百姓",
-            to: "copperGate",
-            effect: s => {
-              s.virtue += 18;
-              s.qi += 20 + s.talent;
-              s.karma = Math.max(0, s.karma - 4);
-              s.log = "九尾狐说：这大概就是感情。你说：也是大荒还能被称为人间的原因。";
-            }
-          },
-          {
-            text: "请求狐火幻术，潜入妖魔营",
-            to: "jadeClue",
-            effect: s => {
-              s.qi += 28 + s.talent;
-              s.karma += 4;
-              s.log = "狐火遮住你的气息，却遮不住你看见铜门深处时的寒意。";
-            }
-          }
-        ]
-      },
-
-      coldShadow: {
-        title: "邪影与白羽",
-        text: "深山海崖边，你找到冷喻旧居。传闻里的太虚魔女没有坐在尸山血海上，她只是坐在玄龟背上，看一场很慢的夕阳。\n\n她问你：若世界先把一个人推成魔，再要求她证明自己无辜，这样的正道，算不算正？莫非云留下的白羽压在桌上，干净得像一句迟来的证词。",
-        choices: [
-          {
-            text: "向冷喻学会控制邪影，而非放纵邪影",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 32 + s.talent;
-              s.karma += 5;
-              s.virtue += 8;
-              s.fragments += 1;
-              s.log = "邪影第一次没有吞噬你，而是站到你身后。";
-            }
-          },
-          {
-            text: "用邪影报复所有污名你的人",
-            to: "hell",
-            effect: s => {
-              s.qi += 48 + s.talent;
-              s.karma += 40;
-              s.virtue -= 30;
-              s.log = "你赢了争辩，却输给了伤口。幽冥的门在你脚下张开。";
-            }
-          },
-          {
-            text: "带走莫非云白羽，去云麓查旧案",
-            to: "jadeClue",
-            effect: s => {
-              s.virtue += 10;
-              s.qi += 16 + s.talent;
-              s.fragments += 1;
-              s.log = "白羽不替任何门派辩解，只证明世上仍有人会做干净的选择。";
-            }
-          }
-        ]
-      },
-
-      jadeClue: {
-        title: "玉符裂痕",
-        text: "你沿着玉符裂痕查到一段被故意掩去的旧事：太古铜门不是单纯的封印，它也是神界、幽都与人间互相推卸代价的门。\n\n玉玑子想借乱世重塑秩序，七夜想让幽都不再只是被封在北溟的阴影。两人的路都不干净，却都不是一句“邪恶”能概括。",
-        choices: [
-          {
-            text: "公开玉符证据，联合诸门审问真相",
-            to: "greatCouncil",
-            effect: s => {
-              s.virtue += 20;
-              s.qi += 18 + s.talent;
-              s.karma = Math.max(0, s.karma - 8);
-              s.fragments += 1;
-              s.log = "天机、冰心、云麓、魍魉第一次坐到同一张案前，所有人都不舒服，但都没有离席。";
-            }
-          },
-          {
-            text: "独自夺取玉符，先拿力量再谈真相",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 44 + s.talent;
-              s.karma += 16;
-              s.virtue -= 8;
-              s.log = "你离答案更近，却离别人更远。轮回最喜欢这种孤独。";
-            }
-          },
-          {
-            text: "追随玄晖北上，直问幽都王颛顼",
-            to: "northSea",
-            effect: s => {
-              s.qi += 24 + s.talent;
-              s.fragments += 1;
-              s.years -= 2;
-              s.log = "北溟风雪里，有人仍以人身背负太阳神子的骄傲。";
-            }
-          }
-        ]
-      },
-
-      copperGate: {
-        title: "太古铜门",
-        text: "太古铜门前，妖魔军阵如潮。门缝里不是单纯魔气，而是更古老的神界余烬，像有人把上古旧债全都塞进这道门里。\n\n你忽然明白：若只把门关上，下一世它还会再开。若只把敌人杀尽，新的敌人会从同一段谎言里长出来。",
-        choices: [
-          {
-            text: "守门救人，先撑过这一夜",
-            to: "tribulation",
-            effect: s => {
-              s.virtue += 16;
-              s.qi += 30 + s.talent;
-              s.years -= 2;
-              s.log = "这一夜很长，但城中灯火没有灭。";
-            }
-          },
-          {
-            text: "入门取证，查铜门深处的上古契约",
-            to: "northSea",
-            effect: s => {
-              s.qi += 34 + s.talent;
-              s.karma += 6;
-              s.fragments += 1;
-              s.log = "铜门内侧刻着一行字：绝地天通之后，仍有人想重开天梯。";
-            }
-          },
-          {
-            text: "借妖魔之势磨炼自己",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 46 + s.talent;
-              s.karma += 12;
-              s.virtue -= 5;
-              s.log = "你没有主动害人，但你开始把灾难当作修行资源。这个念头很冷。";
-            }
-          }
-        ]
-      },
-
-      northSea: {
-        title: "北溟雪路",
-        text: "北溟没有传说里那么遥远，只是每走一步，都像有人在命里加一层霜。\n\n玄晖在风雪中前行。他曾是太阳神子东皇太一，也曾是被碾入泥中的化生魔。他要见幽都王颛顼，不是为了认父，而是为了问：为什么众生总要替神明的旧错付账？",
-        choices: [
-          {
-            text: "陪玄晖入幽都王庭",
-            to: "greatCouncil",
-            effect: s => {
-              s.qi += 28 + s.talent;
-              s.fragments += 1;
-              s.virtue += 8;
-              s.log = "玄晖没有回头，只说：若我倒下，替我把问题问完。";
-            }
-          },
-          {
-            text: "以北溟寒气淬炼自身",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 40 + s.talent;
-              s.karma += 8;
-              s.years -= 2;
-              s.log = "寒气入骨，你的力量更纯，也更不近人情。";
-            }
-          },
-          {
-            text: "偷听幽都密议，独占真相",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 36 + s.talent;
-              s.karma += 15;
-              s.virtue -= 6;
-              s.log = "真相若只被一个人握住，就会变成另一种权力。";
-            }
-          }
-        ]
-      },
-
-      greatCouncil: {
-        title: "大荒诸门会盟",
-        text: "西陵废墟上，诸门终于会盟。天机带来守城军册，冰心带来伤者名录，魍魉带来暗杀名单，云麓带来天书残页，翎羽送来遗墨修复的机关图。\n\n争吵持续三日。有人要杀尽幽都，有人要重开登神大典，有人只想关门自保。你知道，这就是大荒：众声喧哗，却仍有人愿意为了不相识的人留下。",
-        choices: [
-          {
-            text: "提出新约：诸门共守铜门，共审神明旧契",
-            to: "breakWheel",
-            requires: s => s.fragments >= 4 && s.virtue >= 55,
-            effect: s => {
-              s.qi += 28 + s.talent;
-              s.virtue += 15;
-              s.log = "不是所有人都信你，但至少他们愿意先不拔剑。";
-            }
-          },
-          {
-            text: "以武压服诸门，先赢再说",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 48 + s.talent;
-              s.karma += 20;
-              s.virtue -= 12;
-              s.log = "会盟安静了。安静得像一座坟。";
-            }
-          },
-          {
-            text: "闭关破境，等足够强再改天命",
-            to: "tribulation",
-            effect: s => {
-              s.qi += 38 + s.talent;
-              s.years -= 2;
-              s.log = "你离开会盟，知道下一次回来时，必须给出答案。";
-            }
-          }
-        ]
-      },
-
-      tribulation: {
-        title: "大荒命劫",
-        text: () => `雷云从太古铜门上方压下，像整部大荒旧史都在审你。\n\n当前灵力：${state.qi}。境界越高，越能触及真相；道德越低，命劫越重；因果越深，幽都越近。`,
-        choices: [
-          {
-            text: "迎雷破境",
-            to: "afterBreak",
-            effect: s => {
-              const threshold = 28 + s.realm * 22 + Math.max(0, 50 - s.virtue) + Math.max(0, s.karma);
-              if (s.qi >= threshold) {
-                s.realm += 1;
-                s.qi = Math.max(0, s.qi - threshold + 8);
-                s.years += 5;
-                s.memory += 1;
-                s.log = `你扛过命劫，踏入${realms[s.realm]}。雷声里有一段旧史被你听清。`;
-              } else {
-                s.scene = "death";
-                s.log = "雷光落下，你记住了失败的位置。下一世，这一道雷会慢半拍。";
-              }
-            }
-          },
-          {
-            text: "先还人间债，再问天命",
-            to: "afterBreak",
-            effect: s => {
-              s.virtue += 14;
-              s.karma = Math.max(0, s.karma - 12);
-              s.qi += 6 + s.talent;
-              s.years -= 1;
-              s.log = "你放下闭关，去修桥、救人、埋葬无名者。天道没有夸你，但雷云薄了。";
-            }
-          },
-          {
-            text: "吞铜门魔息，强行破境",
-            to: "heartDemon",
-            effect: s => {
-              s.qi += 42 + s.talent;
-              s.karma += 18;
-              s.virtue -= 10;
-              s.log = "力量来得汹涌，你却听见铜门里有人喊出了你的名字。";
-            }
-          }
-        ]
+        title: () => chapterName(),
+        text: () => chapterText(),
+        choices: () => chapterChoices()
       },
 
       afterBreak: {
-        title: "轮回分岔",
-        text: () => `你如今是${realms[state.realm]}修士，诸门旧闻在识海中重新排列。\n\n这一处不是回到原点，而是本世真正的分岔：你可以召集诸门、直入铜门、北上幽都、压下心魔，也可以继续破境，直到登九天或重订绝地天通。`,
-        choices: [
-          {
-            text: "召集诸门重开铜门议局",
-            to: "greatCouncil",
-            requires: s => s.realm < 5 && s.years > 0,
-            effect: s => {
-              s.years -= 1;
-              s.virtue += 4;
-              s.log = "你没有再独自绕路，而是把天机、冰心、云麓、魍魉都拖到同一张桌前。";
-            }
-          },
-          {
-            text: "持天命碎片直入铜门裂隙",
-            to: "copperGate",
-            requires: s => s.fragments >= 2 && s.years > 0,
-            effect: s => {
-              s.qi += 14 + s.talent;
-              s.karma += 8;
-              s.log = "碎片贴上铜纹时，门内传来上一世没听完的回声。";
-            }
-          },
-          {
-            text: "北上北溟，追问玄晖与幽都旧约",
-            to: "northSea",
-            requires: s => s.fragments >= 1 && s.years > 0,
-            effect: s => {
-              s.years -= 1;
-              s.fragments += 1;
-              s.log = "你越过风雪，终于明白幽都不是结局，而是一座被误读太久的门。";
-            }
-          },
-          {
-            text: "先入镜阵，压下铜门心魔",
-            to: "heartDemon",
-            requires: s => s.karma >= 25,
-            effect: s => {
-              s.memory += 1;
-              s.log = "你决定先看清自己，再去审问诸神。";
-            }
-          },
-          {
-            text: "闭关冲境，为登九天蓄势",
-            to: "tribulation",
-            requires: s => s.realm < 5 && s.years > 1,
-            effect: s => {
-              s.qi += 32 + s.talent;
-              s.years -= 2;
-              s.log = "你把本世线索压入丹田，准备以更高境界去撬开天门。";
-            }
-          },
-          {
-            text: "登九天，问神明旧账",
-            to: "ascend",
-            requires: s => s.realm >= 5
-          },
-          {
-            text: "重订绝地天通，终止铜门轮回",
-            to: "breakWheel",
-            requires: s => s.fragments >= 4 && s.realm >= 3
-          },
-          {
-            text: "寿元耗尽，带着大荒旧梦重生",
-            to: "death",
-            requires: s => s.years <= 0
-          }
-        ]
+        title: () => chapterName(),
+        text: () => chapterText(),
+        choices: () => chapterChoices()
       },
 
-      heartDemon: {
-        title: "铜门心魔",
-        text: "心魔披着许多人的脸：玉玑子的野望、七夜的冷笑、冷喻的沉默、玄晖的不屈，还有你自己每一世失败后的不甘。\n\n它问你：既然轮回会重来，为什么不先赢？为什么还要顾及那些终将死去的人？",
+      trueAscend: {
+        title: "天光未远",
+        text: "太古铜门的缝隙里透出很淡的光。\n\n你没有急着跨过去。身后还有人没站稳，也有人第一次敢抬头看铜门上的锈痕。\n\n你回头看了一眼，才把手按在铜门上。",
+        ending: true,
         choices: [
-          {
-            text: "承认想赢，但不拿无辜者作代价",
-            to: "tribulation",
-            effect: s => {
-              s.virtue += 12;
-              s.karma = Math.max(0, s.karma - 10);
-              s.memory += 1;
-              s.log = "心魔没有消失，只是退后一步。你终于能和自己的阴影同行。";
-            }
-          },
-          {
-            text: "镇压心魔，继续独行",
-            to: "afterBreak",
-            effect: s => {
-              s.qi += 24 + s.talent;
-              s.karma += 6;
-              s.log = "你暂时压住了它，但被压住的东西总会寻找裂缝。";
-            }
-          },
-          {
-            text: "让心魔接管，成为新的铜门执钥人",
-            to: "hell",
-            effect: s => {
-              s.virtue -= 35;
-              s.karma += 45;
-              s.log = "你终于握住了门钥，却发现门内外所有人都成了你的囚徒。";
-            }
-          }
-        ]
-      },
-
-      ascend: {
-        title: "九天登神阶",
-        text: () => `九天之上，登神阶如白骨铺成。神明的旧契约悬在你面前：功德足者可问天，因果重者坠幽都。\n\n你的道德为 ${state.virtue}，因果为 ${state.karma}。`,
-        choices: [
-          {
-            text: "踏上登神阶",
-            to: "ascendResult",
-            effect: s => {
-              const burden = Math.max(0, 65 - s.virtue) + s.karma;
-              if (burden >= 55) {
-                s.scene = "hell";
-                s.log = "登神阶忽然翻转，白玉化为黑水。你被因果拖回幽都。";
-              } else if (s.fragments >= 4 && s.virtue >= 60) {
-                s.scene = "trueAscend";
-                s.log = "你看穿登神阶后的祭坛，终于有资格代表大荒发问。";
-              } else {
-                s.scene = "falseAscend";
-                s.log = "你登上九天，却发现自己只是被写进神明旧契的下一行名字。";
-              }
-            }
-          },
-          {
-            text: "退回人间，先补足诸门新约",
-            to: "greatCouncil",
-            effect: s => {
-              s.virtue += 8;
-              s.karma = Math.max(0, s.karma - 8);
-              s.log = "能从天阶上退回来的人，比急着成神的人更像大荒的答案。";
-            }
-          }
+          { text: "在下一次清晨醒来", rebirth: true },
+          { text: "重新开始", hardReset: true }
         ]
       },
 
       breakWheel: {
-        title: "重订绝地天通",
-        text: "四枚天命碎片合一，照出最初的契约：绝地天通不是为了让神远离人，而是为了不让任何一方把灾祸推给另一方。\n\n铜门轮回之所以反复开启，是因为旧契被人改写。若要修正它，必须有人同时承认三件事：幽都不是天生罪地，诸门不是永远清白，神明也要为旧错负责。",
-        choices: [
-          {
-            text: "以诸门新约重封铜门",
-            to: "trueEnding",
-            requires: s => s.virtue >= 70 && s.realm >= 4
-          },
-          {
-            text: "以自身为钥，替大荒争百年喘息",
-            to: "sacrifice",
-            requires: s => s.virtue >= 45
-          },
-          {
-            text: "夺取旧契，命诸门与幽都都听你裁决",
-            to: "hell",
-            effect: s => {
-              s.virtue -= 40;
-              s.karma += 55;
-              s.log = "你废掉旧神，却坐上了旧神的位置。幽都没有惩罚你，它只是让你看见自己。";
-            }
-          }
-        ]
-      },
-
-      trueAscend: {
-        title: "结局：问天而归",
-        text: "你没有留在九天成神，而是带着神明旧契回到西陵。\n\n诸门、幽都、青丘、九黎、北溟都派人来听你宣读新约。大荒仍有战火，仍有私心，仍有人会犯错；但从这一日起，再没有谁能把众生当作填补天裂的柴薪。",
+        title: "铜锈发热",
+        text: "铜锈贴上铜门缝时，门内传来一声很轻的叹息。\n\n你没有听懂那声叹息，却记住了它的温度。有人在你身后点灯，火光照见每个人脸上的疲惫。",
         ending: true,
         choices: [
-          { text: "带着更多记忆再入轮回", rebirth: true },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      falseAscend: {
-        title: "结局：九天祭名",
-        text: "你登上九天，名字却被刻进祭册。\n\n这一世没有白费。你看见了登神阶后的真相，也记住了哪几枚天命碎片能改写旧契。下一世，你会更早回到西陵城外。",
-        ending: true,
-        choices: [
-          { text: "带着真相重生", rebirth: true, bonus: { memory: 3, fragments: 1 } },
-          { text: "彻底重开", hardReset: true }
-        ]
-      },
-
-      trueEnding: {
-        title: "真结局：天下仍是大荒",
-        text: "铜门缓缓闭合，却没有把幽都重新钉死在黑暗里。新约写明：诸门共守边界，幽都共担封印，神明旧契须向人间公开。\n\n玄晖在北溟雪中笑了一下，令狐九尾终于明白了人间感情，冷喻把邪影收回身后，遗墨的机关鸟飞过西陵城头。\n\n你没有成为新的神。你只是让后来者不必靠一次次死亡，才能换来一个答案。",
-        ending: true,
-        choices: [
-          { text: "以新大荒再开一局", hardReset: true }
+          { text: "带着这点温度醒来", rebirth: true, bonus: { memory: 2, fragments: 1 } },
+          { text: "重新开始", hardReset: true }
         ]
       },
 
       sacrifice: {
-        title: "结局：百年封门",
-        text: "你的功德不足以彻底改写旧契，只能以自身为钥，将太古铜门封住百年。\n\n百年很短，却足够让一代孩子在没有妖魔攻城的西陵长大。百年后，也许会有另一个带着记忆的人醒来，接过你没走完的路。",
+        title: "铜门停了一息",
+        text: "剑鞘抵住铜门时，你听见木纹裂开的声音。\n\n铜门没有完全关上，也没有完全打开。至少这一夜，风没有吹进城里。",
         ending: true,
         choices: [
-          { text: "下一世接续此愿", rebirth: true, bonus: { memory: 2, virtue: 8 } },
-          { text: "彻底重开", hardReset: true }
+          { text: "在下一世接住这口气", rebirth: true, bonus: { memory: 2, virtue: 6 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      falseAscend: {
+        title: "白光太亮",
+        text: "你独自走进铜门。\n\n光太亮了，身后的喊声很快被吞没。你不知道自己走到了哪里，只记得掌心那片铜锈忽然冷了下去。",
+        ending: true,
+        choices: [
+          { text: "从冷光里醒来", rebirth: true, bonus: { memory: 2 } },
+          { text: "重新开始", hardReset: true }
         ]
       },
 
       death: {
-        title: "结局：大荒梦回",
-        text: "这一世到此为止。你闭眼前，听见西陵城头有人敲响战鼓，也有人在药庐里轻声唱歌。\n\n死亡没有带走一切。它只把大荒重新摊开，等你下一世再读。",
+        title: "天快亮了",
+        text: "你没有打开太古铜门。\n\n城外的人被带走了一批，屋里的灯也还亮着。天快亮时，你终于闭上眼，记住了最后一阵风。",
         ending: true,
         choices: [
-          { text: "带着记忆重生", rebirth: true, bonus: { memory: 2 } },
-          { text: "彻底重开", hardReset: true }
+          { text: "下一世再醒来", rebirth: true, bonus: { memory: 1, virtue: 4 } },
+          { text: "重新开始", hardReset: true }
         ]
       },
 
       hell: {
-        title: "结局：幽都照影",
-        text: "因果太重，幽都水面映出你的每一次选择。\n\n这里不是永罚之地，而是一面镜子。你必须重新走一遍人间，少一点天赋，多一点债，直到明白力量若不能护人，便只是在替旧灾换一个名字。",
+        title: "井口无声",
+        text: "你在很深的井口前醒来。\n\n没有人审你，也没有人替你解释。只有一盏灯照着水面，水里倒映出你这一世绕开的那些脸。",
         ending: true,
         choices: [
-          { text: "从幽都转生", rebirth: true, hell: true },
-          { text: "彻底重开", hardReset: true }
+          { text: "从井边重新醒来", rebirth: true, bonus: { memory: 1 }, hell: true },
+          { text: "重新开始", hardReset: true }
         ]
       },
 
-      ascendResult: {
-        title: "登神阶后",
-        text: "九天正在衡量你的功德与因果。",
-        choices: []
-      }
-    });
+      medicineEnding: {
+        title: "灯下的药账",
+        text: "你没有推开铜门。\n\n你把药账留在灯下，一页一页补完活人的名字。天亮前，有人终于知道该先救谁，也知道该替谁守住最后一口气。",
+        ending: true,
+        choices: [
+          { text: "带着药炉旁的余温醒来", rebirth: true, bonus: { memory: 2, virtue: 8 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
 
-    Object.assign(scenes, {
-      afterBreak: {
-        title: () => {
-          const maxChapter = Math.max(1, (storyConfig.chapters || []).length);
-          return chapterName();
-        },
-        text: () => chapterText(),
-        choices: () => chapterChoices()
+      shadowEnding: {
+        title: "影子停住了",
+        text: "你把旧令放到铜门缝前。\n\n影子没有立刻散去，却也没有再往人群里钻。持刀的人站在灯外很久，最后把第二枚令牌翻过来，放到你脚边。",
+        ending: true,
+        choices: [
+          { text: "带着巷口的冷意醒来", rebirth: true, bonus: { memory: 2, fragments: 1 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      wandererEnding: {
+        title: "渡口天亮",
+        text: "你没有拜入任何山门，也没有把铜门后的光当成归处。\n\n你沿着渡口把人一批批送走。等最后一辆车过桥，城里的灯仍亮着，车辕上的账簿少了三处空白。",
+        ending: true,
+        choices: [
+          { text: "带着路上的尘土醒来", rebirth: true, bonus: { memory: 2, virtue: 10 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      lampEnding: {
+        title: "雪里还亮着灯",
+        text: "你把灯交还给雪里等候的人。\n\n他没有解释自己是谁，只把灯举得更高。雪线那边终于有人看清回城的路，铜门后的光也因此退了一寸。",
+        ending: true,
+        choices: [
+          { text: "带着雪里的灯影醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 6 } },
+          { text: "重新开始", hardReset: true }
+        ]
       }
     });
 
@@ -1550,7 +481,7 @@
       if (chapter && chapter.name) return chapter.name;
       const act = state.act || 0;
       if (act <= 0) return "雷后入局";
-      if (act === 1) return "诸门相疑";
+      if (act === 1) return "山门相疑";
       if (act === 2) return "铜门显影";
       return "天命收束";
     }
@@ -1559,41 +490,137 @@
       const act = state.act || 0;
       const statusLines = storyConfig.statusLines || {};
       const status = state.karma >= 60
-        ? (statusLines.highKarma || "你的因果太重，魍魉席后的影子始终盯着你的手。")
+        ? (statusLines.highKarma || "灯火离你远了一点。")
         : state.virtue >= 120
-          ? (statusLines.highVirtue || "你的名声已足以压住半座议厅，但真正的信任仍要靠下一步换来。")
-          : (statusLines.normal || "你把门令摊在掌心，也隔着灯火观察递令的人。你还站在门槛外，先看清每一条路要付出的代价。");
+          ? (statusLines.highVirtue || "有人看见你留下来，悄悄松了一口气。")
+          : (statusLines.normal || "你还没有确定谁可信。");
       const chapter = currentChapter();
+      const contextual = contextualChapterText(act, status);
+      if (contextual) return contextual + echoPrelude() + (act === 0 ? birthStatLine() : "");
       if (chapter && chapter.text && chapter.text.normal) {
-        return chapter.text.normal.replaceAll("{{status}}", status) + (act === 0 ? birthStatLine() : "");
+        return chapter.text.normal.replaceAll("{{status}}", status) + echoPrelude() + (act === 0 ? birthStatLine() : "");
       }
 
-      if (act <= 0) {
-        return `雷劫散后，西陵旧议厅的水镜忽然亮起。天机营把铜门裂纹拓在镜中，冰心堂带来城外疫民名单，魍魉长老只问一句：上一世，是谁把这道裂纹藏起来的？\n\n${status}\n\n这一幕的关键不再是“去哪”，而是你要先处理哪一个真实冲突。`;
-      }
-
-      if (act === 1) {
-        return `你已经把第一条线索摆上桌面。遗墨的机关鸟落在梁上，吐出一片带盐痕的天书残页；冷喻没有看残页，只看你腰间的天命碎片。\n\n${status}\n\n现在故事开始分叉：公开残页会迫使诸门站队，私查北溟会更接近幽都旧约，强入铜门则可能让心魔提前醒来。`;
-      }
-
-      if (act === 2) {
-        return `铜门裂纹终于回应了你。水镜里先是北溟雪，再是东海神域的潮声，最后映出九天登神大典上一排没有名字的祭席。\n\n${status}\n\n这一幕已经接近终局。你可以补齐真相，也可以直接用修为撬开天门；若因果继续压上来，幽都会先替你作答。`;
-      }
-
-      return `本世的线索已经收束：诸门的旧账、幽都的误读、铜门的裂纹、九天的祭席，都指向同一个问题。\n\n力量足够时，你可以登九天；碎片足够时，你可以重订绝地天通；若因果压过道心，幽都会把你送回人间重走。`;
+      const fallback = [
+        "你睁眼时，掌心仍有铜锈的温度。\n\n窗外的光很淡，远处有人压低声音说话。\n\n{{status}}\n\n你先坐起来，把袖口收紧。",
+        "门前的石阶被雨打湿。\n\n有人在屋里等你回话，也有人从巷口匆匆走过。\n\n{{status}}\n\n你还不必立刻相信谁。",
+        "夜里有人敲门。\n\n敲门声不重，却一直没有停。\n\n{{status}}\n\n你站在门后，先听了一会儿。",
+        "昨夜留下的痕迹还在。\n\n灯火照着你掌心那片铜锈，也照着众人没有说出口的停顿。\n\n{{status}}\n\n你伸手按住桌沿。"
+      ];
+      return fallback[Math.min(fallback.length - 1, Math.max(0, act))].replaceAll("{{status}}", status);
     }
 
     function requirementPass(requirements = {}, s = state) {
+      const currentRelicGates = {
+        iceLedger: "drugSign",
+        moFeiyunProof: "whiteFeather",
+        swordHeart: "swordTassel",
+        qingyangTrace: "swordTassel",
+        shadowTrust: "oldToken",
+        inkContract: "machineBird",
+        fireOath: "trialStone",
+        foxBond: "ferryLedger",
+        wandererCred: "ferryLedger",
+        xuanhuiBond: "lamp",
+        sunCinders: "lamp"
+      };
       for (const [key, value] of Object.entries(requirements)) {
-        if (key.endsWith("Min")) {
+        if (key === "path") {
+          if (s.path !== value) return false;
+        } else if (key === "pathNot") {
+          if (s.path === value) return false;
+        } else if (key === "pathIn") {
+          const allowed = String(value).split("|").map(item => item.trim()).filter(Boolean);
+          if (!allowed.includes(s.path)) return false;
+        } else if (key === "origin") {
+          if (s.origin !== value) return false;
+        } else if (key === "originIn") {
+          const allowed = String(value).split("|").map(item => item.trim()).filter(Boolean);
+          if (!allowed.includes(s.origin)) return false;
+        } else if (key.endsWith("Min")) {
           const stat = key.slice(0, -3);
           if ((s[stat] || 0) < value) return false;
+          if (currentRelicGates[stat] && !(s.currentRelics || {})[currentRelicGates[stat]]) return false;
         } else if (key.endsWith("Max")) {
           const stat = key.slice(0, -3);
           if ((s[stat] || 0) > value) return false;
         }
       }
       return true;
+    }
+
+    function markCurrentKnowledge(s, config = {}) {
+      if (!s.currentRelics) s.currentRelics = {};
+      if (!s.currentNames) s.currentNames = {};
+      s.currentRelics.copperRust = true;
+      const text = `${config.text || ""}\n${config.log || ""}\n${config.setOrigin || ""}`;
+      if (/药庐|药签|药炉|药童/.test(text)) s.currentRelics.drugSign = true;
+      if (/白羽|星灯|观星/.test(text)) s.currentRelics.whiteFeather = true;
+      if (/雨亭|剑穗|断剑|剑声|剑架|剑鞘/.test(text)) s.currentRelics.swordTassel = true;
+      if (/夜牌|旧令|影子|镜室/.test(text)) s.currentRelics.oldToken = true;
+      if (/机关鸟|盐晶|翎羽/.test(text)) s.currentRelics.machineBird = true;
+      if (/荒火|试锋石|炭/.test(text)) s.currentRelics.trialStone = true;
+      if (/商队|渡口|账簿|杂役/.test(text)) s.currentRelics.ferryLedger = true;
+      if (/雪|点灯|灯旁|雪灯/.test(text)) s.currentRelics.lamp = true;
+
+      if (/玄晖/.test(text)) s.currentNames.xuanhui = true;
+      if (/青阳/.test(text)) s.currentNames.qingyang = true;
+      if (/莫非云/.test(text)) s.currentNames.moFeiyun = true;
+      if (/夜哭/.test(text)) s.currentNames.yeku = true;
+      if (/清时/.test(text)) s.currentNames.qingshi = true;
+      if (/遗墨/.test(text)) s.currentNames.yimo = true;
+    }
+
+    function echoFromLife(old) {
+      const previous = old.echoes || {};
+      const echo = { ...previous };
+      const add = (key, value = 1) => {
+        echo[key] = Math.min(12, (echo[key] || 0) + value);
+      };
+      if ((old.iceLedger || 0) > 0) add("medicine", Math.ceil(old.iceLedger / 2));
+      if ((old.moFeiyunProof || 0) > 0) add("star", Math.ceil(old.moFeiyunProof / 2));
+      if ((old.swordHeart || 0) > 0 || (old.qingyangTrace || 0) > 0) add("sword", Math.ceil(((old.swordHeart || 0) + (old.qingyangTrace || 0)) / 3));
+      if ((old.shadowTrust || 0) > 0) add("shadow", Math.ceil(old.shadowTrust / 2));
+      if ((old.inkContract || 0) > 0) add("machine", Math.ceil(old.inkContract / 2));
+      if ((old.fireOath || 0) > 0) add("fire", Math.ceil(old.fireOath / 2));
+      if ((old.foxBond || 0) > 0 || (old.wandererCred || 0) > 0) add("road", Math.ceil(((old.foxBond || 0) + (old.wandererCred || 0)) / 3));
+      if ((old.xuanhuiBond || 0) > 0 || (old.sunCinders || 0) > 0) add("lamp", Math.ceil(((old.xuanhuiBond || 0) + (old.sunCinders || 0)) / 3));
+      return echo;
+    }
+
+    function echoPrelude() {
+      const echoes = state.echoes || {};
+      const hints = [];
+      if (echoes.medicine) hints.push("药炉的灰");
+      if (echoes.star) hints.push("灯下的白影");
+      if (echoes.sword) hints.push("雨里的剑声");
+      if (echoes.shadow) hints.push("巷口的第二道影子");
+      if (echoes.machine) hints.push("翅骨里细小的响声");
+      if (echoes.fire) hints.push("炉火后的热浪");
+      if (echoes.road) hints.push("渡口未点完的人数");
+      if (echoes.lamp) hints.push("雪里那一点灯");
+      if (!hints.length || state.memory < 3) return "";
+      const visible = hints
+        .map((hint, index) => ({ hint, rank: hashText(`${playerSeed}|${state.life}|echo:${hint}|${index}`) }))
+        .sort((left, right) => left.rank - right.rank)
+        .slice(0, Math.min(2, hints.length))
+        .map(item => item.hint);
+      return `\n\n你并不记得前因，只是对${visible.join("、")}有些说不清的熟悉。`;
+    }
+
+    function choiceEchoScore(choice) {
+      const text = choice.text || "";
+      const echoes = state.echoes || {};
+      let score = 0;
+      if (/药庐|药签|药炉|冰心/.test(text)) score += echoes.medicine || 0;
+      if (/云麓|星灯|白羽|观星|海边|盐滩/.test(text)) score += echoes.star || 0;
+      if (/弈剑|雨亭|剑|剑穗/.test(text)) score += echoes.sword || 0;
+      if (/旧巷|夜牌|旧令|镜室|影子|太虚/.test(text)) score += echoes.shadow || 0;
+      if (/机关鸟|翎羽|盐晶/.test(text)) score += echoes.machine || 0;
+      if (/荒火|炭|试锋石|焦土/.test(text)) score += echoes.fire || 0;
+      if (/商队|渡口|杂役|游侠|账簿/.test(text)) score += echoes.road || 0;
+      if (/雪|点灯|北边|雪线/.test(text)) score += echoes.lamp || 0;
+      return score;
     }
 
     function applyConfigEffects(s, config) {
@@ -1605,6 +632,7 @@
       if (config.setPath) s.path = config.setPath;
       if (config.setOrigin) s.origin = config.setOrigin;
       if (config.log) s.log = config.log;
+      markCurrentKnowledge(s, config);
     }
 
     function configChoice(config) {
@@ -1617,31 +645,170 @@
       };
     }
 
+    function ambientCharacterChoices() {
+      if (state.scene !== "afterBreak") return [];
+      const act = state.act || 0;
+      if (act < 2 || act > 4) return [];
+
+      const make = (text, log, effects = {}, options = {}) => ({
+        text,
+        to: "afterBreak",
+        ambient: true,
+        once: options.once || `ambient:${state.path || "none"}:${hashText(text).toString(36)}`,
+        advanceAct: options.advanceAct,
+        requires: options.requires,
+        effect: s => {
+          Object.entries(effects).forEach(([key, value]) => {
+            if (typeof s[key] === "number" && typeof value === "number") s[key] += value;
+          });
+          s.log = log;
+          markCurrentKnowledge(s, { text, log, effects });
+        }
+      });
+
+      const byPath = {
+        "天机营": [
+          make("听老校尉讲北墙旧事", "老校尉没有讲功劳，只讲哪一夜少点了一盏灯。你听完以后，才知道守城先要守住活人的名字。", { virtue: 5, memory: 1 }),
+          make("替伤号棚送一桶热水", "伤号棚里没人问你是哪一队。有人接过热水，只说今晚别让雨浇灭北墙的灯。", { virtue: 7, years: -1 }),
+          make("跟无名斥候查雨中脚印", "斥候在泥里按住一道浅脚印，说它不像妖，也不像人。你没有追远，只把方向记了下来。", { qi: 8, karma: 1 })
+        ],
+        "冰心堂": [
+          make("听药童说灯下旧病", "药童把药碗往灯下挪了挪，说有些病不是从身上起的。你没急着开方，只先记住他的停顿。", { iceLedger: 1, virtue: 5 }),
+          make("替病榻旁的人换一盏灯", "灯芯短了一截，病人的呼吸却稳了一点。你忽然明白，救人有时先从不惊扰开始。", { virtue: 7, years: -1 }),
+          make("把错放的药包重新分开", "两包药只差一味苦草。你分开它们时，药童低声说，差一点就不是同一个夜晚了。", { iceLedger: 1, memory: 1 })
+        ],
+        "弈剑听雨阁": [
+          make("听守阁人讲一柄旧剑", "守阁人说那柄剑曾经只想去远处，后来才知道人间也有必须路过的地方。", { swordHeart: 1, memory: 1 }),
+          make("替雨亭收起湿伞", "伞骨里有一道旧裂。你收伞时听见檐外一声轻响，像有人把话咽了回去。", { virtue: 5, swordHeart: 1 }),
+          make("在剑架前多站一刻", "你没有拔剑。剑架上的水顺着木纹落下，像一条从黄泉回到人间的细路。", { qi: 8, years: -1 })
+        ],
+        "云麓仙居": [
+          make("听观星人讲一颗暗星", "观星人说暗星不是不亮，只是被云压住。你看了很久，才看见灯芯旁有一点灰白。", { moFeiyunProof: 1, memory: 1 }),
+          make("替星台抄一页空图", "那页星图上没有字，纸背却有潮气。你抄到最后，手指沾上一点盐味。", { moFeiyunProof: 1, karma: 1 }),
+          make("把窗边的灯移远半寸", "灯被移开以后，屋里反而亮了一点。观星的人没有解释，只让你记住这个距离。", { virtue: 5, years: -1 })
+        ],
+        "太虚观": [
+          make("听扫镜人讲半句旧梦", "扫镜人说梦里的人未必是你，镜里的人也未必不是。你没有接话，只把灰扫到门外。", { shadowTrust: 1, memory: 1 }),
+          make("把镜前的灯罩压低", "灯影低下去时，你的影子终于和脚跟贴在一起。屋里安静了一瞬。", { shadowTrust: 1, virtue: 4 }),
+          make("在灰线外停住脚步", "灰线很浅，像有人故意留给你看。你停住，没有踩过去。", { karma: -1, memory: 1 })
+        ],
+        "魍魉": [
+          make("听旧巷里的人报错一声更", "更声错了一拍，巷里的人都没有抬头。你记住那一拍，像记住一扇没开的门。", { shadowTrust: 1, qi: 6 }),
+          make("把夜里的脚步声数完", "脚步声从七道变成六道，又变回七道。你没有追问谁少了一步，只把门闩放轻。", { memory: 1, karma: 1 }),
+          make("替递牌的人守一段巷口", "递牌的人没有回来。你守到雨停，才发现袖里的寒意少了一点。", { shadowTrust: 1, virtue: 4, years: -1 })
+        ],
+        "翎羽山庄": [
+          make("听机关师讲一只旧鸟", "机关师说旧鸟坏过三次，每次都飞回同一个方向。你没有问方向，只记住它翅骨的响声。", { inkContract: 1, memory: 1 }),
+          make("替木翼重新穿一根细线", "细线穿过木翼时，机关鸟没有动，却像松了一口气。", { inkContract: 1, virtue: 5 }),
+          make("把工房里的盐味擦淡", "盐味擦不干净，只从桌面退进了木纹里。你知道这不是普通潮气。", { inkContract: 1, karma: 1 })
+        ],
+        "荒火营地": [
+          make("听炉边人讲一场旧火", "炉边人说火不是只会烧人，也能照见谁先退后。你把这句话记在心里。", { fireOath: 1, virtue: 4 }),
+          make("替炭车垫稳一块石头", "炭车终于不再往泥里陷。有人从火光后看你一眼，像是在确认你会不会半路松手。", { fireOath: 1, years: -1 }),
+          make("把试锋石上的灰擦掉", "灰下露出一道旧痕，不像刀斧，倒像有人用手按过。", { fireOath: 1, qi: 8 })
+        ],
+        "游侠": [
+          make("听车辕书生讲一笔旧账", "书生说账簿最难算的不是银钱，是谁被写成了一个空格。你没有笑他。", { wandererCred: 1, virtue: 5 }),
+          make("替城墙下的孩子找伞", "伞骨断了一根，孩子却还是抱得很紧。你把伞递回去时，城墙上的灯亮了一下。", { virtue: 6, years: -1 }),
+          make("在渡口多等一班船", "后一班船来得很慢，却刚好接走三个原本要回城的人。", { wandererCred: 1, karma: -1 })
+        ]
+      };
+
+      const shared = [
+        make("听茶棚老人讲一段旧谣", "老人说旧谣每一世都有人唱错。你听完才发现，错的那一句偏偏最像你记得的梦。", { memory: 1 }),
+        make("替陌生人把门轻轻带上", "那人没有回头，只在门后说了一声多谢。你不知道他是谁，却记住了这道门的重量。", { virtue: 4 }),
+        make("顺手捡起雨里的断绳", "断绳泡在雨水里，不像什么宝物。可你把它收进袖中时，掌心的铜锈热了一下。", { fragments: 1, karma: 1 }, { requires: s => (s.luck || 0) >= 6 || (s.memory || 0) >= 4 })
+      ];
+
+      const allowed = choice => (!choice.once || !state.flags[choice.once]) && (!choice.requires || choice.requires(state));
+      const takeRanked = (source, count, group) => source
+        .map((choice, index) => ({
+          choice,
+          rank: hashText(`${playerSeed}|ambient|${group}|life:${state.life}|act:${act}|path:${state.path}|origin:${state.origin}|turn:${state.turn}|${choice.text}|${index}`)
+        }))
+        .sort((left, right) => left.rank - right.rank)
+        .map(item => item.choice)
+        .filter(allowed)
+        .slice(0, count);
+
+      const pathSource = byPath[state.path] || [];
+      const pathCount = Math.min(2 + Math.floor(Math.max(0, state.memory) / 14), pathSource.length);
+      const sharedCount = Math.min(1, Math.floor(Math.max(0, state.memory) / 12), shared.length);
+      return [
+        ...takeRanked(pathSource, pathCount, "path"),
+        ...takeRanked(shared, sharedCount, "shared")
+      ];
+    }
+
     function rollBirthStats(s = state) {
       const roll = () => 1 + Math.floor(Math.random() * 10);
       s.rootBone = roll();
       s.mind = roll();
       s.luck = roll();
       s.debt = roll();
-      s.log = `出生数值：根骨 ${s.rootBone}，心性 ${s.mind}，机缘 ${s.luck}，尘债 ${s.debt}。这些数值会影响你能拜入哪些门派，或撞见哪些隐线。`;
+      s.log = `此身底子：根骨 ${s.rootBone}，心性 ${s.mind}，机缘 ${s.luck}，尘债 ${s.debt}。这些底子会影响哪座山门愿意收你，也会影响哪些旧缘会先找上门。`;
     }
 
     function birthStatLine() {
       if (!state.rootBone || !state.mind || !state.luck || !state.debt) return "";
-      return `\n\n【出生数值】根骨 ${state.rootBone}　心性 ${state.mind}　机缘 ${state.luck}　尘债 ${state.debt}`;
+      return `\n\n【此身底子】根骨 ${state.rootBone}　心性 ${state.mind}　机缘 ${state.luck}　旧债 ${state.debt}`;
+    }
+
+    function lastActionBridge() {
+      const text = state.lastActionText || "";
+      const log = state.lastActionLog || "";
+      if (!text || state.lastActionAct !== 2) return "";
+      const cleanLog = log.replace(/[。！？]\s*$/, "");
+      if (cleanLog) {
+        return `雨停以后，你先想起昨夜做过的那件事。\n\n${cleanLog}。`;
+      }
+      return `雨停以后，你先想起昨夜的选择：${text}。`;
+    }
+
+    function contextualChapterText(act, status) {
+      if (act === 2) {
+        const pathText = {
+          "天机营": `你在天机营住下的第二夜，雨把校场上的脚印冲得很浅。\n\n军册摊在案上，几处名字被墨线压住。外头有人敲门，说北墙巡灯少了一盏，巷口的挡箭木车还卡在泥里。\n\n${status}\n\n你还没认全营里的人。先看清眼前这几件事。`,
+          "冰心堂": `你在药庐守到入夜，雨水顺着檐角滴进药碗里。\n\n后门有人压低咳声，炉边的药签还没写完，童子把一包冷针放在你面前。\n\n${status}\n\n你还没学会救所有人。先决定这一夜该先听谁的气息。`,
+          "弈剑听雨阁": `雨亭外的石阶被水淹过一半。\n\n剑架上少了一枚旧穗，亭外有人把伞放下又离开。你听见雨声里夹着一声很轻的剑鸣。\n\n${status}\n\n你还不知道那柄剑属于谁。先别急着拔剑。`,
+          "云麓仙居": `星灯被雨雾压得很低，窗外的云气一层层贴着檐角。\n\n书页里夹着一片湿羽，观星的人没有解释，只让你把灯芯再剪短些。\n\n${status}\n\n你还不知道天上的线要落到哪里。先守住眼前这盏灯。`,
+          "太虚观": `镜室外的雨声很轻，轻得像有人在门后屏住呼吸。\n\n灰痕沿着镜脚慢慢散开。你看见自己的影子比你慢了半步，又很快贴了回来。\n\n${status}\n\n你还不确定镜里有什么。先别让它替你回答。`,
+          "魍魉": `旧巷入夜以后，比白天更像一张合上的纸。\n\n夜牌贴着掌心发凉，巷口那盏灯灭了又亮。门闩响过一次，随后再没有人说话。\n\n${status}\n\n你还不认识递牌的人。先听清哪一道脚步离你最近。`,
+          "翎羽山庄": `机关房的雨棚被打得发响，桌上的小机关鸟一跳一停。\n\n鸟腹里卡着一粒盐晶，齿轮却还在转。屋檐上有人影掠过去，很快被雨遮住。\n\n${status}\n\n你还不知道它想飞去哪里。先别弄断它的翅骨。`,
+          "荒火营地": `炉火被雨气压低，炭车停在棚外，车轮陷进泥里。\n\n有人把试锋石推到你脚边，又有人催你把挡箭木车推到巷口。火光照着每个人脸上的汗。\n\n${status}\n\n你还没弄懂这场火要烧向哪里。先把眼前这辆炭车推稳。`,
+          "游侠": `你没有拜入任何山门，只在城里借了一处落脚。\n\n雨夜里，渡口账簿被风吹开，街口有人找不到回家的路，城墙下还有孩子在哭。\n\n${status}\n\n你不属于任何门派，所以哪里有人喊，你都可以去。`
+        };
+        return pathText[state.path] || "";
+      }
+      if (act === 3) {
+        const bridge = lastActionBridge();
+        const opening = bridge || "雨停以后，你终于有空坐下来，把昨夜看见的事从头理一遍。";
+        return `${opening}\n\n桌上没有多少东西，只有掌心那片铜锈，还有昨夜留下的一点痕迹。你把它们按在灯下，不急着替它们起名字。\n\n${status}\n\n你没有急着向任何人交代。先把来路理清，再决定下一步该问谁。`;
+      }
+      if (act === 5) {
+        return `从雪线回来后，没有人再把雪线外的遭遇当成偶然。\n\n水镜被搬到厅中。灯影落在镜面上，映出的不是答案，而是每个人刚才避开过的停顿。\n\n${status}\n\n这一次，不是你独自追问命运。你只能先看谁愿意开口。`;
+      }
+      if (act === 6) {
+        return `水镜没有给出答案，只把一线冷光投向北方。\n\n太古铜门前没有风。你听见身后有人压低呼吸，也有人把手按在兵刃、灯柄或药箱上。铜门上的锈痕一点点发热。\n\n你仍然不知道铜门后会有什么。可你知道，退回去的人也会被它追上。`;
+      }
+      return "";
     }
 
     function chapterChoices() {
       const act = state.act || 0;
       if (state.years <= 0) {
-        return [{ text: "闭眼前记下最后一枚裂纹", to: "death" }];
+        const debtCalls = state.karma >= 35 || state.virtue < 35;
+        return [{
+          text: debtCalls ? "井底有声音叫你回去" : "天快亮了，先闭眼记住此刻",
+          to: debtCalls ? "hell" : "death"
+        }];
       }
       const chapter = currentChapter();
       if (chapter && Array.isArray(chapter.choices)) {
         const choices = chapter.choices.map(configChoice);
         if (state.scene === "birth" && act === 0) {
           const rerollChoice = {
-            text: state.rootBone ? "重掷这一世出生数值" : "掷出这一世出生数值",
+            text: state.rootBone ? "重新摸清这一世的身骨" : "摸清这一世的身骨",
             to: "birth",
             always: true,
             advanceAct: false,
@@ -1650,128 +817,9 @@
           if (!state.rootBone) return [rerollChoice];
           choices.unshift(rerollChoice);
         }
-        return choices;
+        return [...choices, ...ambientCharacterChoices()];
       }
-
-      if (act <= 0) {
-        return [
-          {
-            text: "逼问魍魉长老：上一世谁藏起裂纹",
-            to: "shadow",
-            effect: s => {
-              s.karma += 4;
-              s.fragments += 1;
-              s.log = "魍魉席后一阵沉默。有人终于承认，铜门裂纹不是第一次出现。";
-            }
-          },
-          {
-            text: "先救城外疫民，换冰心堂公开药账",
-            to: "iceHeart",
-            effect: s => {
-              s.virtue += 12;
-              s.years -= 1;
-              s.log = "药账里夹着一枚旧印，印文正与铜门边缘吻合。";
-            }
-          },
-          {
-            text: "让遗墨机关鸟拓下水镜裂纹",
-            to: "jadeClue",
-            effect: s => {
-              s.fragments += 1;
-              s.qi += 10 + s.talent;
-              s.log = "机关鸟飞回时，爪上多了一粒东海盐晶。";
-            }
-          }
-        ];
-      }
-
-      if (act === 1) {
-        return [
-          {
-            text: "公开天书残页，迫诸门当场站队",
-            to: "greatCouncil",
-            effect: s => {
-              s.virtue += 8;
-              s.karma += 3;
-              s.log = "诸门终于不再谈风骨，只开始谈各自欠下的债。";
-            }
-          },
-          {
-            text: "夜入北溟，追玄晖留下的幽都旧约",
-            to: "northSea",
-            effect: s => {
-              s.fragments += 1;
-              s.years -= 1;
-              s.log = "北溟风雪里，你听见幽都并不承认自己是地狱。";
-            }
-          },
-          {
-            text: "独自贴近铜门，听清门内喊出的名字",
-            to: "copperGate",
-            effect: s => {
-              s.qi += 16 + s.talent;
-              s.karma += 8;
-              s.log = "铜门没有打开，只把你的倒影换成了上一世的样子。";
-            }
-          }
-        ];
-      }
-
-      if (act === 2) {
-        return [
-          {
-            text: "入镜阵审问心魔，先定自己的底线",
-            to: "heartDemon",
-            requires: s => s.karma >= 20,
-            effect: s => {
-              s.memory += 1;
-              s.log = "心魔没有退散，只把最锋利的问题留给你。";
-            }
-          },
-          {
-            text: "闭关冲境，用金丹火推开九天门缝",
-            to: "tribulation",
-            requires: s => s.realm < 5,
-            effect: s => {
-              s.qi += 34 + s.talent;
-              s.years -= 2;
-              s.log = "你把残页、药账、裂纹一并压入丹田，雷云再次聚拢。";
-            }
-          },
-          {
-            text: "以碎片拼合旧约，提前重订绝地天通",
-            to: "breakWheel",
-            requires: s => s.fragments >= 4 && s.realm >= 3
-          },
-          {
-            text: "登九天，直接问神明旧账",
-            to: "ascend",
-            requires: s => s.realm >= 5
-          }
-        ];
-      }
-
-      return [
-        {
-          text: "以诸门新约重封铜门",
-          to: "breakWheel",
-          requires: s => s.fragments >= 4 && s.virtue >= 60
-        },
-        {
-          text: "登九天，看清祭席后的名字",
-          to: "ascend",
-          requires: s => s.realm >= 5
-        },
-        {
-          text: "因果压身，先入幽都照见本心",
-          to: "hell",
-          requires: s => s.karma >= 55
-        },
-        {
-          text: "寿元将尽，把本世线索交给下一世",
-          to: "death"
-        }
-      ];
+      return [];
     }
 
     scenes.birth.title = () => chapterName();
@@ -1864,11 +912,6 @@
     const qi = document.querySelector("#qi");
     const virtue = document.querySelector("#virtue");
     const karma = document.querySelector("#karma");
-    const memory = document.querySelector("#memory");
-    const talent = document.querySelector("#talent");
-    const fragments = document.querySelector("#fragments");
-    const xuanhuiBond = document.querySelector("#xuanhui-bond");
-    const sunCinders = document.querySelector("#sun-cinders");
     const log = document.querySelector("#log");
     const audioToggle = document.querySelector("#audio-toggle");
     const audioState = document.querySelector("#audio-state");
@@ -1928,27 +971,42 @@
       },
 
       profile() {
-        const danger = state.scene === "hell" || state.scene === "heartDemon" || state.scene === "copperGate";
-        const bright = state.scene === "birth" || state.scene === "sect" || state.scene === "foxRoad" || state.scene === "greatCouncil" || state.scene === "trueEnding";
-        const cold = state.scene === "northSea" || state.scene === "shadow";
-        if (danger) return { root: 73.42, scale: [1, 1.125, 1.333, 1.5, 1.875, 2], pulse: 2600, drone: [0.5, 1, 2], color: "dark" };
-        if (cold) return { root: 82.41, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 2900, drone: [0.5, 1, 2], color: "cold" };
-        if (bright) return { root: 98, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2500, drone: [0.5, 1, 2], color: "bright" };
-        return { root: 87.31, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2800, drone: [0.5, 1, 2], color: "neutral" };
+        const danger = state.scene === "hell" || state.scene === "falseAscend";
+        const bright = state.scene === "birth" || state.scene === "trueAscend" || state.scene === "breakWheel";
+        const cold = state.scene === "death" || state.scene === "sacrifice";
+        const deepCycle = state.life >= 5 || state.memory >= 10 || state.fragments >= 3;
+        const burdened = state.karma >= 35 || state.virtue < 35;
+        const pathTint = state.path === "游侠" ? 1.125 : state.path === "天机营" ? 0.889 : 1;
+        let profile = { root: 87.31, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2800, drone: [0.5, 1, 2], color: "neutral", gain: 0.76 };
+        if (danger || burdened) profile = { root: 73.42, scale: [1, 1.067, 1.25, 1.333, 1.5, 1.875], pulse: 2450, drone: [0.5, 1, 1.5], color: "dark", gain: 0.82 };
+        else if (cold) profile = { root: 82.41, scale: [1, 1.125, 1.333, 1.5, 1.777, 2], pulse: 2920, drone: [0.5, 1, 2], color: "cold", gain: 0.74 };
+        else if (bright) profile = { root: 98, scale: [1, 1.125, 1.25, 1.5, 1.666, 2], pulse: 2380, drone: [0.5, 1, 2], color: "bright", gain: 0.8 };
+        if (deepCycle && !danger) {
+          profile = {
+            ...profile,
+            root: profile.root * 0.944,
+            pulse: Math.max(2100, profile.pulse - 220),
+            drone: [0.5, 1, 1.5, 2],
+            color: profile.color === "bright" ? "bright-cycle" : `${profile.color}-cycle`,
+            gain: Math.min(0.88, profile.gain + 0.04)
+          };
+        }
+        return { ...profile, root: profile.root * pathTint };
       },
 
       updateMusicMode() {
         if (!this.enabled || !this.ctx) return;
         const profile = this.profile();
-        const mode = `${state.scene}|${state.path}|${profile.color}`;
+        const mode = `${state.scene}|${state.path}|${profile.color}|${Math.min(8, state.life)}|${state.realm}|${Math.floor(state.karma / 20)}|${Math.floor(state.virtue / 20)}`;
         if (mode === this.currentMode) return;
         this.currentMode = mode;
         const now = this.ctx.currentTime;
+        if (this.master) this.master.gain.setTargetAtTime(profile.gain, now, 1.2);
         this.drones.forEach(({ osc, gain }, index) => {
           const target = profile.root * profile.drone[index % profile.drone.length];
           try {
             osc.frequency.setTargetAtTime(target, now, 0.8);
-            gain.gain.setTargetAtTime([0.058, 0.032, 0.018][index] || 0.014, now, 1.4);
+            gain.gain.setTargetAtTime([0.065, 0.038, 0.022, 0.014][index] || 0.012, now, 1.4);
           } catch (error) {}
         });
       },
@@ -1959,7 +1017,7 @@
         const master = this.ctx.createGain();
         const profile = this.profile();
         this.master = master;
-        master.gain.setValueAtTime(0.62, now);
+        master.gain.setValueAtTime(profile.gain, now);
         master.connect(this.ctx.destination);
 
         profile.drone.forEach((ratio, index) => {
@@ -1967,7 +1025,7 @@
           const gain = this.ctx.createGain();
           osc.type = index === 1 ? "triangle" : "sine";
           osc.frequency.setValueAtTime(profile.root * ratio, now);
-          gain.gain.setValueAtTime([0.058, 0.032, 0.018][index] || 0.014, now);
+          gain.gain.setValueAtTime([0.065, 0.038, 0.022, 0.014][index] || 0.012, now);
           osc.connect(gain);
           gain.connect(master);
           osc.start();
@@ -2088,11 +1146,16 @@
         const ratio = profile.scale[phrase[step] % profile.scale.length];
         const base = profile.root * 2 * ratio;
         const beat = profile.pulse / 1000;
-        this.pluck(base, now, profile.color === "dark" ? 0.065 : 0.082);
-        this.pluck(base * 1.5, now + beat * 0.34, profile.color === "dark" ? 0.032 : 0.044);
-        if (step % 2 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.22, profile.color === "bright" ? 0.034 : 0.026);
-        if (step % 4 === 1) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.28, profile.color === "cold" ? 0.052 : 0.04);
-        if (profile.color === "dark" && step % 4 === 0) this.drum(now + 0.14, 0.022);
+        const dark = profile.color.includes("dark");
+        const cold = profile.color.includes("cold");
+        const bright = profile.color.includes("bright");
+        const cycle = profile.color.includes("cycle");
+        this.pluck(base, now, dark ? 0.068 : 0.09);
+        this.pluck(base * 1.5, now + beat * 0.34, dark ? 0.035 : 0.048);
+        if (step % 2 === 0) this.breath(profile.root * 2 * profile.scale[(phrase[step] + 2) % profile.scale.length], now + 0.22, bright ? 0.038 : 0.028);
+        if (step % 4 === 1) this.xiao(profile.root * 4 * profile.scale[(phrase[step] + 1) % profile.scale.length], now + beat * 0.28, cold ? 0.054 : 0.043);
+        if (dark && step % 4 === 0) this.drum(now + 0.14, 0.024);
+        if (cycle && step % 8 === 3) this.tone(base * 0.5, 2.2, 0.022, "sine", now + 0.18, this.master || undefined);
         if (state.virtue >= 70 && step % 8 === 6) this.tone(base * 2, 1.6, 0.028, "sine", now + 0.35, this.master || undefined);
         this.musicStep += 1;
       },
@@ -2130,10 +1193,6 @@
       return hash >>> 0;
     }
 
-    function pick(list, salt = "") {
-      return list[hashText(`${state.scene}|${state.life}|${state.turn}|${state.realm}|${state.virtue}|${state.karma}|${salt}`) % list.length];
-    }
-
     function seededRank(text, salt = "") {
       return hashText(`${playerSeed}|${state.life}|${state.turn}|${state.realm}|${salt}|${text}`);
     }
@@ -2142,10 +1201,13 @@
       const rewards = {
         trueAscend: { memory: 4, fragments: 1, virtue: 12, label: "问天而归" },
         falseAscend: { memory: 3, fragments: 1, virtue: 0, label: "九天祀名" },
-        trueEnding: { memory: 5, fragments: 2, virtue: 18, label: "大荒新约" },
-        sacrifice: { memory: 2, fragments: 1, virtue: 8, label: "百年封门" },
+        sacrifice: { memory: 2, fragments: 1, virtue: 8, label: "百年封住铜门" },
         death: { memory: 2, fragments: 0, virtue: 0, label: "大荒梦回" },
-        hell: { memory: 1, fragments: 0, virtue: -12, label: "幽都照影", hell: true }
+        hell: { memory: 1, fragments: 0, virtue: -12, label: "幽都照影", hell: true },
+        medicineEnding: { memory: 3, fragments: 0, virtue: 14, label: "灯下的药账" },
+        shadowEnding: { memory: 3, fragments: 1, virtue: 6, label: "影子停住了" },
+        wandererEnding: { memory: 3, fragments: 0, virtue: 16, label: "渡口天亮" },
+        lampEnding: { memory: 4, fragments: 1, virtue: 12, label: "雪里还亮着灯" }
       };
       return rewards[sceneKey] || { memory: 1, fragments: 0, virtue: 0, label: "一世终了" };
     }
@@ -2153,31 +1215,49 @@
     function endingSummary(scene) {
       if (!scene.ending) return "";
       const reward = endingReward(state.scene);
+      const currentRelics = state.currentRelics || {};
+      const currentNames = state.currentNames || {};
       const verdicts = [
-        state.xuanhuiBond >= 5 ? "判词：你没有把失势神子当作法器。金乌火因此仍愿照向人间。" : "",
-        state.swordHeart >= 5 ? "判词：你接过黄泉与碧落之间的一剑，却没有把人间斩成通路。" : "",
-        state.qingyangTrace >= 4 ? "判词：青阳旧痕已入识海。少昊、东海与幽都之间，还有一笔旧账等你来问。" : "",
-        state.moFeiyunProof >= 3 ? "判词：白羽没有被风吹走。冷喻旧案终有一世会被摆上明堂。" : "",
-        state.iceLedger >= 3 ? "判词：药账里的活人不再只是数字。你记住了他们真正的死期。" : "",
-        state.shadowTrust >= 3 ? "判词：影子也有底线。夜哭记下了你划掉的那些名字。" : "",
-        state.foxBond >= 3 ? "判词：狐火曾为陌生人停步。令狐九尾离懂得人间又近了一寸。" : "",
-        state.inkContract >= 3 ? "判词：机关鸟飞过战火，带回来的不止盐晶，还有愿意担责的人心。" : "",
-        state.fireOath >= 3 ? "判词：荒火没有烧穿底线。彤记住了你先撤凡人再破门的顺序。" : "",
-        state.wandererCred >= 4 ? "判词：你没有入任何一门，却替许多门派补上了他们没能看见的人间。" : ""
+        currentNames.xuanhui && state.xuanhuiBond >= 5 ? "判词：你没有把点灯的人当作法器。那一点金色余烬，因此仍愿照向人间。" : "",
+        currentRelics.swordTassel && state.swordHeart >= 5 ? "判词：你接过黄泉与碧落之间的一剑，却没有把人间斩成通路。" : "",
+        currentRelics.swordTassel && state.qingyangTrace >= 4 ? "判词：断剑的旧痕已入识海。海风、雪线与幽影之间，还有一笔旧账等你来问。" : "",
+        currentRelics.whiteFeather && state.moFeiyunProof >= 3 ? "判词：白羽没有被风吹走。镜中旧案终有一世会被摆上明堂。" : "",
+        currentRelics.drugSign && state.iceLedger >= 3 ? "判词：药账里的活人不再只是数字。你记住了他们真正的死期。" : "",
+        currentRelics.oldToken && state.shadowTrust >= 3 ? "判词：影子也有底线。持刀的人记下了你划掉的那些名字。" : "",
+        currentRelics.ferryLedger && state.foxBond >= 3 ? "判词：狐火曾为陌生人停步。车辕上的书生离懂得人间又近了一寸。" : "",
+        currentRelics.machineBird && state.inkContract >= 3 ? "判词：机关鸟飞过战火，带回来的不止盐晶，还有愿意担责的人心。" : "",
+        currentRelics.trialStone && state.fireOath >= 3 ? "判词：荒火没有烧穿底线。炉边的人记住了你先撤凡人再破铜门的顺序。" : "",
+        currentRelics.ferryLedger && state.wandererCred >= 4 ? "判词：你没有拜入任何山门，却替许多门派补上了他们没能看见的人间。" : ""
       ].filter(Boolean);
-      const penalty = state.karma >= 40 || state.virtue < 35 || reward.hell
-        ? "幽都判定：因果偏重，下一世开局更难，但记忆更锋利。"
-        : "天命判定：此世因果可承，下一世将带着更多悟性醒来。";
+      const conduct = state.virtue >= 70
+        ? "你留下的多是灯火和活人的名字。"
+        : state.virtue < 35
+          ? "你身后有些房门关得很重，下一次醒来时仍会听见回声。"
+          : "你留下的事有明有暗，还没有人能替你下定论。";
+      const burden = state.karma >= 40 || reward.hell
+        ? "有些旧债没有散，来世会先敲你的门。"
+        : "有些风声会跟着你，等下一次睁眼时再响起。";
+      const endingVerdict = {
+        medicineEnding: "此世判词：你没有急着追铜门后的光，而是先把灯留给病榻旁的人。药账补完时，命运少漏了一行。",
+        shadowEnding: "此世判词：你没有把影子当成天生的恶。旧令放在铜门前，那些被划掉的名字终于有了回声。",
+        wandererEnding: "此世判词：你没有拜入山门，却把门外的人一批批送过长路。人间欠你的不是仙名，是一盏还亮着的灯。",
+        lampEnding: "此世判词：你把雪里的灯还给等待的人。铜门后的光退了一寸，回城的路便多亮了一寸。",
+        trueAscend: "此世判词：你回头看见了人间，所以天光没有把你带远。",
+        breakWheel: "此世判词：铜锈发热，轮回松动。你没有赢过命运，只是让它第一次停下来听人说话。",
+        sacrifice: "此世判词：剑没有出鞘，铜门却停了一息。有些胜利不在门后，而在风没有吹进城里。",
+        falseAscend: "此世判词：你独自走进太亮的光里。它像飞升，也像另一种失明。",
+        death: "此世判词：你退后一步，把人先带走。太古铜门仍在北方雪线外，但这一夜不是所有灯都灭了。",
+        hell: "此世判词：旧债比你先到井边。重走人间，不是惩罚，是让你重新看见被绕开的人。"
+      }[state.scene] || "";
       const result = [
-        "【这一世结算】",
-        `结局：${reward.label}`,
-        `世数：第 ${state.life} 世`,
-        `最高境界：${realms[state.realm]}`,
-        `道德：${state.virtue}　因果：${state.karma}　天命碎片：${state.fragments}`,
-        `轮回收益：记忆 +${reward.memory}${reward.fragments ? `，天命碎片 +${reward.fragments}` : ""}${reward.virtue > 0 ? `，下世道德 +${reward.virtue}` : reward.virtue < 0 ? `，下世道德 ${reward.virtue}` : ""}`,
-        ...verdicts,
-        penalty
-      ];
+        "【这一世余痕】",
+        `第 ${state.life} 世止于：${reward.label}`,
+        `你走到过：${realms[state.realm]}`,
+        conduct,
+        burden,
+        endingVerdict,
+        ...verdicts
+      ].filter(Boolean);
       return result.join("\n");
     }
 
@@ -2205,250 +1285,46 @@
       return baseText;
     }
 
-    function sketchForState(scene) {
-      const tone = state.virtue >= 65 ? "#7fc8a9" : state.virtue <= 35 ? "#d97869" : "#d8b35f";
-      const ink = state.karma >= 30 ? "#322025" : "#273126";
-      const glow = state.scene === "hell" || state.scene === "heartDemon" ? "#d97869" : tone;
-      const skyTop = state.scene === "hell" || state.scene === "heartDemon" ? "#25171b" : "#101711";
-      const skyBottom = state.scene === "ascend" || state.scene === "trueAscend" ? "#22372f" : "#1d241b";
-      const seed = hashText(`${state.scene}|${state.turn}|${state.life}|${state.realm}|${state.virtue}|${state.karma}`);
-
-      const dots = Array.from({ length: 18 }, (_, index) => {
-        const x = 24 + ((seed + index * 47) % 464);
-        const y = 18 + ((seed >> (index % 8)) + index * 29) % 120;
-        const r = 1 + ((seed + index) % 3) * 0.55;
-        const opacity = 0.22 + ((index % 5) * 0.08);
-        return `<circle cx="${x}" cy="${y}" r="${r}" fill="${index % 3 === 0 ? tone : "#f4efdf"}" opacity="${opacity}"/>`;
-      }).join("");
-
-      const clouds = Array.from({ length: 4 }, (_, index) => {
-        const x = 42 + index * 118 + ((seed + index * 17) % 24);
-        const y = 48 + ((seed + index * 31) % 42);
-        return `<path d="M${x} ${y} C${x + 22} ${y - 12} ${x + 42} ${y - 12} ${x + 62} ${y} C${x + 42} ${y + 10} ${x + 22} ${y + 10} ${x} ${y}" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.13"/>`;
-      }).join("");
-
-      const karmaThreads = state.karma > 10
-        ? Array.from({ length: Math.min(5, 1 + Math.floor(state.karma / 12)) }, (_, index) => {
-          const start = 74 + index * 76;
-          return `<path d="M${start} 18 C${start - 34} 74 ${start + 52} 104 ${start + 10} 164 S${start + 70} 226 ${start - 8} 272" fill="none" stroke="#d97869" stroke-width="${2 + index * 0.45}" opacity="${0.18 + index * 0.08}"/>`;
-        }).join("")
-        : "";
-
-      const virtueHalo = state.virtue > 55
-        ? `<circle cx="260" cy="136" r="${42 + state.realm * 5}" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.36"/>
-           <circle cx="260" cy="136" r="${58 + state.realm * 4}" fill="none" stroke="#7fc8a9" stroke-width="1.5" opacity="0.18"/>`
-        : "";
-
-      const fragmentGate = state.fragments >= 2
-        ? `<g opacity="0.86">
-             <path d="M374 80 L430 48 L430 232 L374 202 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
-             <path d="M402 92 L402 206 M384 118 L420 98 M384 170 L420 194" stroke="#f4efdf" stroke-width="1.5" opacity="0.48"/>
-             <circle cx="402" cy="148" r="${3 + state.fragments}" fill="#d8b35f"/>
-           </g>`
-        : "";
-
-      const figure = `<g transform="translate(244 116)">
-          <ellipse cx="16" cy="88" rx="34" ry="9" fill="#000" opacity="0.18"/>
-          <circle cx="16" cy="17" r="11" fill="#f4efdf" opacity="0.9"/>
-          <path d="M6 31 C8 58 4 82 -4 106 M26 31 C24 58 28 82 36 106" fill="none" stroke="#f4efdf" stroke-width="3" stroke-linecap="round"/>
-          <path d="M16 30 C3 54 2 82 16 102 C30 82 29 54 16 30 Z" fill="${ink}" stroke="${tone}" stroke-width="2"/>
-          <path d="M5 54 C-22 66 -32 86 -42 104 M27 54 C54 66 64 86 74 104" fill="none" stroke="${tone}" stroke-width="3" stroke-linecap="round"/>
-          <path d="M-18 106 C2 94 30 94 50 106" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.55"/>
-        </g>`;
-
-      const sceneArt = {
-        birth: `<g>
-          <path d="M34 242 C78 188 106 126 142 82 C166 112 188 166 222 238" fill="url(#mountWash)" stroke="#7f8b77" stroke-width="2"/>
-          <path d="M118 242 C168 174 210 98 264 60 C304 126 352 178 404 242" fill="url(#mountWash2)" stroke="${tone}" stroke-width="2"/>
-          <path d="M62 226 C96 204 124 204 160 226 M320 224 C352 200 386 204 420 226" fill="none" stroke="#d8b35f" stroke-width="3" opacity="0.5"/>
-          <path d="M72 204 L108 176 L146 204 L146 238 L72 238 Z" fill="#20251d" stroke="#f4efdf" stroke-width="2" opacity="0.82"/>
-          <path d="M92 238 L92 214 L124 214 L124 238" fill="#151812" stroke="${tone}" stroke-width="2"/>
-        </g>`,
-        sect: `<g>
-          <path d="M50 232 L116 154 L182 232 Z M134 232 L230 104 L330 232 Z" fill="url(#mountWash)" stroke="#6f7967" stroke-width="2"/>
-          <path d="M76 222 L76 148 L156 98 L238 148 L238 222 Z" fill="#20251d" stroke="${tone}" stroke-width="3"/>
-          <path d="M52 150 L156 82 L262 150" fill="none" stroke="#d8b35f" stroke-width="5" stroke-linecap="round"/>
-          <path d="M112 222 L112 170 L202 170 L202 222 M136 170 L136 130 L178 130 L178 170" fill="#151812" stroke="#f4efdf" stroke-width="2"/>
-          <path d="M292 226 C312 184 344 166 382 170 C360 192 350 214 356 238" fill="#263226" stroke="#7fc8a9" stroke-width="2" opacity="0.7"/>
-        </g>`,
-        market: `<g>
-          <path d="M36 230 C72 144 138 108 206 138 C252 158 286 136 328 96 C352 150 386 194 474 230 Z" fill="#1b1717" stroke="#6f7967" stroke-width="2"/>
-          <path d="M68 222 L96 154 L132 222 Z M132 222 L170 130 L216 222 Z M214 222 L248 150 L292 222 Z" fill="#2a211d" stroke="#d8b35f" stroke-width="2" opacity="0.82"/>
-          <path d="M86 162 C116 174 140 174 168 158 M228 158 C258 170 286 170 316 156" fill="none" stroke="#d97869" stroke-width="3" opacity="0.5"/>
-          <circle cx="182" cy="126" r="18" fill="#d97869" opacity="0.18" stroke="#d97869" stroke-width="2"/>
-          <path d="M390 222 C382 178 412 148 444 162 C466 174 458 214 426 228" fill="#211b1c" stroke="#d97869" stroke-width="2"/>
-        </g>`,
-        demon: `<g>
-          <path d="M26 238 C70 196 74 130 136 126 C200 120 208 180 266 170 C322 158 346 104 414 118 C472 132 458 204 502 238 Z" fill="#20251d" stroke="#6f7967" stroke-width="2"/>
-          <path d="M78 226 C92 170 130 146 172 158 C212 168 226 210 198 232" fill="#273126" stroke="#d97869" stroke-width="3"/>
-          <path d="M130 156 L104 124 M166 158 L198 126" stroke="#d97869" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="142" cy="176" r="6" fill="#d97869"/><circle cx="176" cy="178" r="6" fill="#d97869"/>
-          <path d="M318 228 C306 188 338 156 376 162 C410 166 428 198 416 232" fill="none" stroke="#7fc8a9" stroke-width="4"/>
-        </g>`,
-        tribulation: `<g>
-          <path d="M24 92 C78 42 136 76 184 54 C242 28 284 72 338 48 C394 24 442 58 488 84" fill="none" stroke="#f4efdf" stroke-width="14" opacity="0.08"/>
-          <path d="M108 28 L66 126 L124 116 L84 238 L236 90 L164 102 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="4"/>
-          <path d="M304 32 L250 138 L318 124 L276 252 L452 82 L366 100 Z" fill="${tone}" opacity="0.22" stroke="${tone}" stroke-width="3"/>
-          <path d="M38 236 C96 210 152 212 206 236 C274 202 348 202 474 236" fill="none" stroke="#b9b39f" stroke-width="3" opacity="0.38"/>
-        </g>`,
-        heartDemon: `<g>
-          <path d="M44 232 C74 130 140 84 210 126 C254 70 336 86 386 154 C410 186 424 216 472 230" fill="#211719" stroke="#d97869" stroke-width="3"/>
-          <path d="M114 218 C104 148 154 110 208 150 C260 98 316 130 310 218" fill="none" stroke="#d97869" stroke-width="6"/>
-          <path d="M182 152 C220 178 188 206 226 236 M278 148 C244 178 284 206 250 236" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.35"/>
-          <circle cx="180" cy="150" r="7" fill="#d97869"/><circle cx="302" cy="150" r="7" fill="#d97869"/>
-        </g>`,
-        hell: `<g>
-          <path d="M0 248 C42 190 82 182 118 128 C154 76 218 158 254 104 C302 34 360 138 418 110 C462 90 488 160 512 196 L512 288 L0 288 Z" fill="#201316" stroke="#d97869" stroke-width="2" opacity="0.92"/>
-          <path d="M34 240 C78 198 110 202 144 230 S232 246 272 212 S360 176 470 230" fill="none" stroke="#d97869" stroke-width="7" opacity="0.35"/>
-          <path d="M96 260 C130 210 126 166 160 132 M388 260 C352 216 364 170 326 132" fill="none" stroke="#f4efdf" stroke-width="3" opacity="0.2"/>
-          <circle cx="256" cy="104" r="32" fill="#d97869" opacity="0.12" stroke="#d97869" stroke-width="3"/>
-        </g>`,
-        ascend: `<g>
-          <path d="M56 238 C126 206 164 218 222 196 C284 172 352 190 456 148" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.26"/>
-          <path d="M188 238 L188 78 C210 50 302 50 324 78 L324 238" fill="url(#jadeWash)" stroke="#7fc8a9" stroke-width="4"/>
-          <path d="M220 104 C240 82 274 82 294 104 M216 142 L298 142 M216 178 L298 178" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.55"/>
-          <path d="M350 104 C384 84 416 92 438 124 C410 122 386 136 372 162" fill="none" stroke="#d8b35f" stroke-width="3" opacity="0.6"/>
-        </g>`,
-        breakWheel: `<g>
-          <circle cx="256" cy="148" r="94" fill="url(#jadeWash)" stroke="${tone}" stroke-width="4" opacity="0.9"/>
-          <circle cx="256" cy="148" r="62" fill="none" stroke="#f4efdf" stroke-width="2" opacity="0.42"/>
-          <path d="M162 148 L350 148 M256 54 L256 242 M190 82 L322 214 M322 82 L190 214" stroke="#d8b35f" stroke-width="3" opacity="0.72"/>
-          <path d="M104 222 C166 192 196 222 256 196 C316 170 370 204 438 170" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.32"/>
-        </g>`
-      };
-
-      sceneArt.iceHeart = `<g>
-        <path d="M46 236 C94 204 116 164 172 172 C224 180 236 132 292 138 C354 144 384 194 464 216" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.25"/>
-        <path d="M72 224 L72 132 L152 90 L232 132 L232 224 Z" fill="#20251d" stroke="#7fc8a9" stroke-width="3"/>
-        <path d="M116 224 L116 166 L188 166 L188 224 M152 126 L152 204 M116 166 L188 166" stroke="#f4efdf" stroke-width="3" opacity="0.75"/>
-        <circle cx="344" cy="150" r="34" fill="url(#jadeWash)" stroke="#7fc8a9" stroke-width="2"/>
-        <path d="M326 150 L362 150 M344 132 L344 168" stroke="#f4efdf" stroke-width="4" stroke-linecap="round"/>
-      </g>`;
-      sceneArt.shadow = `<g>
-        <path d="M0 230 C82 176 118 198 178 142 C234 88 288 126 332 90 C384 48 440 104 512 74 L512 288 L0 288 Z" fill="#161719" stroke="#6f7967" stroke-width="2" opacity="0.95"/>
-        <path d="M84 230 C120 178 166 162 216 182 C276 206 320 164 390 144" fill="none" stroke="#d8b35f" stroke-width="2" opacity="0.35"/>
-        <path d="M142 210 C156 158 194 132 236 142 C214 166 210 196 226 230" fill="#1f2520" stroke="#d97869" stroke-width="3"/>
-        <path d="M102 180 L198 176 M126 150 L176 218" stroke="#f4efdf" stroke-width="2" opacity="0.45"/>
-      </g>`;
-      sceneArt.foxRoad = `<g>
-        <path d="M32 236 C92 190 122 204 174 178 C238 146 304 170 366 138 C416 112 456 132 498 104" fill="none" stroke="#d8b35f" stroke-width="4" opacity="0.2"/>
-        <path d="M74 224 C110 162 178 150 220 198 C252 230 312 224 346 178" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.48"/>
-        ${Array.from({ length: 9 }, (_, index) => `<path d="M${344 + index * 8} 184 C${384 + index * 4} ${112 + index * 4} ${424 - index * 5} ${116 + index * 9} ${450 - index * 7} 176" fill="none" stroke="#f4efdf" stroke-width="2" opacity="${0.18 + index * 0.04}"/>`).join("")}
-        <circle cx="346" cy="172" r="18" fill="#f4efdf" opacity="0.82"/><circle cx="338" cy="154" r="9" fill="#f4efdf" opacity="0.7"/><circle cx="354" cy="154" r="9" fill="#f4efdf" opacity="0.7"/>
-      </g>`;
-      sceneArt.coldShadow = sceneArt.heartDemon;
-      sceneArt.jadeClue = `<g>
-        <path d="M60 226 L122 132 L194 226 Z M166 226 L246 88 L342 226 Z" fill="url(#mountWash)" stroke="#6f7967" stroke-width="2"/>
-        <path d="M344 216 C320 170 340 128 386 124 C430 120 454 166 430 218" fill="#211719" stroke="#d8b35f" stroke-width="3"/>
-        <path d="M382 88 L420 132 L398 198 L350 178 L342 122 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
-        <path d="M360 126 L408 174 M410 130 L356 174" stroke="#d97869" stroke-width="3" opacity="0.62"/>
-      </g>`;
-      sceneArt.copperGate = `<g>
-        <path d="M38 236 C96 196 126 204 174 168 C230 126 286 146 342 106 C402 64 452 94 492 66" fill="none" stroke="#d97869" stroke-width="4" opacity="0.22"/>
-        <path d="M176 238 L176 74 C206 38 306 38 336 74 L336 238 Z" fill="#211719" stroke="#d97869" stroke-width="5"/>
-        <path d="M206 108 L306 108 M206 150 L306 150 M206 192 L306 192 M256 78 L256 238" stroke="#d8b35f" stroke-width="3" opacity="0.48"/>
-        <path d="M62 238 C116 218 156 218 208 238 M306 238 C360 214 408 216 470 238" fill="none" stroke="#7fc8a9" stroke-width="3" opacity="0.28"/>
-      </g>`;
-      sceneArt.northSea = `<g>
-        <rect x="0" y="0" width="512" height="288" fill="#152029" opacity="0.26"/>
-        <path d="M28 238 C86 164 142 178 190 108 C242 30 310 146 366 86 C416 34 456 134 502 106" fill="url(#mountWash2)" stroke="#f4efdf" stroke-width="2" opacity="0.62"/>
-        <path d="M0 242 C76 226 142 236 210 218 S360 206 512 222" fill="none" stroke="#f4efdf" stroke-width="5" opacity="0.22"/>
-        <circle cx="356" cy="82" r="30" fill="#d8b35f" opacity="0.18" stroke="#d8b35f" stroke-width="2"/>
-        <path d="M340 82 C356 66 374 66 390 82" fill="none" stroke="#d8b35f" stroke-width="2" opacity="0.55"/>
-      </g>`;
-      sceneArt.greatCouncil = `<g>
-        <path d="M58 232 L58 142 L120 104 L182 142 L182 232 Z M330 232 L330 142 L392 104 L454 142 L454 232 Z" fill="#20251d" stroke="#d8b35f" stroke-width="2" opacity="0.76"/>
-        <path d="M142 230 C188 178 326 178 372 230" fill="none" stroke="#7fc8a9" stroke-width="4" opacity="0.42"/>
-        ${[92, 138, 188, 324, 374, 420].map((x, i) => `<circle cx="${x}" cy="${188 + (i % 2) * 10}" r="12" fill="${i % 3 === 0 ? "#7fc8a9" : i % 3 === 1 ? "#d8b35f" : "#d97869"}" opacity="0.5"/>`).join("")}
-        <path d="M216 128 L296 128 L310 214 L202 214 Z" fill="url(#goldWash)" stroke="#d8b35f" stroke-width="3"/>
-      </g>`;
-      sceneArt.memoryArchive = sceneArt.breakWheel;
-      sceneArt.afterBreak = sceneArt.breakWheel;
-      sceneArt.falseAscend = sceneArt.ascend;
-      sceneArt.trueAscend = sceneArt.ascend;
-      sceneArt.trueEnding = sceneArt.breakWheel;
-      sceneArt.sacrifice = sceneArt.copperGate;
-      sceneArt.death = sceneArt.birth;
-
-      const art = sceneArt[state.scene] || sceneArt.birth;
-      return `<svg viewBox="0 0 512 288" role="img" aria-label="${scene.title}">
-        <defs>
-          <linearGradient id="skyWash" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="${skyTop}"/>
-            <stop offset="1" stop-color="${skyBottom}"/>
-          </linearGradient>
-          <linearGradient id="mountWash" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="#334130" stop-opacity="0.88"/>
-            <stop offset="1" stop-color="#151812" stop-opacity="0.92"/>
-          </linearGradient>
-          <linearGradient id="mountWash2" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#263226"/>
-            <stop offset="1" stop-color="#151812"/>
-          </linearGradient>
-          <radialGradient id="goldWash" cx="50%" cy="46%" r="66%">
-            <stop offset="0" stop-color="#d8b35f" stop-opacity="0.42"/>
-            <stop offset="1" stop-color="#d8b35f" stop-opacity="0.06"/>
-          </radialGradient>
-          <radialGradient id="jadeWash" cx="50%" cy="46%" r="70%">
-            <stop offset="0" stop-color="#7fc8a9" stop-opacity="0.34"/>
-            <stop offset="1" stop-color="#7fc8a9" stop-opacity="0.04"/>
-          </radialGradient>
-          <filter id="softGlow">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <rect width="512" height="288" fill="url(#skyWash)"/>
-        <circle cx="404" cy="62" r="${18 + state.realm * 2}" fill="${glow}" opacity="0.12" filter="url(#softGlow)"/>
-        ${dots}
-        ${clouds}
-        <path d="M0 252 C58 224 96 238 146 216 C206 190 246 214 304 198 C374 178 424 198 512 168 L512 288 L0 288 Z" fill="#0d100d" opacity="0.46"/>
-        ${karmaThreads}
-        ${virtueHalo}
-        ${art}
-        ${fragmentGate}
-        <circle cx="260" cy="136" r="${18 + state.realm * 5}" fill="${tone}" opacity="0.13" filter="url(#softGlow)"/>
-        ${figure}
-        <path d="M18 266 C94 248 166 260 238 246 S384 234 494 250" fill="none" stroke="#f4efdf" stroke-width="1.5" opacity="0.18"/>
-      </svg>`;
-    }
-
     function artworkForState(scene) {
       const imagePools = {
-        birth: ["assets/xiling-ruins.webp", "assets/great-council.webp", "assets/copper-gate.webp"],
-        memoryArchive: ["assets/copper-gate.webp", "assets/great-council.webp", "assets/east-sea-godrealm.webp"],
-        sect: ["assets/xiling-ruins.webp", "assets/great-council.webp"],
-        iceHeart: ["assets/iceheart-hall.webp"],
-        shadow: ["assets/leize-shadow.webp", "assets/cold-shadow.webp"],
-        foxRoad: ["assets/fox-road.webp"],
-        coldShadow: ["assets/cold-shadow.webp"],
-        jadeClue: ["assets/great-council.webp", "assets/copper-gate.webp", "assets/east-sea-godrealm.webp"],
-        copperGate: ["assets/copper-gate.webp", "assets/east-sea-godrealm.webp"],
-        northSea: ["assets/beiming-road.webp", "assets/copper-gate.webp", "assets/hell-rebirth.webp"],
-        greatCouncil: ["assets/great-council.webp"],
-        tribulation: ["assets/tribulation.webp"],
-        afterBreak: ["assets/tribulation.webp", "assets/great-council.webp", "assets/heart-trial.webp"],
-        heartDemon: ["assets/heart-trial.webp", "assets/cold-shadow.webp", "assets/copper-gate.webp"],
-        ascend: ["assets/tribulation.webp", "assets/copper-gate.webp", "assets/heart-trial.webp"],
-        breakWheel: ["assets/copper-gate.webp", "assets/great-council.webp", "assets/east-sea-godrealm.webp"],
-        trueAscend: ["assets/true-ascend.webp", "assets/great-council.webp", "assets/tribulation.webp"],
-        falseAscend: ["assets/copper-gate.webp"],
-        trueEnding: ["assets/true-ascend.webp", "assets/great-council.webp"],
-        sacrifice: ["assets/copper-gate.webp", "assets/tribulation.webp", "assets/true-ascend.webp"],
+        birth: ["assets/xiling-ruins.webp", "assets/fox-road.webp", "assets/leize-shadow.webp"],
+        afterBreak: [
+          "assets/great-council.webp",
+          "assets/iceheart-hall.webp",
+          "assets/leize-shadow.webp",
+          "assets/fox-road.webp",
+          "assets/beiming-road.webp",
+          "assets/copper-gate.webp",
+          "assets/east-sea-godrealm.webp"
+        ],
+        trueAscend: ["assets/true-ascend.webp", "assets/great-council.webp"],
+        breakWheel: ["assets/copper-gate.webp", "assets/east-sea-godrealm.webp", "assets/great-council.webp"],
+        sacrifice: ["assets/copper-gate.webp", "assets/tribulation.webp"],
+        falseAscend: ["assets/copper-gate.webp", "assets/heart-trial.webp"],
         death: ["assets/xiling-ruins.webp", "assets/beiming-road.webp", "assets/hell-rebirth.webp"],
-        hell: ["assets/hell-rebirth.webp", "assets/beiming-road.webp", "assets/cold-shadow.webp"],
-        ascendResult: ["assets/tribulation.webp"]
+        hell: ["assets/hell-rebirth.webp", "assets/cold-shadow.webp"]
       };
       const configuredArtPools = storyConfig.artPools || {};
-      const rawPool = configuredArtPools[state.scene] || imagePools[state.scene] || ["assets/xiling-ruins.webp"];
+      const stageArtKeys = {
+        afterBreak: `afterBreak:${Math.min(Math.max(state.act || 1, 1), 6)}`,
+        breakWheel: state.path === "游侠" ? "breakWheel:wanderer" : "breakWheel"
+      };
+      const routeKey = state.scene === "afterBreak" && state.path === "游侠" && state.act >= 4
+        ? "afterBreak:wanderer"
+        : "";
+      const artKey = routeKey || stageArtKeys[state.scene] || state.scene;
+      const rawPool = configuredArtPools[artKey]
+        || configuredArtPools[state.scene]
+        || imagePools[state.scene]
+        || ["assets/xiling-ruins.webp"];
       const pool = rawPool.filter(src => /^assets\/[-a-z0-9]+\.webp$/i.test(src));
       if (!pool.length) pool.push("assets/xiling-ruins.webp");
-      const src = pool[seededRank(state.scene, "art") % pool.length];
+      const src = pool[seededRank(`${artKey}:${state.origin}:${state.path}`, "art") % pool.length];
       const positions = ["center center", "center top", "center 38%", "center 58%", "left center", "right center"];
       const position = positions[seededRank(state.scene, "art-position") % positions.length];
-      const filter = state.scene === "hell" || state.scene === "heartDemon"
+      const filter = state.scene === "hell" || state.scene === "falseAscend"
         ? "contrast(1.1) saturate(0.92) hue-rotate(-8deg)"
-        : state.scene === "northSea" || state.scene === "death"
+        : state.scene === "death" || state.scene === "sacrifice" || state.scene === "lampEnding"
           ? "contrast(1.06) saturate(0.88) hue-rotate(10deg)"
           : "contrast(1.04) saturate(0.98)";
       return `<div class="art-frame"><img src="${src}" alt="${textOf(scene.title)}" style="filter:${filter}; object-position:${position};"></div>`;
@@ -2462,8 +1338,8 @@
       const base = sceneChoiceList(scene).filter(choice => !choice.requires || choice.requires(state));
       if (!base.length && !scene.ending) {
         return [{
-          text: state.scene === "afterBreak" ? "线索不足，先回人间补一段证词" : "暂退一步，重整本世线索",
-          to: state.scene === "afterBreak" ? nextStoryScene() : "afterBreak",
+          text: state.scene === "afterBreak" ? "先回人群里再听一夜" : "暂且退开，等风声过去",
+          to: "afterBreak",
           always: true,
           advanceAct: false,
           effect: s => {
@@ -2471,12 +1347,29 @@
             s.memory += 1;
             s.virtue += 2;
             s.log = state.scene === "afterBreak"
-              ? "这一幕的证词还不够。你没有硬闯，而是回到人间，把缺掉的名字重新问一遍。"
-              : "你暂时退开，把散乱的线索重新排好。";
+              ? "这一夜还没有听清。你没有硬闯，只回到人群里，把漏掉的哭声再听一遍。"
+              : "你暂时退开，把掌心那片铜锈重新收好。";
           }
         }];
       }
-      if (state.scene !== "birth") return base;
+      if (state.scene !== "birth") {
+        const act = state.act || 0;
+        if (state.scene === "afterBreak" && act > 0 && act < 6 && base.length > 6) {
+          const required = base.filter(choice => choice.always);
+          const pool = base.filter(choice => !required.includes(choice));
+          const visibleCount = Math.min(pool.length, 6 + Math.floor(Math.max(0, state.memory) / 8));
+          const selected = pool
+            .map((choice, index) => ({
+              choice,
+              rank: hashText(`${playerSeed}|life:${state.life}|act:${act}|path:${state.path}|choice:${choice.text}|${index}`) - choiceEchoScore(choice) * 10000000
+            }))
+            .sort((left, right) => left.rank - right.rank)
+            .slice(0, visibleCount)
+            .map(item => item.choice);
+          return [...required, ...selected];
+        }
+        return base;
+      }
 
       const fixed = base.filter(choice => choice.requires || choice.rebirth || choice.hardReset || choice.always);
       const origin = base.filter(choice => !fixed.includes(choice));
@@ -2484,7 +1377,7 @@
       const seededOrigins = origin
         .map((choice, index) => ({
           choice,
-          rank: hashText(`${playerSeed}|life:${state.life}|origin:${choice.text}|${index}`)
+          rank: hashText(`${playerSeed}|life:${state.life}|origin:${choice.text}|${index}`) - choiceEchoScore(choice) * 10000000
         }))
         .sort((left, right) => left.rank - right.rank)
         .slice(0, visibleOrigins)
@@ -2495,16 +1388,7 @@
       return [...priority, ...seededOrigins, ...gated];
     }
 
-    function nextStoryScene() {
-      if (state.fragments >= 4 && state.realm >= 4) return "breakWheel";
-      const early = ["foxRoad", "iceHeart", "shadow"];
-      const middle = ["greatCouncil", "jadeClue", "coldShadow", "copperGate"];
-      const late = ["northSea", "copperGate", "greatCouncil", "jadeClue"];
-      const pool = state.realm <= 1 ? early : state.realm <= 3 ? middle : late;
-      return pool[seededRank(`${state.scene}|${state.turn}|${state.qi}`, "next-story") % pool.length];
-    }
-
-    function rebirth(choice) {
+function rebirth(choice) {
       audio.play(choice.hell ? "danger" : "rebirth");
       const old = cloneData(state);
       const bonus = choice.bonus || {};
@@ -2513,22 +1397,14 @@
       state.memory = Math.max(0, old.memory + 1 + (bonus.memory || 0) - (choice.hell ? 2 : 0));
       state.talent = Math.max(0, Math.floor(old.talent * 0.55) + Math.floor(state.memory / 3) - (choice.hell ? 2 : 0));
       state.fragments = Math.max(0, old.fragments + (bonus.fragments || 0));
-      state.xuanhuiBond = Math.max(0, Math.floor((old.xuanhuiBond || 0) * 0.6));
-      state.sunCinders = Math.max(0, old.sunCinders || 0);
-      state.swordHeart = Math.max(0, Math.floor((old.swordHeart || 0) * 0.55));
-      state.qingyangTrace = Math.max(0, old.qingyangTrace || 0);
-      state.foxBond = Math.max(0, Math.floor((old.foxBond || 0) * 0.55));
-      state.shadowTrust = Math.max(0, Math.floor((old.shadowTrust || 0) * 0.55));
-      state.inkContract = Math.max(0, Math.floor((old.inkContract || 0) * 0.55));
-      state.iceLedger = Math.max(0, old.iceLedger || 0);
-      state.fireOath = Math.max(0, Math.floor((old.fireOath || 0) * 0.55));
-      state.moFeiyunProof = Math.max(0, old.moFeiyunProof || 0);
-      state.wandererCred = Math.max(0, Math.floor((old.wandererCred || 0) * 0.55));
+      state.echoes = echoFromLife(old);
+      state.currentRelics = {};
+      state.currentNames = {};
       state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
       state.karma = choice.hell ? 15 : 0;
       state.log = choice.hell
-        ? "\u4f60\u4ece\u5e7d\u90fd\u5f52\u6765\uff0c\u5f00\u5c40\u66f4\u96be\uff0c\u4f46\u8bb0\u5fc6\u66f4\u950b\u5229\u3002"
-        : "\u4f60\u518d\u5ea6\u9192\u6765\u3002\u524d\u4e16\u7684\u75db\u82e6\u6ca1\u6709\u767d\u8d39\uff0c\u5b83\u4eec\u6c89\u6210\u4e86\u609f\u6027\u3002";
+        ? "你从冷井边醒来。时间回到开端，旧人不识你，只有几处声音比从前更刺耳。"
+        : "你再度醒来。时间回到开端，旧人不认得你，昨夜的东西也不在手里，只有一些模糊的熟悉感沉进识海。";
       render();
     }
 
@@ -2558,20 +1434,22 @@
 
       if (choice.once) state.flags[choice.once] = true;
       state.turn += 1;
+      const actionAct = state.act || 0;
       const configuredMaxAct = Math.max(4, (storyConfig.chapters || []).length - 1);
       if (choice.advanceAct !== false) state.act = Math.min(configuredMaxAct, (state.act || 0) + 1);
       const currentScene = state.scene;
       const intendedScene = choice.to;
       if (choice.effect) choice.effect(state);
+      state.lastActionText = choice.text || "";
+      state.lastActionLog = state.log || "";
+      state.lastActionAct = actionAct;
       if (state.scene === currentScene) state.scene = intendedScene;
-      if (currentScene === "afterBreak" && intendedScene === "birth") {
-        state.scene = nextStoryScene();
-        state.log = "\u4f60\u6ca1\u6709\u9000\u56de\u539f\u70b9\uff0c\u800c\u662f\u5faa\u7740\u672c\u4e16\u7ebf\u7d22\u8d70\u5411\u5927\u8352\u66f4\u6df1\u5904\u3002";
-      }
-
       if (state.years <= 0 && !scenes[state.scene].ending) {
-        state.scene = "death";
-        state.log = "\u5bff\u5143\u8d70\u5230\u5c3d\u5934\u3002\u597d\u5728\u4f60\u5df2\u7ecf\u5b66\u4f1a\u5982\u4f55\u628a\u5931\u8d25\u5e26\u56de\u4e0b\u4e00\u4e16\u3002";
+        const debtCalls = state.karma >= 35 || state.virtue < 35;
+        state.scene = debtCalls ? "hell" : "death";
+        state.log = debtCalls
+          ? "寿元走到尽头时，井底先亮了。旧债没有消失，只是换一种方式让你重走人间。"
+          : "寿元走到尽头。好在你已经学会如何把失败带回下一世。";
       }
 
       if (scenes[state.scene].ending) {
@@ -2587,8 +1465,6 @@
         audio.play(state.scene === "hell" ? "danger" : "ending");
       } else if (state.scene === "afterBreak") {
         audio.play("break");
-      } else if (state.scene === "heartDemon") {
-        audio.play("danger");
       }
 
       render();
@@ -2638,11 +1514,6 @@
       virtue.className = state.virtue < 35 ? "warning" : "";
       karma.textContent = state.karma;
       karma.className = state.karma > 35 ? "warning" : "";
-      memory.textContent = state.memory;
-      talent.textContent = state.talent;
-      fragments.textContent = state.fragments;
-      xuanhuiBond.textContent = state.xuanhuiBond || 0;
-      sunCinders.textContent = state.sunCinders || 0;
       log.textContent = state.log;
 
       const nextThreshold = 28 + state.realm * 22 + Math.max(0, 50 - state.virtue) + Math.max(0, state.karma);
