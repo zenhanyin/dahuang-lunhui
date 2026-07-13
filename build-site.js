@@ -184,20 +184,41 @@ async function translateText(request) {
   const sourceText = textValue(payload.text, 4800);
   if (!target || !sourceText) return jsonResponse({ ok: false, error: "bad_request" }, { status: 400 });
 
-  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
+  const googleUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
     encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(sourceText);
-  const response = await fetch(url, {
-    headers: {
-      "accept": "application/json,text/plain,*/*",
-      "user-agent": "Mozilla/5.0"
+  try {
+    const response = await fetch(googleUrl, {
+      headers: {
+        "accept": "application/json,text/plain,*/*",
+        "user-agent": "Mozilla/5.0"
+      }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const translated = Array.isArray(data && data[0])
+        ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
+        : "";
+      if (translated) return jsonResponse({ ok: true, provider: "google", text: translated });
     }
-  });
-  if (!response.ok) return jsonResponse({ ok: false, error: "translate_failed" }, { status: 502 });
-  const data = await response.json();
-  const translated = Array.isArray(data && data[0])
-    ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
-    : "";
-  return jsonResponse({ ok: true, text: translated || sourceText });
+  } catch (error) {}
+
+  const myMemoryUrl = "https://api.mymemory.translated.net/get?q=" +
+    encodeURIComponent(sourceText) + "&langpair=" + encodeURIComponent("zh-CN|" + target);
+  try {
+    const response = await fetch(myMemoryUrl, {
+      headers: {
+        "accept": "application/json",
+        "user-agent": "Mozilla/5.0"
+      }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const translated = data && data.responseData && data.responseData.translatedText;
+      if (translated) return jsonResponse({ ok: true, provider: "mymemory", text: translated });
+    }
+  } catch (error) {}
+
+  return jsonResponse({ ok: false, error: "translate_failed" }, { status: 502 });
 }
 
 export default {
