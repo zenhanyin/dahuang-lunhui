@@ -77,43 +77,243 @@
     }
 
     #scene-text {
-      margin: 0;
-      max-width: 72ch;
-      font-size: 18px;
-      white-space: pre-line;
-    }
-
-    .sketch {
-      width: min(520px, 100%);
-      margin: 24px 0 0;
-      border: 1px solid var(--line);
-      background: rgba(244, 239, 223, 0.035);
-      aspect-ratio: 16 / 9;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
       overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    .sketch img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .art-frame {
+    .scene-frame {
       position: relative;
-      width: 100%;
-      height: 100%;
+      width: min(760px, 100%);
+      min-height: clamp(420px, 62vh, 650px);
+      margin: 20px 0 0;
+      border: 1px solid var(--line);
       background: #101711;
+      overflow: hidden;
+      isolation: isolate;
     }
 
-    .art-frame::after {
+    .vn-bg,
+    .vn-shade,
+    .vn-portrait,
+    .vn-dialogue {
+      position: absolute;
+    }
+
+    .vn-bg {
+      inset: 0;
+      background-size: cover;
+      background-position: center center;
+      filter: contrast(1.04) saturate(0.98);
+      transform: scale(1.02);
+      transition: background-image 260ms ease, filter 260ms ease;
+      z-index: 0;
+    }
+
+    .vn-shade {
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(9, 12, 9, 0.1), rgba(9, 12, 9, 0.34) 48%, rgba(9, 12, 9, 0.78)),
+        radial-gradient(circle at 28% 18%, rgba(216, 179, 95, 0.13), transparent 32%),
+        linear-gradient(90deg, rgba(9, 12, 9, 0.32), transparent 42%, rgba(9, 12, 9, 0.25));
+      pointer-events: none;
+    }
+
+    .vn-portrait {
+      right: clamp(16px, 5vw, 58px);
+      bottom: 120px;
+      width: clamp(150px, 23vw, 230px);
+      height: clamp(240px, 42vh, 390px);
+      z-index: 4;
+      opacity: 0.92;
+      filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.48));
+      pointer-events: none;
+    }
+
+    .vn-portrait::before,
+    .vn-portrait::after {
       content: "";
       position: absolute;
-      inset: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .vn-portrait::before {
+      top: 6%;
+      width: 34%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: linear-gradient(160deg, rgba(244, 239, 223, 0.94), rgba(179, 162, 126, 0.82));
+      box-shadow: 0 0 0 9px rgba(31, 30, 25, 0.72);
+    }
+
+    .vn-portrait::after {
+      bottom: 0;
+      width: 74%;
+      height: 74%;
+      border-radius: 48% 48% 10% 10%;
       background:
-        linear-gradient(180deg, rgba(16, 23, 17, 0.08), rgba(16, 23, 17, 0.18)),
-        radial-gradient(circle at 24% 24%, rgba(216, 179, 95, 0.12), transparent 36%);
+        radial-gradient(circle at 50% 14%, rgba(216, 179, 95, 0.28), transparent 18%),
+        linear-gradient(150deg, rgba(31, 35, 31, 0.96), rgba(77, 68, 49, 0.94));
+      clip-path: polygon(50% 0, 82% 16%, 100% 100%, 0 100%, 18% 16%);
+    }
+
+    .vn-portrait.is-hidden {
+      display: none;
+    }
+
+    .vn-portrait.pos-left {
+      left: clamp(16px, 5vw, 58px);
+      right: auto;
+    }
+
+    .vn-portrait.tone-iron::after {
+      background: linear-gradient(150deg, rgba(43, 50, 51, 0.98), rgba(87, 80, 62, 0.94));
+    }
+
+    .vn-portrait.tone-medicine::after {
+      background: linear-gradient(150deg, rgba(35, 61, 45, 0.98), rgba(81, 91, 63, 0.94));
+    }
+
+    .vn-portrait.tone-rain::after {
+      background: linear-gradient(150deg, rgba(34, 43, 55, 0.98), rgba(72, 78, 83, 0.94));
+    }
+
+    .vn-portrait.tone-star::after,
+    .vn-portrait.tone-mirror::after {
+      background: linear-gradient(150deg, rgba(33, 44, 63, 0.98), rgba(62, 78, 99, 0.94));
+    }
+
+    .vn-portrait.tone-shadow::after {
+      background: linear-gradient(150deg, rgba(24, 25, 30, 0.98), rgba(58, 45, 55, 0.94));
+    }
+
+    .vn-portrait.tone-wood::after {
+      background: linear-gradient(150deg, rgba(49, 50, 35, 0.98), rgba(91, 77, 48, 0.94));
+    }
+
+    .vn-portrait.tone-fire::after {
+      background: linear-gradient(150deg, rgba(70, 38, 31, 0.98), rgba(112, 67, 38, 0.94));
+    }
+
+    .vn-portrait.tone-wanderer::after,
+    .vn-portrait.tone-water::after {
+      background: linear-gradient(150deg, rgba(37, 50, 48, 0.98), rgba(66, 81, 82, 0.94));
+    }
+
+    .vn-portrait.tone-sun::before {
+      background: radial-gradient(circle, rgba(255, 233, 172, 0.96), rgba(215, 166, 73, 0.82));
+      box-shadow: 0 0 0 9px rgba(58, 44, 21, 0.72), 0 0 38px rgba(216, 179, 95, 0.4);
+    }
+
+    .vn-portrait.tone-sun::after {
+      background: linear-gradient(150deg, rgba(72, 52, 30, 0.98), rgba(125, 82, 35, 0.94));
+    }
+
+    .vn-portrait.tone-player {
+      opacity: 0.72;
+    }
+
+    .vn-portrait.has-image {
+      left: clamp(30px, 4vw, 50px);
+      right: auto;
+      bottom: clamp(34px, 4.2vw, 50px);
+      width: clamp(76px, 9vw, 104px);
+      height: clamp(76px, 9vw, 104px);
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      opacity: 1;
+      filter: saturate(0.92) contrast(0.98);
+      mix-blend-mode: normal;
+      border: 1px solid rgba(244, 239, 223, 0.24);
+      border-radius: 4px;
+      background-color: rgba(10, 14, 11, 0.92);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42);
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .vn-portrait.has-image::before {
+      display: none;
+    }
+
+    .vn-portrait.has-image::after {
+      content: "";
+      inset: 0;
+      width: auto;
+      height: auto;
+      left: auto;
+      transform: none;
+      border-radius: 4px;
+      clip-path: none;
+      background: linear-gradient(to bottom, rgba(244, 239, 223, 0.06), transparent 35%, rgba(9, 12, 9, 0.22));
       pointer-events: none;
+    }
+
+    .vn-portrait.has-image.pos-left {
+      left: clamp(30px, 4vw, 50px);
+    }
+
+    .vn-dialogue {
+      left: clamp(14px, 3vw, 28px);
+      right: clamp(14px, 3vw, 28px);
+      bottom: clamp(14px, 3vw, 26px);
+      z-index: 3;
+      min-height: 132px;
+      max-height: min(260px, 38vh);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 16px 18px 14px;
+      border: 1px solid rgba(244, 239, 223, 0.2);
+      background: rgba(16, 20, 15, 0.84);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .vn-dialogue.has-portrait {
+      padding-left: clamp(124px, 15vw, 168px);
+    }
+
+    .vn-speaker {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .vn-text {
+      min-height: 0;
+      overflow: auto;
+      color: var(--ink);
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.72;
+      white-space: pre-line;
+      scrollbar-width: thin;
+    }
+
+    .vn-continue {
+      justify-self: end;
+      min-height: 34px;
+      padding: 5px 12px;
+      font-size: 14px;
+      text-align: center;
+      background: rgba(42, 49, 39, 0.84);
+    }
+
+    .vn-summary {
+      margin: 10px 0 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(216, 179, 95, 0.36);
+      background: rgba(216, 179, 95, 0.08);
+      color: var(--ink);
     }
 
     .choices {
@@ -274,6 +474,22 @@
         border-right: 0;
         border-bottom: 1px solid var(--line);
       }
+
+      .scene-frame {
+        min-height: min(620px, 72vh);
+      }
+
+      .vn-portrait {
+        right: 8px;
+        bottom: 150px;
+        width: 140px;
+        height: 245px;
+        opacity: 0.76;
+      }
+
+      .vn-dialogue {
+        max-height: 42vh;
+      }
     }
   </style>
 </head>
@@ -284,7 +500,7 @@
       <p class="subtitle">在大荒醒来，先活过这一世</p>
       <h2 id="scene-title"></h2>
       <p id="scene-text"></p>
-      <div id="scene-sketch" class="sketch" aria-label="当前道途简笔画"></div>
+      <div id="scene-sketch" class="scene-frame" aria-label="当前剧情场景"></div>
       <div id="choices" class="choices"></div>
     </section>
 
@@ -366,7 +582,9 @@
         year: "年",
         life: n => `第 ${n} 世`,
         unknown: "未定",
-        artLabel: "当前道途画面"
+        artLabel: "当前道途画面",
+        narrator: "旁白",
+        continue: "继续"
       },
       en: {
         htmlLang: "en",
@@ -393,7 +611,9 @@
         year: "yrs",
         life: n => `Life ${n}`,
         unknown: "Undecided",
-        artLabel: "Current journey image"
+        artLabel: "Current journey image",
+        narrator: "Narrator",
+        continue: "Continue"
       },
       ja: {
         htmlLang: "ja",
@@ -420,7 +640,9 @@
         year: "年",
         life: n => `第 ${n} 世`,
         unknown: "未定",
-        artLabel: "現在の道程の画"
+        artLabel: "現在の道程の画",
+        narrator: "語り",
+        continue: "続ける"
       },
       ko: {
         htmlLang: "ko",
@@ -447,7 +669,9 @@
         year: "년",
         life: n => `${n}번째 생`,
         unknown: "미정",
-        artLabel: "현재 여정 이미지"
+        artLabel: "현재 여정 이미지",
+        narrator: "나레이션",
+        continue: "계속"
       }
     };
 
@@ -531,6 +755,10 @@
     }
 
     let currentLanguage = readSavedLanguage() || "zh";
+    const visualState = {
+      sceneKey: "",
+      lineIndex: 0
+    };
 
     function ui(key) {
       return (I18N[currentLanguage] && I18N[currentLanguage][key]) || I18N.zh[key] || key;
@@ -598,7 +826,7 @@
       life: 1,
       realm: 0,
       qi: 0,
-      years: 8,
+      years: 30,
       virtue: 50,
       karma: 0,
       memory: 0,
@@ -613,7 +841,9 @@
       inkContract: 0,
       iceLedger: 0,
       fireOath: 0,
+      changqinEcho: 0,
       moFeiyunProof: 0,
+      qiyeTrace: 0,
       wandererCred: 0,
       rootBone: 0,
       mind: 0,
@@ -625,6 +855,7 @@
       act: 0,
       currentRelics: {},
       currentNames: {},
+      currentPeople: {},
       lastActionText: "",
       lastActionLog: "",
       lastActionAct: -1,
@@ -719,6 +950,16 @@
         ]
       },
 
+      qingshiEnding: {
+        title: "海风里的药灯",
+        text: "你没有推开铜门，也没有让海风把病人的呼吸带走。\n\n清时把海寂脉案压在药账最末，先写仍活着的人，再写该守的药灯。天亮前，最里面那张病榻上传来一声很轻的咳。屋里的人没有欢呼，只是把下一碗药温上。\n\n这一回，冰心堂没有等真相落定才救人。",
+        ending: true,
+        choices: [
+          { text: "带着海风里的药灯醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 10 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
       shadowEnding: {
         title: "影子停住了",
         text: "你把旧令放到铜门缝前。\n\n影子没有立刻散去，却也没有再往人群里钻。持刀的人站在灯外很久，最后把第二枚令牌翻过来，放到你脚边。",
@@ -747,6 +988,76 @@
           { text: "带着雪里的灯影醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 6 } },
           { text: "重新开始", hardReset: true }
         ]
+      },
+
+      changqinEnding: {
+        title: "乐风未熄",
+        text: "你没有让圣火替人间复仇。\n\n你把那段乐风留在铜门外。火光没有冲进门缝，只照见退回来的人、未熄的炉、和九黎山下仍愿守夜的荒火弟子。\n\n炉边女子把试锋石收回匣中，匣盖合上时，那段细弦声终于不再像战鼓。",
+        ending: true,
+        choices: [
+          { text: "带着圣火里的余音醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 10 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      xuanhuiEnding: {
+        title: "金灯照回人间",
+        text: "你没有追问东皇旧名，也没有把玄晖推回神位。\n\n你跟他在雪线外多走了一段路。灯光照不到铜门深处，却照见回城的人一个个找到自己的影子。\n\n玄晖把灯挂回木杆上，手指被风冻得发红。那一刻，他看起来不像神明，只像一个仍愿意等人的点灯人。",
+        ending: true,
+        choices: [
+          { text: "带着金灯余温醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 8 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      qingyangEnding: {
+        title: "雨声绕过铜门",
+        text: "青阳没有拔剑。\n\n他带你从铜门侧面绕过。雨声在脚下变得很远，像从看不见的深处一路漫上来，又被剑鞘轻轻压住。\n\n你没有问那条路通向哪里。至少这一夜，剑没有替任何人斩开人间。",
+        ending: true,
+        choices: [
+          { text: "带着雨中剑声醒来", rebirth: true, bonus: { memory: 3, virtue: 6 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      qiyeEnding: {
+        title: "北墙未破",
+        text: "七道刻痕、撤民小路和上邪残页一并铺在铜门前。墙外许久没有再传令。\n\n你没有赢过武观，也没有把七夜写成传奇。你只是把一城退路、一册活人名、一盏北墙灯都摆到光下。天亮时，北墙没有破，井口没有毒，撤民的小路也没有断。",
+        ending: true,
+        choices: [
+          { text: "带着北墙灯影醒来", rebirth: true, bonus: { memory: 3, fragments: 1, virtue: 8 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      mofeiyunEnding: {
+        title: "白羽入潮",
+        text: "莫非云把白羽放进水镜里。\n\n镜面只映出东海方向一线灰白的潮。白羽在水面转了半圈，羽根上那圈细线一点点散开，露出被海盐磨白的断口。\n\n莫非云把湿透的星图压回书页里，没有再让风替他说话。",
+        ending: true,
+        choices: [
+          { text: "带着潮声里的白羽醒来", rebirth: true, bonus: { memory: 3, fragments: 1 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      eastSeaSecretEnding: {
+        title: "潮外仍有门",
+        text: "你没有推开铜门，也没有替任何人把整件事说完。\n\n你只是把这一世里亲眼见过的细处，一处一处说给潮声听：雪灯为何总偏向北方，白羽为何带着海盐，旧令为何不肯翻面，圣火里为何会有一段不属于战鼓的弦音。\n\n东海之外的潮声停了一息。风把你袖中的铜锈吹冷，又把那些旧物上的水汽慢慢吹干。没有人宣布你赢了什么，只是这一回，活人没有再被摆到门前。",
+        ending: true,
+        choices: [
+          { text: "带着潮外的回声醒来", rebirth: true, bonus: { memory: 5, fragments: 2, virtue: 10 } },
+          { text: "重新开始", hardReset: true }
+        ]
+      },
+
+      rustWitnessEnding: {
+        title: "锈痕留在石阶",
+        text: "你没有把铜锈贴上铜门。\n\n你把它放在门风吹不到的石阶上。绿锈贴着石面慢慢冷下去，断口朝外，像一枚从门上剥落、又被许多人带回来的旧痂。\n\n后来有人经过这里，会先看见那道断口，再看见石阶上被掌心磨亮的一小圈痕迹。",
+        ending: true,
+        choices: [
+          { text: "带着掌心的锈痕醒来", rebirth: true, bonus: { memory: 4, fragments: 1, virtue: 8 } },
+          { text: "重新开始", hardReset: true }
+        ]
       }
     });
 
@@ -759,13 +1070,14 @@
     }
 
     function chapterName() {
+      if ((state.act || 0) === 0 && state.rootBone && state.mind && state.luck && state.debt) return "此身底子";
       const chapter = currentChapter();
       if (chapter && chapter.name) return chapter.name;
       const act = state.act || 0;
       if (act <= 0) return "雷后入局";
       if (act === 1) return "山门相疑";
       if (act === 2) return "铜门显影";
-      return "天命收束";
+      return "门前抉择";
     }
 
     function chapterText() {
@@ -776,11 +1088,14 @@
         : state.virtue >= 120
           ? (statusLines.highVirtue || "有人看见你留下来，悄悄松了一口气。")
           : (statusLines.normal || "你还没有确定谁可信。");
+      if (act === 0 && state.rootBone && state.mind && state.luck && state.debt) {
+        return `你已经摸清这一世的身骨。\n\n窗外的路还没有定。先选这一世从哪里醒来。${birthStatLine()}`;
+      }
       const chapter = currentChapter();
       const contextual = contextualChapterText(act, status);
-      if (contextual) return contextual + echoPrelude() + (act === 0 ? birthStatLine() : "");
+      if (contextual) return contextual + echoPrelude() + deepCyclePrelude(act) + (act === 0 ? birthStatLine() : "");
       if (chapter && chapter.text && chapter.text.normal) {
-        return chapter.text.normal.replaceAll("{{status}}", status) + echoPrelude() + (act === 0 ? birthStatLine() : "");
+        return chapter.text.normal.replaceAll("{{status}}", status) + echoPrelude() + deepCyclePrelude(act) + (act === 0 ? birthStatLine() : "");
       }
 
       const fallback = [
@@ -801,6 +1116,8 @@
         shadowTrust: "oldToken",
         inkContract: "machineBird",
         fireOath: "trialStone",
+        changqinEcho: "changqinTone",
+        qiyeTrace: "blackFlag",
         foxBond: "ferryLedger",
         wandererCred: "ferryLedger",
         xuanhuiBond: "lamp",
@@ -819,6 +1136,11 @@
         } else if (key === "originIn") {
           const allowed = String(value).split("|").map(item => item.trim()).filter(Boolean);
           if (!allowed.includes(s.origin)) return false;
+        } else if (key === "knownName") {
+          if (!(s.currentNames || {})[value]) return false;
+        } else if (key === "knownNameIn") {
+          const allowed = String(value).split("|").map(item => item.trim()).filter(Boolean);
+          if (!allowed.some(name => (s.currentNames || {})[name])) return false;
         } else if (key.endsWith("Min")) {
           const stat = key.slice(0, -3);
           if ((s[stat] || 0) < value) return false;
@@ -834,6 +1156,7 @@
     function markCurrentKnowledge(s, config = {}) {
       if (!s.currentRelics) s.currentRelics = {};
       if (!s.currentNames) s.currentNames = {};
+      if (!s.currentPeople) s.currentPeople = {};
       s.currentRelics.copperRust = true;
       const text = `${config.text || ""}\n${config.log || ""}\n${config.setOrigin || ""}`;
       if (/药庐|药签|药炉|药童/.test(text)) s.currentRelics.drugSign = true;
@@ -842,15 +1165,32 @@
       if (/夜牌|旧令|影子|镜室/.test(text)) s.currentRelics.oldToken = true;
       if (/机关鸟|盐晶|翎羽/.test(text)) s.currentRelics.machineBird = true;
       if (/荒火|试锋石|炭/.test(text)) s.currentRelics.trialStone = true;
+      if (/圣火|祝融|乐风|长琴/.test(text)) s.currentRelics.changqinTone = true;
+      if (/朔方|七道刻痕|上邪|军册|军令/.test(text)) s.currentRelics.blackFlag = true;
       if (/商队|渡口|账簿|杂役/.test(text)) s.currentRelics.ferryLedger = true;
       if (/雪|点灯|灯旁|雪灯/.test(text)) s.currentRelics.lamp = true;
 
-      if (/玄晖/.test(text)) s.currentNames.xuanhui = true;
-      if (/青阳/.test(text)) s.currentNames.qingyang = true;
-      if (/莫非云/.test(text)) s.currentNames.moFeiyun = true;
-      if (/夜哭/.test(text)) s.currentNames.yeku = true;
-      if (/清时/.test(text)) s.currentNames.qingshi = true;
-      if (/遗墨/.test(text)) s.currentNames.yimo = true;
+      if (/天机营校尉|守门校尉|校尉/.test(text)) s.currentPeople.tianjiGuard = true;
+      if (/朔方城主|幽都统帅|七夜|武观/.test(text)) s.currentPeople.qiyeCommander = true;
+      if (/药庐少年|药童|药庐的童子/.test(text)) s.currentPeople.iceBoy = true;
+      if (/雨亭剑客|剑客/.test(text)) s.currentPeople.swordGuest = true;
+      if (/观星者|观星的人/.test(text)) s.currentPeople.starWatcher = true;
+      if (/镜中影|镜中的影子|镜室里的人/.test(text)) s.currentPeople.mirrorShadow = true;
+      if (/递牌人|持刀的人/.test(text)) s.currentPeople.shadowBlade = true;
+      if (/机关师|翎羽弟子/.test(text)) s.currentPeople.featherMechanic = true;
+      if (/炉边女子|搬炭的人/.test(text)) s.currentPeople.fireWoman = true;
+      if (/火中琴声|琴声|太子长琴|长琴/.test(text)) s.currentPeople.changqinEcho = true;
+      if (/车辕书生|车辕上的书生|书生/.test(text)) s.currentPeople.ferryScholar = true;
+      if (/点灯人|灯旁的人|雪灯人|玄晖/.test(text)) s.currentPeople.lampKeeper = true;
+
+      if (/叫他玄晖|叫作玄晖|名为玄晖|名字是玄晖/.test(text)) s.currentNames.xuanhui = true;
+      if (/武观（七夜）|武观\(七夜\)|本名武观|旧名武观|名武观|叫作武观|叫他武观|名为武观|名字是武观|另一个名字：武观|另一个名字是武观/.test(text)) s.currentNames.wuguan = true;
+      if (/叫他青阳|自己叫青阳|名为青阳|名字是青阳/.test(text)) s.currentNames.qingyang = true;
+      if (/叫他莫非云|叫作莫非云|名为莫非云|名字是莫非云/.test(text)) s.currentNames.moFeiyun = true;
+      if (/叫他夜哭|叫作夜哭|自己叫夜哭|名为夜哭|名字是夜哭/.test(text)) s.currentNames.yeku = true;
+      if (/我叫清时|叫清时|名为清时|名字是清时/.test(text)) s.currentNames.qingshi = true;
+      if (/叫他遗墨|叫作遗墨|名为遗墨|名字是遗墨/.test(text)) s.currentNames.yimo = true;
+      if (/名太子长琴|叫作太子长琴|叫他太子长琴|名为太子长琴|名字是太子长琴/.test(text)) s.currentNames.changqin = true;
     }
 
     function echoFromLife(old) {
@@ -864,7 +1204,9 @@
       if ((old.swordHeart || 0) > 0 || (old.qingyangTrace || 0) > 0) add("sword", Math.ceil(((old.swordHeart || 0) + (old.qingyangTrace || 0)) / 3));
       if ((old.shadowTrust || 0) > 0) add("shadow", Math.ceil(old.shadowTrust / 2));
       if ((old.inkContract || 0) > 0) add("machine", Math.ceil(old.inkContract / 2));
+      if ((old.qiyeTrace || 0) > 0) add("tianji", Math.ceil(old.qiyeTrace / 2));
       if ((old.fireOath || 0) > 0) add("fire", Math.ceil(old.fireOath / 2));
+      if ((old.changqinEcho || 0) > 0) add("changqin", Math.ceil(old.changqinEcho / 2));
       if ((old.foxBond || 0) > 0 || (old.wandererCred || 0) > 0) add("road", Math.ceil(((old.foxBond || 0) + (old.wandererCred || 0)) / 3));
       if ((old.xuanhuiBond || 0) > 0 || (old.sunCinders || 0) > 0) add("lamp", Math.ceil(((old.xuanhuiBond || 0) + (old.sunCinders || 0)) / 3));
       return echo;
@@ -876,9 +1218,11 @@
       if (echoes.medicine) hints.push("药炉的灰");
       if (echoes.star) hints.push("灯下的白影");
       if (echoes.sword) hints.push("雨里的剑声");
+      if (echoes.tianji) hints.push("北墙外的七道刻痕");
       if (echoes.shadow) hints.push("巷口的第二道影子");
       if (echoes.machine) hints.push("翅骨里细小的响声");
       if (echoes.fire) hints.push("炉火后的热浪");
+      if (echoes.changqin) hints.push("火里一声未尽的弦音");
       if (echoes.road) hints.push("渡口未点完的人数");
       if (echoes.lamp) hints.push("雪里那一点灯");
       if (!hints.length || state.memory < 3) return "";
@@ -890,6 +1234,21 @@
       return `\n\n你并不记得前因，只是对${visible.join("、")}有些说不清的熟悉。`;
     }
 
+    function deepCyclePrelude(act) {
+      const notes = [];
+      if (state.life >= 3 && state.memory >= 6 && act >= 2) {
+        notes.push("你开始分得清，哪些事是这一世亲眼所见，哪些只是上一回留下的触感又浮了上来。");
+      }
+      if (state.life >= 5 && state.memory >= 12 && act >= 5) {
+        notes.push("有些话你上一世也听过，只是那时你还不知道，沉默本身也是一种线索。");
+      }
+      if (state.fragments >= 5 && state.memory >= 16 && act >= 7) {
+        notes.push("铜锈不再只发热。它像在提醒你：真正反复出现的，不是铜门，而是每一次被迫站到门前的人。");
+      }
+      if (!notes.length) return "";
+      return `\n\n${notes.slice(0, 1).join("\n\n")}`;
+    }
+
     function choiceEchoScore(choice) {
       const text = choice.text || "";
       const echoes = state.echoes || {};
@@ -897,18 +1256,30 @@
       if (/药庐|药签|药炉|冰心/.test(text)) score += echoes.medicine || 0;
       if (/云麓|星灯|白羽|观星|海边|盐滩/.test(text)) score += echoes.star || 0;
       if (/弈剑|雨亭|剑|剑穗/.test(text)) score += echoes.sword || 0;
+      if (/天机|军册|北墙|巡灯|朔方|七道刻痕|七夜|武观|上邪|军令/.test(text)) score += echoes.tianji || 0;
       if (/旧巷|夜牌|旧令|镜室|影子|太虚/.test(text)) score += echoes.shadow || 0;
       if (/机关鸟|翎羽|盐晶/.test(text)) score += echoes.machine || 0;
       if (/荒火|炭|试锋石|焦土/.test(text)) score += echoes.fire || 0;
+      if (/圣火|祝融|乐风|长琴/.test(text)) score += echoes.changqin || 0;
       if (/商队|渡口|杂役|游侠|账簿/.test(text)) score += echoes.road || 0;
       if (/雪|点灯|北边|雪线/.test(text)) score += echoes.lamp || 0;
       return score;
     }
 
+    function scaledYearDelta(value, act) {
+      if (value >= 0 || value <= -30) return value;
+      const costByAct = [3, 3, 4, 5, 6, 5, 4];
+      const cost = costByAct[Math.max(0, Math.min(costByAct.length - 1, act || 0))] || 4;
+      return value < 0 ? value * cost : value;
+    }
+
     function applyConfigEffects(s, config) {
       const effects = config.effects || {};
       Object.entries(effects).forEach(([key, value]) => {
-        if (typeof s[key] === "number" && typeof value === "number") s[key] += value;
+        if (typeof value === "number" && (typeof s[key] === "number" || s[key] === undefined)) {
+          if (s[key] === undefined) s[key] = 0;
+          s[key] += key === "years" ? scaledYearDelta(value, s.actionAct ?? s.act ?? 0) : value;
+        }
       });
       if (config.talentToQi) s.qi += s.talent;
       if (config.setPath) s.path = config.setPath;
@@ -941,7 +1312,9 @@
         requires: options.requires,
         effect: s => {
           Object.entries(effects).forEach(([key, value]) => {
-            if (typeof s[key] === "number" && typeof value === "number") s[key] += value;
+            if (typeof s[key] === "number" && typeof value === "number") {
+              s[key] += key === "years" ? scaledYearDelta(value, s.actionAct ?? s.act ?? 0) : value;
+            }
           });
           s.log = log;
           markCurrentKnowledge(s, { text, log, effects });
@@ -956,7 +1329,7 @@
         ],
         "冰心堂": [
           make("听药童说灯下旧病", "药童把药碗往灯下挪了挪，说有些病不是从身上起的。你没急着开方，只先记住他的停顿。", { iceLedger: 1, virtue: 5 }),
-          make("替病榻旁的人换一盏灯", "灯芯短了一截，病人的呼吸却稳了一点。你忽然明白，救人有时先从不惊扰开始。", { virtue: 7, years: -1 }),
+          make("替病榻旁的人换一盏灯", "灯芯短了一截，病人的呼吸却稳了一点。药童没有说话，只把药碗往你这边推近半寸。", { virtue: 7, years: -1 }),
           make("把错放的药包重新分开", "两包药只差一味苦草。你分开它们时，药童低声说，差一点就不是同一个夜晚了。", { iceLedger: 1, memory: 1 })
         ],
         "弈剑听雨阁": [
@@ -970,7 +1343,7 @@
           make("把窗边的灯移远半寸", "灯被移开以后，屋里反而亮了一点。观星的人没有解释，只让你记住这个距离。", { virtue: 5, years: -1 })
         ],
         "太虚观": [
-          make("听扫镜人讲半句旧梦", "扫镜人说梦里的人未必是你，镜里的人也未必不是。你没有接话，只把灰扫到门外。", { shadowTrust: 1, memory: 1 }),
+          make("听扫镜人讲半句旧话", "扫镜人说镜里的人未必比门外的人更假。你没有接话，只把灰扫到门外。", { shadowTrust: 1, memory: 1 }),
           make("把镜前的灯罩压低", "灯影低下去时，你的影子终于和脚跟贴在一起。屋里安静了一瞬。", { shadowTrust: 1, virtue: 4 }),
           make("在灰线外停住脚步", "灰线很浅，像有人故意留给你看。你停住，没有踩过去。", { karma: -1, memory: 1 })
         ],
@@ -1023,55 +1396,102 @@
     }
 
     function rollBirthStats(s = state) {
-      const roll = () => 1 + Math.floor(Math.random() * 10);
+      const roll = () => 1 + Math.floor(Math.random() * 20);
       s.rootBone = roll();
       s.mind = roll();
       s.luck = roll();
       s.debt = roll();
-      s.log = `此身底子：根骨 ${s.rootBone}，心性 ${s.mind}，机缘 ${s.luck}，尘债 ${s.debt}。这些底子会影响哪座山门愿意收你，也会影响哪些旧缘会先找上门。`;
+      s.log = "";
     }
 
     function birthStatLine() {
       if (!state.rootBone || !state.mind || !state.luck || !state.debt) return "";
-      return `\n\n【此身底子】根骨 ${state.rootBone}　心性 ${state.mind}　机缘 ${state.luck}　旧债 ${state.debt}`;
+      return `\n\n【此身底子】根骨 ${state.rootBone}　心性 ${state.mind}　机缘 ${state.luck}　旧债 ${state.debt}　命数 30 年`;
     }
 
     function lastActionBridge() {
       const text = state.lastActionText || "";
-      const log = state.lastActionLog || "";
       if (!text || state.lastActionAct !== 2) return "";
-      const cleanLog = log.replace(/[。！？]\s*$/, "");
-      if (cleanLog) {
-        return `雨停以后，你先想起昨夜做过的那件事。\n\n${cleanLog}。`;
-      }
-      return `雨停以后，你先想起昨夜的选择：${text}。`;
+      const byNeedle = [
+        [/药庐|冷针|药炉|咳声/, "雨停以后，药庐后门仍有湿冷的药气。你没有急着追问来历，先把昨夜听见的咳声一笔一笔记回纸上。"],
+        [/军册|北墙|巡灯|军械|伤号/, "雨停以后，军册被重新压在灯下。你先数伤号，再看缺页，昨夜那些被雨冲淡的脚印终于有了方向。"],
+        [/剑|雨亭|剑架/, "雨停以后，亭檐还在滴水。剑声没有再响，你却记得第三声落下时，水珠曾往北滚了一寸。"],
+        [/星灯|星图|白羽|铜锈/, "雨停以后，星灯亮得很低。书页里的白羽没有动，掌心的铜锈却比昨夜更热。"],
+        [/镜|夜牌|巷口|旧令/, "雨停以后，镜脚旁的灰没有散尽。你先把门闩重新扣好，再回想昨夜哪一道影子慢了半步。"],
+        [/机关鸟|木翼|盐晶/, "雨停以后，机关鸟终于安静下来。你把木翼下的盐晶拨到灯边，才发现它不是第一次经过战火。"],
+        [/圣火|试锋石|炭|火盆|旧木车/, "雨停以后，炉火低低压在灰下。你先确认火盆没有灭，再把昨夜从试锋石旁带回来的痕迹摊开。"],
+        [/城墙|孩子|商队|渡口/, "雨停以后，城墙下的人声还没有散。你先把昨夜救回的人数清点一遍，再去看账簿空出的地方。"]
+      ];
+      const found = byNeedle.find(([pattern]) => pattern.test(text));
+      if (found) return found[1];
+      return `雨停以后，你没有立刻离开。昨夜的选择还压在心口，你先把它放到灯下，慢慢看清它留下的痕迹。`;
     }
 
     function contextualChapterText(act, status) {
       if (act === 2) {
         const pathText = {
-          "天机营": `你在天机营住下的第二夜，雨把校场上的脚印冲得很浅。\n\n军册摊在案上，几处名字被墨线压住。外头有人敲门，说北墙巡灯少了一盏，巷口的挡箭木车还卡在泥里。\n\n${status}\n\n你还没认全营里的人。先看清眼前这几件事。`,
+          "天机营": `你在天机营住下的第二夜，雨把校场上的脚印冲得很浅。\n\n军册摊在案上，几处名字被墨线压住。外头有人敲门，说北墙巡灯少了一盏，巷口的旧木车还卡在泥里。\n\n${status}\n\n你还没认全营里的人。先看清眼前这几件事。`,
           "冰心堂": `你在药庐守到入夜，雨水顺着檐角滴进药碗里。\n\n后门有人压低咳声，炉边的药签还没写完，童子把一包冷针放在你面前。\n\n${status}\n\n你还没学会救所有人。先决定这一夜该先听谁的气息。`,
           "弈剑听雨阁": `雨亭外的石阶被水淹过一半。\n\n剑架上少了一枚旧穗，亭外有人把伞放下又离开。你听见雨声里夹着一声很轻的剑鸣。\n\n${status}\n\n你还不知道那柄剑属于谁。先别急着拔剑。`,
           "云麓仙居": `星灯被雨雾压得很低，窗外的云气一层层贴着檐角。\n\n书页里夹着一片湿羽，观星的人没有解释，只让你把灯芯再剪短些。\n\n${status}\n\n你还不知道天上的线要落到哪里。先守住眼前这盏灯。`,
           "太虚观": `镜室外的雨声很轻，轻得像有人在门后屏住呼吸。\n\n灰痕沿着镜脚慢慢散开。你看见自己的影子比你慢了半步，又很快贴了回来。\n\n${status}\n\n你还不确定镜里有什么。先别让它替你回答。`,
           "魍魉": `旧巷入夜以后，比白天更像一张合上的纸。\n\n夜牌贴着掌心发凉，巷口那盏灯灭了又亮。门闩响过一次，随后再没有人说话。\n\n${status}\n\n你还不认识递牌的人。先听清哪一道脚步离你最近。`,
           "翎羽山庄": `机关房的雨棚被打得发响，桌上的小机关鸟一跳一停。\n\n鸟腹里卡着一粒盐晶，齿轮却还在转。屋檐上有人影掠过去，很快被雨遮住。\n\n${status}\n\n你还不知道它想飞去哪里。先别弄断它的翅骨。`,
-          "荒火营地": `炉火被雨气压低，炭车停在棚外，车轮陷进泥里。\n\n有人把试锋石推到你脚边，又有人催你把挡箭木车推到巷口。火光照着每个人脸上的汗。\n\n${status}\n\n你还没弄懂这场火要烧向哪里。先把眼前这辆炭车推稳。`,
+          "荒火营地": `炉火被雨气压低，炭车停在棚外，车轮陷进泥里。\n\n有人把试锋石推到你脚边，又有人催你把旧木车推到巷口。火光照着每个人脸上的汗。\n\n${status}\n\n你还没弄懂这场火要烧向哪里。先把眼前这辆炭车推稳。`,
+          "幽都旧隙": `你没有进任何山门。雨里的雪味一路往北，最后停在城外一道旧裂前。\n\n裂口里没有人声，只有一盏灯在很远处亮着。风从地下吹上来，吹得掌心铜锈发冷。\n\n${status}\n\n你还不知道灯旁的人是谁。先别让这阵风把你带走。`,
           "游侠": `你没有拜入任何山门，只在城里借了一处落脚。\n\n雨夜里，渡口账簿被风吹开，街口有人找不到回家的路，城墙下还有孩子在哭。\n\n${status}\n\n你不属于任何门派，所以哪里有人喊，你都可以去。`
         };
         return pathText[state.path] || "";
       }
       if (act === 3) {
         const bridge = lastActionBridge();
+        const pathText = {
+          "天机营": "案上摊着军册、巡灯图和一片被雨泡软的缺页。校尉没有催你交代，只让你先把活人的名字圈出来。",
+          "冰心堂": "药庐里没有人高声说话。药签、冷针和那几次咳声都被摆到灯下，像在等你分清先后。",
+          "弈剑听雨阁": "雨亭没有开门，剑架却被擦得很亮。旧剑穗垂在墙边，像一条还没有落下的线。",
+          "云麓仙居": "星灯照着书页，白羽边缘泛着一点潮痕。观星的人站得很远，像怕自己的影子先碰到水镜。",
+          "太虚观": "镜室里只留一盏矮灯。灰痕、旧令和你的影子都在镜前，你一时分不清哪一个先碰到了镜面。",
+          "魍魉": "旧巷的门在身后合上。夜牌、旧令和刀鞘上的影子都很安静，安静得像在等你先犯错。",
+          "翎羽山庄": "机关房里仍有雨水滴落。机关鸟蜷着木翼，盐晶被放在旁边，细线绷得像一口忍住的气。",
+          "荒火营地": "圣火殿侧门还热着。火盆、炉灰和试锋石旁的灰纹被一一摆开，炉边女子没有解释，只把门关严。",
+          "幽都旧隙": "旧裂里的风一夜没有停。灯影、金灰和雪线上的脚印被你一一记下，却没有哪一样肯先解释自己。",
+          "游侠": "你把昨夜走过的地方在账簿上圈出来。渡口、城墙和巷口并不属于同一条路，却都有人等你回话。"
+        };
         const opening = bridge || "雨停以后，你终于有空坐下来，把昨夜看见的事从头理一遍。";
-        return `${opening}\n\n桌上没有多少东西，只有掌心那片铜锈，还有昨夜留下的一点痕迹。你把它们按在灯下，不急着替它们起名字。\n\n${status}\n\n你没有急着向任何人交代。先把来路理清，再决定下一步该问谁。`;
+        const local = pathText[state.path] || "桌上没有多少东西，只有掌心那片铜锈，还有昨夜留下的一点痕迹。";
+        return `${opening}\n\n${local}\n\n${status}\n\n你先不替任何人下结论。把眼前的痕迹理顺，再决定下一步该问谁。`;
       }
       if (act === 5) {
-        return `从雪线回来后，没有人再把雪线外的遭遇当成偶然。\n\n水镜被搬到厅中。灯影落在镜面上，映出的不是答案，而是每个人刚才避开过的停顿。\n\n${status}\n\n这一次，不是你独自追问命运。你只能先看谁愿意开口。`;
+        const pathText = {
+          "天机营": "从雪线回来后，军帐里的灯一直亮着。你没有资格坐到案前，只被校尉留在帐边，把伤号名册和巡灯图一页页递过去。",
+          "冰心堂": "从雪线回来后，药庐后堂没有开审，只有药账、脉案和几盏低灯。你站在药庐少年身后，替他压住被风掀起的纸角，听堂上长辈低声核对药名。",
+          "弈剑听雨阁": "从雪线回来后，雨亭剑客把剑鞘横在膝上。你坐在门槛外擦干鞋上的雪水，只能听见屋内有人把断剑穗放回案上。",
+          "云麓仙居": "从雪线回来后，观星的人把白羽压在潮湿的星图旁。你被安排去剪灯芯，只能从灯影里看星图的缺口慢慢对上潮声。",
+          "太虚观": "从雪线回来后，镜室里的人把水镜转向门外。你没有靠近镜面，只在帘外听见自己的影子比呼吸慢了一拍。",
+          "魍魉": "从雪线回来后，持刀的人没有进灯里。你被留在门边看住旧令，令牌背面仍旧朝下，像一句暂时不能说出口的话。",
+          "翎羽山庄": "从雪线回来后，机关鸟被放回长案。你蹲在桌脚替机关师托住木翼，盐晶在灯下泛出一点潮白。",
+          "荒火营地": "从雪线回来后，炉边女子把火盆移到圣火殿侧门。你只负责添炭，火光照着试锋石旁的灰纹，像一根绷紧的弦。",
+          "幽都旧隙": "从雪线回来后，那盏灯被挂在旧裂旁。你站在灯外，看见不融的金灰一点点落回雪里。",
+          "游侠": "从雪线回来后，你把渡口账簿和城门名册送到临时搭起的棚下。棚里的人未必认识你，但他们终于愿意先弄清少了谁。"
+        };
+        const local = pathText[state.path] || "从雪线回来后，没有人再把雪线外的遭遇当成偶然。";
+        return `${local}\n\n这里不是定罪的地方，也没有谁能一眼看完整件事。每条路都只照见自己亲手摸过的那一小段：一页名册、一张药签、一截剑穗、一枚令牌，或者一盏没有熄掉的灯。\n\n${status}\n\n你还不能替任何人下结论。先听眼前这条线上的人怎么把话说完整。`;
       }
       if (act === 6) {
-        return `水镜没有给出答案，只把一线冷光投向北方。\n\n太古铜门前没有风。你听见身后有人压低呼吸，也有人把手按在兵刃、灯柄或药箱上。铜门上的锈痕一点点发热。\n\n你仍然不知道铜门后会有什么。可你知道，退回去的人也会被它追上。`;
+        const pathText = {
+          "天机营": "议事散去以后，校尉没有让你进内帐，只把一卷重新缝好的军册交到你手里。你要做的不是定策，而是把它送到北墙。",
+          "冰心堂": "药账合上以后，清时把最后一页压进怀里。屋外有人催促启程，他却先让你帮忙把病榻旁的灯一盏盏添满。",
+          "弈剑听雨阁": "剑鞘上的雪水干了，青阳仍没有拔剑。他从屋檐下经过，只问你愿不愿替他把一封没有署名的信送到亭外。",
+          "云麓仙居": "星图被卷起时，莫非云把白羽留在掌心。你被叫去扶住摇晃的星灯，灯芯偏向北方，却还没有人说要出发。",
+          "太虚观": "镜影退到你身侧，没有再替你回答。你被留下擦净镜脚旁的灰，镜面里那道冷光才慢慢变得可辨。",
+          "魍魉": "夜哭把旧令收回袖中，刀柄仍旧朝下。他没有邀你入局，只让你替他看一眼巷口还剩几盏灯。",
+          "翎羽山庄": "遗墨重新扣好机关鸟的腹匣。木翼微微一振，先指向风小的地方，再指向北方；你只负责扶住窗，免得它刚起飞就折翼。",
+          "荒火营地": "炉边女子把火盆压低，圣火里那一点弦音反而更清楚。她没有让你碰刀，只让你记住这段声音不是催人焚门的鼓声。",
+          "幽都旧隙": "点灯人把灯放在雪线边缘，没有让它照进幽都深处。你仍站在灯外，只被允许替后来的人把雪踩实。",
+          "游侠": "账簿合上以后，你先数同行的人。北方的冷光就在远处，但队伍里仍有人走得很慢，你能做的只是别把他们落下。"
+        };
+        const local = pathText[state.path] || "水镜前的沉默散去以后，许多人没有立刻离开。";
+        return `${local}\n\n门派长辈仍在内堂争论铜门该不该开，争论声被门板压得很低。你没有资格插话，只能在外廊听见几个名字被反复提起。\n\n${status}\n\n太古铜门还在北方等着。可在真正动身之前，你可以先把眼前的人照顾好，也可以选择跟谁多走一段。`;
       }
       return "";
     }
@@ -1099,7 +1519,7 @@
           if (!state.rootBone) return [rerollChoice];
           choices.unshift(rerollChoice);
         }
-        return [...choices, ...ambientCharacterChoices()];
+        return choices;
       }
       return [];
     }
@@ -1183,7 +1603,7 @@
 
     const sceneTitle = document.querySelector("#scene-title");
     const sceneText = document.querySelector("#scene-text");
-    const sceneSketch = document.querySelector("#scene-sketch");
+    const sceneFrame = document.querySelector("#scene-sketch");
     const choices = document.querySelector("#choices");
     const appTitle = document.querySelector("h1");
     const subtitle = document.querySelector(".subtitle");
@@ -1501,7 +1921,14 @@
         medicineEnding: { memory: 3, fragments: 0, virtue: 14, label: "灯下的药账" },
         shadowEnding: { memory: 3, fragments: 1, virtue: 6, label: "影子停住了" },
         wandererEnding: { memory: 3, fragments: 0, virtue: 16, label: "渡口天亮" },
-        lampEnding: { memory: 4, fragments: 1, virtue: 12, label: "雪里还亮着灯" }
+        lampEnding: { memory: 4, fragments: 1, virtue: 12, label: "雪里还亮着灯" },
+        changqinEnding: { memory: 4, fragments: 1, virtue: 14, label: "乐风未熄" },
+        qiyeEnding: { memory: 4, fragments: 1, virtue: 12, label: "北墙未破" },
+        xuanhuiEnding: { memory: 4, fragments: 1, virtue: 12, label: "金灯照回人间" },
+        qingyangEnding: { memory: 3, fragments: 0, virtue: 10, label: "雨声绕过铜门" },
+        mofeiyunEnding: { memory: 3, fragments: 1, virtue: 8, label: "白羽入潮" },
+        eastSeaSecretEnding: { memory: 5, fragments: 2, virtue: 12, label: "潮外仍有门" },
+        rustWitnessEnding: { memory: 4, fragments: 1, virtue: 10, label: "锈痕留在石阶" }
       };
       return rewards[sceneKey] || { memory: 1, fragments: 0, virtue: 0, label: "一世终了" };
     }
@@ -1513,7 +1940,8 @@
       const currentNames = state.currentNames || {};
       const verdicts = [
         currentNames.xuanhui && state.xuanhuiBond >= 5 ? "判词：你没有把点灯的人当作法器。那一点金色余烬，因此仍愿照向人间。" : "",
-        currentRelics.swordTassel && state.swordHeart >= 5 ? "判词：你接过黄泉与碧落之间的一剑，却没有把人间斩成通路。" : "",
+        currentNames.wuguan && state.qiyeTrace >= 5 ? "判词：七夜不是传说里的恶名，也不是旧卷里一个孤零零的名字。你看见军令会压向哪里，也把活人的退路守在那里。" : "",
+        currentRelics.swordTassel && state.swordHeart >= 5 ? "判词：你接过那柄始终没有出鞘的剑，也记住了有些路不必用人间来偿还。" : "",
         currentRelics.swordTassel && state.qingyangTrace >= 4 ? "判词：断剑的旧痕已入识海。海风、雪线与幽影之间，还有一笔旧账等你来问。" : "",
         currentRelics.whiteFeather && state.moFeiyunProof >= 3 ? "判词：白羽没有被风吹走。镜中旧案终有一世会被摆上明堂。" : "",
         currentRelics.drugSign && state.iceLedger >= 3 ? "判词：药账里的活人不再只是数字。你记住了他们真正的死期。" : "",
@@ -1521,6 +1949,7 @@
         currentRelics.ferryLedger && state.foxBond >= 3 ? "判词：狐火曾为陌生人停步。车辕上的书生离懂得人间又近了一寸。" : "",
         currentRelics.machineBird && state.inkContract >= 3 ? "判词：机关鸟飞过战火，带回来的不止盐晶，还有愿意担责的人心。" : "",
         currentRelics.trialStone && state.fireOath >= 3 ? "判词：荒火没有烧穿底线。炉边的人记住了你先撤凡人再破铜门的顺序。" : "",
+        currentRelics.changqinTone && state.changqinEcho >= 3 ? "判词：圣火没有替仇恨开路。那一缕乐风记住了人间仍有人传火，而非只会纵火。" : "",
         currentRelics.ferryLedger && state.wandererCred >= 4 ? "判词：你没有拜入任何山门，却替许多门派补上了他们没能看见的人间。" : ""
       ].filter(Boolean);
       const conduct = state.virtue >= 70
@@ -1532,12 +1961,14 @@
         ? "有些旧债没有散，来世会先敲你的门。"
         : "有些风声会跟着你，等下一次睁眼时再响起。";
       const endingVerdict = {
-        medicineEnding: "此世判词：你没有急着追铜门后的光，而是先把灯留给病榻旁的人。药账补完时，命运少漏了一行。",
+        medicineEnding: "此世判词：你没有急着追铜门后的光，而是先把灯留给病榻旁的人。药账补完时，少漏了一个本该被喊回来的名字。",
         shadowEnding: "此世判词：你没有把影子当成天生的恶。旧令放在铜门前，那些被划掉的名字终于有了回声。",
         wandererEnding: "此世判词：你没有拜入山门，却把门外的人一批批送过长路。人间欠你的不是仙名，是一盏还亮着的灯。",
         lampEnding: "此世判词：你把雪里的灯还给等待的人。铜门后的光退了一寸，回城的路便多亮了一寸。",
+        changqinEnding: "此世判词：你没有借神火焚门，只把乐风留在人间。祝融旧焰照见的不是复仇，是守夜的人。",
+        qiyeEnding: "此世判词：北墙没有破。你没有照着武观的军令往前冲，只把它改成一城人的退路。",
         trueAscend: "此世判词：你回头看见了人间，所以天光没有把你带远。",
-        breakWheel: "此世判词：铜锈发热，轮回松动。你没有赢过命运，只是让它第一次停下来听人说话。",
+        breakWheel: "此世判词：铜锈发热，轮回松动。你没有替所有人开门，只是让门前的人第一次停下来听人说话。",
         sacrifice: "此世判词：剑没有出鞘，铜门却停了一息。有些胜利不在门后，而在风没有吹进城里。",
         falseAscend: "此世判词：你独自走进太亮的光里。它像飞升，也像另一种失明。",
         death: "此世判词：你退后一步，把人先带走。太古铜门仍在北方雪线外，但这一夜不是所有灯都灭了。",
@@ -1579,7 +2010,7 @@
       return baseText;
     }
 
-    function artworkForState(scene) {
+    function currentArtwork(scene) {
       const imagePools = {
         birth: ["assets/xiling-ruins.webp", "assets/fox-road.webp", "assets/leize-shadow.webp"],
         afterBreak: [
@@ -1596,22 +2027,100 @@
         sacrifice: ["assets/copper-gate.webp", "assets/tribulation.webp"],
         falseAscend: ["assets/copper-gate.webp", "assets/heart-trial.webp"],
         death: ["assets/xiling-ruins.webp", "assets/beiming-road.webp", "assets/hell-rebirth.webp"],
-        hell: ["assets/hell-rebirth.webp", "assets/cold-shadow.webp"]
+        hell: ["assets/hell-rebirth.webp", "assets/cold-shadow.webp"],
+        eastSeaSecretEnding: ["assets/east-sea-godrealm.webp", "assets/east-sea-tide-palace.webp"],
+        rustWitnessEnding: ["assets/bronze-gate-v2.webp", "assets/copper-gate.webp"]
       };
       const configuredArtPools = storyConfig.artPools || {};
+      const maxChapterArt = Math.max(1, (storyConfig.chapters || []).length - 1);
       const stageArtKeys = {
-        afterBreak: `afterBreak:${Math.min(Math.max(state.act || 1, 1), 6)}`,
+        afterBreak: `afterBreak:${Math.min(Math.max(state.act || 1, 1), maxChapterArt)}`,
         breakWheel: state.path === "游侠" ? "breakWheel:wanderer" : "breakWheel"
       };
       const routeKey = state.scene === "afterBreak" && state.path === "游侠" && state.act >= 4
         ? "afterBreak:wanderer"
         : "";
       const artKey = routeKey || stageArtKeys[state.scene] || state.scene;
+      const routeStageArt = {
+        "天机营": {
+          2: ["assets/tianji-north-wall-command.webp", "assets/rain-three-paths.webp"],
+          3: ["assets/tianji-shangxie-registry.webp", "assets/relic-table.webp"],
+          4: ["assets/beiming-road.webp", "assets/snow-lamp-return.webp", "assets/tianji-north-wall-command.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/tianji-shangxie-registry.webp"],
+          6: ["assets/companions-pact.webp", "assets/tianji-shangxie-registry.webp", "assets/bronze-gate-v2.webp"]
+        },
+        "冰心堂": {
+          2: ["assets/iceheart-hall.webp", "assets/medicine-ledger-night.webp"],
+          3: ["assets/medicine-ledger-night.webp", "assets/relic-table.webp"],
+          4: ["assets/rain-three-paths.webp", "assets/beiming-road.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/medicine-ledger-night.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp"]
+        },
+        "弈剑听雨阁": {
+          2: ["assets/rain-three-paths.webp", "assets/yijian-rain-pavilion.webp"],
+          3: ["assets/relic-table.webp", "assets/copper-gate.webp"],
+          4: ["assets/beiming-road.webp", "assets/snow-lamp-return.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/yijian-rain-pavilion.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/copper-gate.webp"]
+        },
+        "云麓仙居": {
+          2: ["assets/rain-three-paths.webp", "assets/east-sea-tide-palace.webp"],
+          3: ["assets/east-sea-tide-palace.webp", "assets/relic-table.webp"],
+          4: ["assets/east-sea-godrealm.webp", "assets/beiming-road.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/east-sea-tide-palace.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/east-sea-godrealm.webp"]
+        },
+        "太虚观": {
+          2: ["assets/rain-three-paths.webp", "assets/shadow-token-door.webp"],
+          3: ["assets/shadow-token-door.webp", "assets/cold-shadow.webp"],
+          4: ["assets/beiming-road.webp", "assets/cold-shadow.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/cold-shadow.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/shadow-token-door.webp"]
+        },
+        "魍魉": {
+          2: ["assets/shadow-token-door.webp", "assets/rain-three-paths.webp"],
+          3: ["assets/shadow-token-door.webp", "assets/cold-shadow.webp", "assets/relic-table.webp"],
+          4: ["assets/beiming-road.webp", "assets/cold-shadow.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/shadow-token-door.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/shadow-token-door.webp"]
+        },
+        "翎羽山庄": {
+          2: ["assets/rain-three-paths.webp", "assets/lingyu-mechanic-rooftop.webp"],
+          3: ["assets/relic-table.webp", "assets/east-sea-tide-palace.webp"],
+          4: ["assets/beiming-road.webp", "assets/snow-lamp-return.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/lingyu-mechanic-rooftop.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp"]
+        },
+        "荒火营地": {
+          2: ["assets/rain-three-paths.webp", "assets/changqin-fire-temple.webp"],
+          3: ["assets/relic-table.webp", "assets/changqin-fire-temple.webp"],
+          4: ["assets/changqin-fire-temple.webp", "assets/tribulation.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/changqin-fire-temple.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/changqin-fire-temple.webp"]
+        },
+        "幽都旧隙": {
+          2: ["assets/rain-three-paths.webp", "assets/beiming-road.webp"],
+          3: ["assets/relic-table.webp", "assets/shadow-token-door.webp"],
+          4: ["assets/beiming-road.webp", "assets/xuanhui-beiming.webp", "assets/snow-lamp-return.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/xuanhui-beiming.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/snow-lamp-return.webp"]
+        },
+        "游侠": {
+          2: ["assets/rain-three-paths.webp", "assets/wanderer-ferry.webp"],
+          3: ["assets/relic-table.webp", "assets/wanderer-ferry.webp"],
+          4: ["assets/wanderer-ferry.webp", "assets/fox-road.webp", "assets/ferry-dawn-crowd.webp"],
+          5: ["assets/water-mirror-council.webp", "assets/ferry-dawn-crowd.webp"],
+          6: ["assets/companions-pact.webp", "assets/bronze-gate-v2.webp", "assets/ferry-dawn-crowd.webp"]
+        }
+      };
+      const routePool = state.scene === "afterBreak" && state.path
+        ? routeStageArt[state.path]?.[state.act || 1]
+        : null;
       const rawPool = configuredArtPools[artKey]
         || configuredArtPools[state.scene]
         || imagePools[state.scene]
         || ["assets/xiling-ruins.webp"];
-      const pool = rawPool.filter(src => /^assets\/[-a-z0-9]+\.webp$/i.test(src));
+      const pool = (routePool || rawPool).filter(src => /^assets\/[-a-z0-9]+\.webp$/i.test(src));
       if (!pool.length) pool.push("assets/xiling-ruins.webp");
       const src = pool[seededRank(`${artKey}:${state.origin}:${state.path}`, "art") % pool.length];
       const positions = ["center center", "center top", "center 38%", "center 58%", "left center", "right center"];
@@ -1621,23 +2130,256 @@
         : state.scene === "death" || state.scene === "sacrifice" || state.scene === "lampEnding"
           ? "contrast(1.06) saturate(0.88) hue-rotate(10deg)"
           : "contrast(1.04) saturate(0.98)";
-      return `<div class="art-frame"><img src="${src}" alt="${textOf(scene.title)}" style="filter:${filter}; object-position:${position};"></div>`;
+      return { src, position, filter, alt: textOf(scene.title) };
+    }
+
+    function artworkForState(scene) {
+      const art = currentArtwork(scene);
+      return `<div class="art-frame"><img src="${art.src}" alt="${art.alt}" style="filter:${art.filter}; object-position:${art.position};"></div>`;
+    }
+
+    function inferSpeaker(scene) {
+      return ui("narrator");
+    }
+
+    function characterEntries() {
+      const configured = storyConfig.characters || {};
+      return Object.entries(configured).map(([key, character]) => ({
+        key,
+        name: character.name || key,
+        aliases: [character.name || key, ...(character.aliases || [])].filter(Boolean),
+        portraitClass: character.portraitClass || key,
+        position: character.position || "right",
+        tone: character.tone || "neutral"
+      }));
+    }
+
+    const trueNameRules = {
+      "玄晖": { key: "xuanhui", publicName: "点灯人" },
+      "东皇太一": { key: "xuanhui", publicName: "点灯人" },
+      "武观": { key: "wuguan", publicName: "七夜" },
+      "青阳": { key: "qingyang", publicName: "雨亭剑客" },
+      "青阳少昊": { key: "qingyang", publicName: "雨亭剑客" },
+      "莫非云": { key: "moFeiyun", publicName: "观星者" },
+      "清时": { key: "qingshi", publicName: "药庐少年" },
+      "遗墨": { key: "yimo", publicName: "机关师" },
+      "夜哭": { key: "yeku", publicName: "递牌人" },
+      "太子长琴": { key: "changqin", publicName: "火中琴声" },
+      "长琴": { key: "changqin", publicName: "火中琴声" }
+    };
+
+    const portraitImages = {
+      narrator: "assets/avatar-narrator.webp",
+      player: "assets/avatar-player.webp",
+      tianji_guard: "assets/avatar-tianji-guard.webp",
+      ice_boy: "assets/avatar-ice-boy.webp",
+      sword_guest: "assets/avatar-sword-guest.webp",
+      star_watcher: "assets/avatar-star-watcher.webp",
+      mirror_shadow: "assets/avatar-mirror-shadow.webp",
+      shadow_blade: "assets/avatar-shadow-blade.webp",
+      feather_mechanic: "assets/avatar-feather-mechanic.webp",
+      fire_woman: "assets/avatar-fire-woman.webp",
+      ferry_scholar: "assets/avatar-ferry-scholar.webp",
+      old_boatman: "assets/avatar-old-boatman.webp",
+      lamp_keeper: "assets/avatar-lamp-keeper.webp",
+      child: "assets/avatar-child.webp",
+      changqin_echo: "assets/avatar-changqin-echo.webp",
+      qiye_commander: "assets/avatar-qiye-commander.webp"
+    };
+
+    function portraitSource(character, art) {
+      if (!character || character.position === "hidden") return "";
+      const src = portraitImages[character.key];
+      if (!src) return "";
+      return src;
+    }
+
+    function displayCharacter(character, spokenName) {
+      const name = String(spokenName || "").trim();
+      const rule = trueNameRules[name];
+      if (!rule) return character;
+      if ((state.currentNames || {})[rule.key]) return { ...character, name };
+      return { ...character, name: rule.publicName };
+    }
+
+    function resolveCharacter(speaker) {
+      const name = String(speaker || "").trim();
+      const entries = characterEntries();
+      const exact = entries.find(character => character.aliases.includes(name) || character.key === name);
+      if (exact) return displayCharacter(exact, name);
+      const fuzzy = entries.find(character => character.aliases.some(alias => alias && (name.includes(alias) || alias.includes(name))));
+      if (fuzzy) return displayCharacter(fuzzy, name);
+      if (!name || name === ui("narrator")) {
+        return {
+          key: "narrator",
+          name: ui("narrator"),
+          aliases: [ui("narrator")],
+          portraitClass: "narrator",
+          position: "hidden",
+          tone: "neutral"
+        };
+      }
+      return {
+        key: "unknown",
+        name,
+        aliases: [name],
+        portraitClass: "unknown",
+        position: "hidden",
+        tone: "neutral"
+      };
+    }
+
+    function parseVisualParagraph(raw, fallbackSpeaker) {
+      const text = String(raw || "").trim();
+      const match = text.match(/^([^：:\n]{1,14})[：:]\s*([\s\S]+)$/);
+      if (match && !/[，。？！、]/.test(match[1])) {
+        const character = resolveCharacter(match[1].trim());
+        return {
+          speaker: character.name,
+          character,
+          text: match[2].trim()
+        };
+      }
+      const character = resolveCharacter(fallbackSpeaker);
+      return { speaker: character.name, character, text };
+    }
+
+    function splitVisualLines(scene, baseText, summary) {
+      const cleaned = String(baseText || "")
+        .replace(/\{\{status\}\}/g, "")
+        .split(/\n{2,}/)
+        .map(part => part.trim())
+        .filter(Boolean);
+      const entry = state.lastActionLog && state.turn > 0
+        ? String(state.lastActionLog).split(/\n{2,}/).map(part => part.trim()).filter(Boolean)
+        : [];
+      const birthRollJustHappened = state.scene === "birth"
+        && state.turn > 0
+        && entry.length
+        && ["rootBone", "mind", "luck", "debt"].some(key => Number(state[key] || 0) > 0);
+      const baseParts = birthRollJustHappened
+        ? []
+        : (cleaned.length ? cleaned : [String(baseText || "").trim()].filter(Boolean));
+      const parts = [...entry, ...baseParts];
+      const speaker = inferSpeaker(scene);
+      const lines = parts.map((text, index) => {
+        const isEntryLine = index < entry.length;
+        const fallbackSpeaker = isEntryLine ? ui("narrator") : speaker;
+        return parseVisualParagraph(text, fallbackSpeaker);
+      });
+      if (summary) lines.push({ speaker: ui("narrator"), text: summary, summary: true });
+      return lines.length ? lines : [{ speaker: ui("narrator"), text: "" }];
+    }
+
+    function visualSceneKey(scene) {
+      return [
+        state.scene,
+        state.act || 0,
+        state.turn || 0,
+        state.life || 1,
+        state.path || "",
+        textOf(scene.title)
+      ].join("|");
+    }
+
+    function resetVisualProgress() {
+      visualState.sceneKey = "";
+      visualState.lineIndex = 0;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
     }
 
     function sceneChoiceList(scene) {
       return typeof scene.choices === "function" ? scene.choices() : (scene.choices || []);
     }
 
+    function quietFallbackChoices(act) {
+      const byAct = {
+        2: [
+          {
+            text: "先把眼前这件事做完",
+            log: "你没有急着追问远处的风声，只把眼前能做的事先做稳。"
+          },
+          {
+            text: "记住今夜最反常的一处",
+            log: "你把今夜最反常的一处记在心里。它暂时说不清来历，却足够让你下一次少走一步错路。",
+            effects: { memory: 1 }
+          }
+        ],
+        3: [
+          {
+            text: "把来路重新理一遍",
+            log: "你把来路重新理了一遍。没弄清的地方仍旧没弄清，但哪些话不能轻信，已经比昨夜清楚。"
+          },
+          {
+            text: "先不把手里的东西交出去",
+            log: "你把手里的东西收好。有人想立刻拿走它，可你至少要先知道它为什么会落到自己手里。",
+            effects: { memory: 1, karma: 1 }
+          }
+        ],
+        4: [
+          {
+            text: "沿着能回头的地方走",
+            log: "风雪很重，你没有把所有人都推向更深处。先找到能回头的路，也是一种前行。",
+            effects: { virtue: 4, years: -1 }
+          },
+          {
+            text: "在雪线边多停一刻",
+            log: "你在雪线边多停了一刻。远处的灯没有靠近，但脚下的雪声终于变得清楚。",
+            effects: { memory: 1 }
+          }
+        ],
+        5: [
+          {
+            text: "先听完席间的沉默",
+            log: "你没有抢先开口。沉默在席间转了一圈，许多人的眼神反而比话更诚实。",
+            effects: { virtue: 3 }
+          },
+          {
+            text: "只问自己亲眼见过的事",
+            log: "你没有替任何传闻作证，只问自己亲眼见过的事。有人不满，也有人因此松了一口气。",
+            effects: { memory: 1 }
+          }
+        ]
+      };
+      return (byAct[act] || []).map((item, index) => ({
+        text: item.text,
+        to: "afterBreak",
+        always: true,
+        effect: s => {
+          Object.entries(item.effects || {}).forEach(([key, value]) => {
+            if (typeof s[key] === "number" && typeof value === "number") {
+              s[key] += key === "years" ? scaledYearDelta(value, s.actionAct ?? s.act ?? 0) : value;
+            }
+          });
+          s.log = item.log;
+          markCurrentKnowledge(s, item);
+        }
+      }));
+    }
+
     function availableChoices(scene) {
       const base = sceneChoiceList(scene).filter(choice => !choice.requires || choice.requires(state));
+      if (state.scene === "afterBreak" && !scene.ending && base.length > 0 && base.length < 2) {
+        quietFallbackChoices(state.act || 0).forEach(choice => {
+          if (!choice.once || !state.flags[choice.once]) base.push(choice);
+        });
+      }
       if (!base.length && !scene.ending) {
         return [{
           text: state.scene === "afterBreak" ? "先回人群里再听一夜" : "暂且退开，等风声过去",
           to: "afterBreak",
           always: true,
-          advanceAct: false,
           effect: s => {
-            s.years -= 1;
+            s.years += scaledYearDelta(-1, s.actionAct ?? s.act ?? 0);
             s.memory += 1;
             s.virtue += 2;
             s.log = state.scene === "afterBreak"
@@ -1694,6 +2436,7 @@ function rebirth(choice) {
       state.echoes = echoFromLife(old);
       state.currentRelics = {};
       state.currentNames = {};
+      state.currentPeople = {};
       state.virtue = Math.max(20, 50 + (bonus.virtue || 0) - (choice.hell ? 12 : 0));
       state.karma = choice.hell ? 15 : 0;
       state.log = choice.hell
@@ -1710,6 +2453,7 @@ function rebirth(choice) {
 
     function choose(choice) {
       audio.play("click");
+      resetVisualProgress();
       track("choice", {
         text: choice.text,
         to: choice.to || "",
@@ -1733,7 +2477,9 @@ function rebirth(choice) {
       if (choice.advanceAct !== false) state.act = Math.min(configuredMaxAct, (state.act || 0) + 1);
       const currentScene = state.scene;
       const intendedScene = choice.to;
+      state.actionAct = actionAct;
       if (choice.effect) choice.effect(state);
+      delete state.actionAct;
       state.lastActionText = choice.text || "";
       state.lastActionLog = state.log || "";
       state.lastActionAct = actionAct;
@@ -1769,7 +2515,7 @@ function rebirth(choice) {
       document.title = ui("title");
       if (appTitle) appTitle.textContent = ui("title");
       if (subtitle) subtitle.textContent = ui("subtitle");
-      if (sceneSketch && sceneSketch.setAttribute) sceneSketch.setAttribute("aria-label", ui("artLabel"));
+      if (sceneFrame && sceneFrame.setAttribute) sceneFrame.setAttribute("aria-label", ui("artLabel"));
       if (document.querySelectorAll) document.querySelectorAll("[data-i18n]").forEach(node => {
         node.textContent = ui(node.dataset.i18n);
       });
@@ -1804,33 +2550,75 @@ function rebirth(choice) {
         state.scene = "birth";
         state.log = "轮回出现裂隙，但你稳住了识海，重新回到山脚。";
       }
+      const key = visualSceneKey(scene);
+      if (visualState.sceneKey !== key) {
+        visualState.sceneKey = key;
+        visualState.lineIndex = 0;
+      }
       sceneTitle.textContent = translateText(textOf(scene.title));
       sceneTitle.className = scene.ending ? "ending" : "";
-      sceneText.textContent = translateText(variedSceneText(scene, textOf(scene.text)));
       const summary = endingSummary(scene);
-      if (summary) {
-        sceneText.innerHTML = "";
-        sceneText.append(document.createTextNode(translateText(variedSceneText(scene, textOf(scene.text)))));
-        const summaryBox = document.createElement("div");
-        summaryBox.className = "life-summary";
-        summaryBox.textContent = translateText(summary);
-        sceneText.append(summaryBox);
+      const baseText = variedSceneText(scene, textOf(scene.text));
+      const visualLines = splitVisualLines(scene, baseText, summary);
+      visualState.lineIndex = Math.min(visualState.lineIndex, Math.max(0, visualLines.length - 1));
+      const currentLine = visualLines[visualState.lineIndex] || visualLines[0];
+      const allLinesSeen = visualState.lineIndex >= visualLines.length - 1;
+      sceneText.textContent = translateText(currentLine.text || baseText || textOf(scene.text));
+      if (sceneFrame) {
+        const art = currentArtwork(scene);
+        const character = currentLine.character || resolveCharacter(currentLine.speaker);
+        const portraitSrc = portraitSource(character, art);
+        const showPortrait = Boolean(portraitSrc) && character.position !== "hidden";
+        const portraitClasses = [
+          "vn-portrait",
+          showPortrait ? "has-image" : "",
+          `char-${character.portraitClass || character.key || "unknown"}`,
+          `tone-${character.tone || "neutral"}`,
+          showPortrait && character.position === "left" ? "pos-left" : "",
+          showPortrait ? "" : "is-hidden"
+        ].filter(Boolean).join(" ");
+        const portraitStyle = portraitSrc
+          ? ` style="background-image:url('${escapeHtml(portraitSrc)}');"`
+          : "";
+        const speakerText = translateText(currentLine.speaker || ui("narrator"));
+        const lineText = translateText(currentLine.text || "");
+        sceneFrame.innerHTML = `
+          <img src="${escapeHtml(art.src)}" alt="${escapeHtml(art.alt)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${escapeHtml(art.position)};filter:${escapeHtml(art.filter)};opacity:0;pointer-events:none;">
+          <div class="vn-bg" style="background-image:url('${escapeHtml(art.src)}');background-position:${escapeHtml(art.position)};filter:${escapeHtml(art.filter)};"></div>
+          <div class="vn-shade"></div>
+          <div class="${escapeHtml(portraitClasses)}"${portraitStyle} aria-hidden="true"></div>
+          <div class="vn-dialogue${showPortrait ? " has-portrait" : ""}">
+            <div class="vn-speaker">${escapeHtml(speakerText)}</div>
+            <div class="vn-text${currentLine.summary ? " vn-summary" : ""}">${escapeHtml(lineText)}</div>
+          </div>
+        `;
       }
-      if (sceneSketch) sceneSketch.innerHTML = artworkForState(scene);
       audio.updateMusicMode();
 
       choices.innerHTML = "";
-      availableChoices({ ...scene, choices: endingChoices(scene) }).forEach(choice => {
-        if (choice.once && state.flags[choice.once]) return;
+      if (!allLinesSeen) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = translateText(choice.text);
+        button.textContent = ui("continue");
         button.addEventListener("click", () => {
           audio.ensureStarted();
-          choose(choice);
+          visualState.lineIndex = Math.min(visualState.lineIndex + 1, visualLines.length - 1);
+          render();
         });
         choices.appendChild(button);
-      });
+      } else {
+        availableChoices({ ...scene, choices: endingChoices(scene) }).forEach(choice => {
+          if (choice.once && state.flags[choice.once]) return;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = translateText(choice.text);
+          button.addEventListener("click", () => {
+            audio.ensureStarted();
+            choose(choice);
+          });
+          choices.appendChild(button);
+        });
+      }
 
       life.textContent = ui("life")(state.life);
       origin.textContent = translateValue(state.origin || ui("unknown"));

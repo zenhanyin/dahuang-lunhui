@@ -2,39 +2,51 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const dist = path.join(root, "dist");
+const dist = process.env.DAHUANG_BUILD_STAGING || path.join(root, "dist");
 const assetDir = path.join(root, "assets");
 const distAssetDir = path.join(dist, "assets");
 const hostingSource = path.join(root, ".openai", "hosting.json");
 const hostingDest = path.join(dist, ".openai", "hosting.json");
 
-fs.rmSync(dist, { recursive: true, force: true });
+fs.mkdirSync(dist, { recursive: true });
 fs.mkdirSync(path.join(dist, "server"), { recursive: true });
 fs.mkdirSync(distAssetDir, { recursive: true });
 fs.mkdirSync(path.dirname(hostingDest), { recursive: true });
 
+function isSamePath(left, right) {
+  return path.resolve(left).toLowerCase() === path.resolve(right).toLowerCase();
+}
+
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const html = sourceHtml;
+if (!isSamePath(dist, root)) {
+  fs.writeFileSync(path.join(dist, "index.html"), html, "utf8");
+  fs.writeFileSync(path.join(dist, "text-adventure.html"), html, "utf8");
+}
+if (!isSamePath(hostingSource, hostingDest)) {
+  fs.copyFileSync(hostingSource, hostingDest);
+}
+
 const storyConfig = fs.readFileSync(path.join(root, "story-config.js"), "utf8");
 const storyJson = storyConfig
   .replace(/^\s*window\.DAHUANG_STORY_CONFIG\s*=\s*/, "")
   .replace(/;\s*$/, "");
 JSON.parse(storyJson);
 const packedStory = Buffer.from(storyJson, "utf8").toString("base64");
-const storyLoader = `<script>(()=>{const b="${packedStory}";const raw=atob(b);const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));window.DAHUANG_STORY_CONFIG=JSON.parse(new TextDecoder().decode(bytes));})();</script>`;
-const html = sourceHtml.replace('<script src="story-config.js"></script>', storyLoader);
-fs.writeFileSync(path.join(dist, "index.html"), html, "utf8");
-fs.writeFileSync(path.join(dist, "text-adventure.html"), html, "utf8");
-fs.copyFileSync(hostingSource, hostingDest);
+const storyLoader = `(()=>{const b="${packedStory}";const raw=atob(b);const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));window.DAHUANG_STORY_CONFIG=JSON.parse(new TextDecoder().decode(bytes));})();`;
 
 const imageAssets = {};
 for (const file of fs.readdirSync(assetDir).filter(file => /\.(webp|png)$/i.test(file))) {
   const source = path.join(assetDir, file);
-  fs.copyFileSync(source, path.join(distAssetDir, file));
+  const destination = path.join(distAssetDir, file);
+  if (!isSamePath(source, destination)) {
+    fs.copyFileSync(source, destination);
+  }
   imageAssets[`/assets/${file}`] = fs.readFileSync(source).toString("base64");
 }
 
 const worker = `const gameHtml = ${JSON.stringify(html)};
-const textAssets = {};
+const textAssets = ${JSON.stringify({ "/story-config.js": storyLoader })};
 const imageAssets = ${JSON.stringify(imageAssets)};
 const statsKey = "dh-7m4q-20260713";
 
@@ -170,6 +182,72 @@ function targetLanguage(lang) {
   return "";
 }
 
+const translationGlossary = {
+  en: [
+    ["大荒轮回录", "Dahuang: Wheel of Rebirth"], ["大荒", "Dahuang"], ["大荒诸门", "Dahuang sects"],
+    ["天机营", "Tianji Camp"], ["冰心堂", "Bingxin Hall"], ["弈剑听雨阁", "Yijian Rain Pavilion"],
+    ["云麓仙居", "Yunlu Hermitage"], ["太虚观", "Taixu Temple"], ["翎羽山庄", "Lingyu Manor"],
+    ["荒火营地", "Wildfire Camp"], ["魍魉", "Wangliang"], ["游侠", "wanderer"],
+    ["幽都", "Youdu"], ["东海神域", "East Sea Divine Realm"], ["神界", "divine realm"],
+    ["人间", "mortal world"], ["太古铜门", "ancient bronze gate"], ["铜门", "bronze gate"],
+    ["铜锈", "copper rust"], ["浅水盘", "shallow water basin"], ["旧令", "old token"],
+    ["机关鸟", "mechanical bird"], ["白羽", "white feather"], ["盐晶", "salt crystal"],
+    ["药签", "medicine slip"], ["药账", "medicine ledger"], ["脉案", "pulse record"],
+    ["药灯", "medicine lantern"], ["药庐", "medicine hut"], ["军册", "military register"],
+    ["玄晖", "Xuanhui"], ["东皇太一", "Donghuang Taiyi"], ["金乌", "Golden Crow"],
+    ["青阳", "Qingyang"], ["少昊", "Shaohao"], ["莫非云", "Mo Feiyun"], ["清时", "Qingshi"],
+    ["海寂", "Sea-Silence"], ["太子长琴", "Prince Changqin"], ["七夜", "Qiye"], ["武观", "Wuguan"],
+    ["夜哭", "Yeku"], ["观星者", "star watcher"], ["雨亭剑客", "Rain Pavilion swordsman"],
+    ["避群人", "reclusive healer"], ["炉边女子", "hearth-side woman"], ["雪线", "snowline"],
+    ["北溟雪线", "Northern Sea snowline"], ["朔方", "Shuofang"], ["上邪", "Shangxie"]
+  ],
+  ja: [
+    ["大荒轮回录", "大荒輪廻録"], ["大荒", "大荒"], ["大荒诸门", "大荒の諸門"],
+    ["天机营", "天機営"], ["冰心堂", "氷心堂"], ["弈剑听雨阁", "弈剣聴雨閣"],
+    ["云麓仙居", "雲麓仙居"], ["太虚观", "太虚観"], ["翎羽山庄", "翎羽山荘"],
+    ["荒火营地", "荒火営地"], ["魍魉", "魍魎"], ["游侠", "遊侠"],
+    ["幽都", "幽都"], ["东海神域", "東海神域"], ["神界", "神界"],
+    ["人间", "人の世"], ["太古铜门", "太古の青銅門"], ["铜门", "青銅門"],
+    ["铜锈", "青銅の錆"], ["浅水盘", "浅い水盤"], ["旧令", "古い令牌"],
+    ["机关鸟", "機巧鳥"], ["白羽", "白羽"], ["盐晶", "塩晶"],
+    ["药签", "薬籤"], ["药账", "薬帳"], ["脉案", "脈案"],
+    ["药灯", "薬灯"], ["药庐", "薬廬"], ["军册", "軍冊"],
+    ["玄晖", "玄暉"], ["东皇太一", "東皇太一"], ["金乌", "金烏"],
+    ["青阳", "青陽"], ["少昊", "少昊"], ["莫非云", "莫非雲"], ["清时", "清時"],
+    ["海寂", "海寂"], ["太子长琴", "太子長琴"], ["七夜", "七夜"], ["武观", "武観"],
+    ["夜哭", "夜哭"], ["观星者", "観星者"], ["雨亭剑客", "雨亭の剣客"],
+    ["避群人", "群れを避ける医者"], ["炉边女子", "炉辺の女"], ["雪线", "雪線"],
+    ["北溟雪线", "北溟雪線"], ["朔方", "朔方"], ["上邪", "上邪"]
+  ],
+  ko: [
+    ["大荒轮回录", "대황 윤회록"], ["大荒", "대황"], ["大荒诸门", "대황의 여러 문파"],
+    ["天机营", "천기영"], ["冰心堂", "빙심당"], ["弈剑听雨阁", "혁검청우각"],
+    ["云麓仙居", "운록선거"], ["太虚观", "태허관"], ["翎羽山庄", "영우산장"],
+    ["荒火营地", "황화영지"], ["魍魉", "망량"], ["游侠", "유협"],
+    ["幽都", "유도"], ["东海神域", "동해 신역"], ["神界", "신계"],
+    ["人间", "인간 세상"], ["太古铜门", "태고 청동문"], ["铜门", "청동문"],
+    ["铜锈", "청동 녹"], ["浅水盘", "얕은 물그릇"], ["旧令", "낡은 영패"],
+    ["机关鸟", "기계 새"], ["白羽", "흰 깃"], ["盐晶", "소금 결정"],
+    ["药签", "약첨"], ["药账", "약장"], ["脉案", "맥안"],
+    ["药灯", "약등"], ["药庐", "약려"], ["军册", "군책"],
+    ["玄晖", "현휘"], ["东皇太一", "동황태일"], ["金乌", "금오"],
+    ["青阳", "청양"], ["少昊", "소호"], ["莫非云", "막비운"], ["清时", "청시"],
+    ["海寂", "해적"], ["太子长琴", "태자 장금"], ["七夜", "칠야"], ["武观", "무관"],
+    ["夜哭", "야곡"], ["观星者", "관성자"], ["雨亭剑客", "우정 검객"],
+    ["避群人", "무리를 피한 의원"], ["炉边女子", "화롯가의 여자"], ["雪线", "설선"],
+    ["北溟雪线", "북명 설선"], ["朔方", "삭방"], ["上邪", "상야"]
+  ]
+};
+
+function applyTranslationGlossary(lang, text) {
+  let value = String(text || "");
+  const terms = translationGlossary[lang] || [];
+  for (const [source, target] of [...terms].sort((a, b) => b[0].length - a[0].length)) {
+    value = value.split(source).join(target);
+  }
+  return value;
+}
+
 async function translateText(request) {
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, error: "method_not_allowed" }, { status: 405 });
@@ -183,9 +261,10 @@ async function translateText(request) {
   const target = targetLanguage(payload.lang);
   const sourceText = textValue(payload.text, 4800);
   if (!target || !sourceText) return jsonResponse({ ok: false, error: "bad_request" }, { status: 400 });
+  const preparedText = applyTranslationGlossary(target, sourceText);
 
   const googleUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
-    encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(sourceText);
+    encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(preparedText);
   try {
     const response = await fetch(googleUrl, {
       headers: {
@@ -198,12 +277,12 @@ async function translateText(request) {
       const translated = Array.isArray(data && data[0])
         ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
         : "";
-      if (translated) return jsonResponse({ ok: true, provider: "google", text: translated });
+      if (translated) return jsonResponse({ ok: true, provider: "google", text: applyTranslationGlossary(target, translated) });
     }
   } catch (error) {}
 
   const myMemoryUrl = "https://api.mymemory.translated.net/get?q=" +
-    encodeURIComponent(sourceText) + "&langpair=" + encodeURIComponent("zh-CN|" + target);
+    encodeURIComponent(preparedText) + "&langpair=" + encodeURIComponent("zh-CN|" + target);
   try {
     const response = await fetch(myMemoryUrl, {
       headers: {
@@ -214,7 +293,7 @@ async function translateText(request) {
     if (response.ok) {
       const data = await response.json();
       const translated = data && data.responseData && data.responseData.translatedText;
-      if (translated) return jsonResponse({ ok: true, provider: "mymemory", text: translated });
+      if (translated) return jsonResponse({ ok: true, provider: "mymemory", text: applyTranslationGlossary(target, translated) });
     }
   } catch (error) {}
 
@@ -273,5 +352,9 @@ export default {
 };
 `;
 
-fs.writeFileSync(path.join(dist, "server", "index.js"), worker, "utf8");
-console.log(`Built Dahuang site with ${Object.keys(imageAssets).length} image assets.`);
+if (process.env.DAHUANG_EMIT_WORKER_STDOUT === "1") {
+  process.stdout.write(worker);
+} else {
+  fs.writeFileSync(path.join(dist, "server", "index.js"), worker, "utf8");
+  console.log(`Built Dahuang site with ${Object.keys(imageAssets).length} image assets.`);
+}

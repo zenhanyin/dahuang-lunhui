@@ -147,12 +147,34 @@ def build_config(workbook_path: Path):
             if scene and image:
                 art_pools.setdefault(scene, []).append(image)
 
+    characters = {}
+    if "CharacterVisuals" in wb.sheetnames:
+        for row in rows_by_header(wb["CharacterVisuals"]):
+            key = str(row.get("Key", ""))
+            name = str(row.get("Name", ""))
+            if not key or not name:
+                continue
+            aliases = [
+                alias.strip()
+                for alias in re.split(r"[|,，、/]+", str(row.get("Aliases", "")))
+                if alias and alias.strip()
+            ]
+            characters[key] = {
+                "name": name,
+                "aliases": aliases,
+                "portraitClass": str(row.get("PortraitClass", "")) or key,
+                "position": str(row.get("Position", "")) or "right",
+                "tone": str(row.get("Tone", "")) or "neutral",
+            }
+
     config = {
         "chapters": [chapter for _, chapter in sorted(chapters, key=lambda item: item[0])],
         "statusLines": status_lines,
     }
     if art_pools:
         config["artPools"] = art_pools
+    if characters:
+        config["characters"] = characters
     return config
 
 
