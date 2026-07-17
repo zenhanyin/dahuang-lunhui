@@ -248,6 +248,45 @@ function applyTranslationGlossary(lang, text) {
   return value;
 }
 
+function usableTranslation(text) {
+  const value = String(text || "").trim();
+  if (!value) return false;
+  if (value.includes("�")) return false;
+  const marks = (value.match(/[?]/g) || []).length;
+  if (/[?]{4,}/.test(value)) return false;
+  return marks <= Math.max(8, value.length * 0.22);
+}
+
+async function googleTranslate(target, text) {
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
+    encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(text);
+  const response = await fetch(url, {
+    headers: {
+      "accept": "application/json,text/plain,*/*",
+      "user-agent": "Mozilla/5.0"
+    }
+  });
+  if (!response.ok) return "";
+  const data = await response.json();
+  return Array.isArray(data && data[0])
+    ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
+    : "";
+}
+
+async function myMemoryTranslate(target, text) {
+  const url = "https://api.mymemory.translated.net/get?q=" +
+    encodeURIComponent(text) + "&langpair=" + encodeURIComponent("zh-CN|" + target);
+  const response = await fetch(url, {
+    headers: {
+      "accept": "application/json",
+      "user-agent": "Mozilla/5.0"
+    }
+  });
+  if (!response.ok) return "";
+  const data = await response.json();
+  return data && data.responseData && data.responseData.translatedText || "";
+}
+
 async function translateText(request) {
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, error: "method_not_allowed" }, { status: 405 });
@@ -262,42 +301,23 @@ async function translateText(request) {
   const sourceText = textValue(payload.text, 4800);
   if (!target || !sourceText) return jsonResponse({ ok: false, error: "bad_request" }, { status: 400 });
   const preparedText = applyTranslationGlossary(target, sourceText);
+  const candidates = [...new Set([preparedText, sourceText])];
 
-  const googleUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=" +
-    encodeURIComponent(target) + "&dt=t&q=" + encodeURIComponent(preparedText);
-  try {
-    const response = await fetch(googleUrl, {
-      headers: {
-        "accept": "application/json,text/plain,*/*",
-        "user-agent": "Mozilla/5.0"
-      }
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const translated = Array.isArray(data && data[0])
-        ? data[0].map(part => Array.isArray(part) ? part[0] : "").join("")
-        : "";
-      if (translated) return jsonResponse({ ok: true, provider: "google", text: applyTranslationGlossary(target, translated) });
-    }
-  } catch (error) {}
+  for (const candidate of candidates) {
+    try {
+      const translated = applyTranslationGlossary(target, await googleTranslate(target, candidate));
+      if (usableTranslation(translated)) return jsonResponse({ ok: true, provider: "google", text: translated });
+    } catch (error) {}
+  }
 
-  const myMemoryUrl = "https://api.mymemory.translated.net/get?q=" +
-    encodeURIComponent(preparedText) + "&langpair=" + encodeURIComponent("zh-CN|" + target);
-  try {
-    const response = await fetch(myMemoryUrl, {
-      headers: {
-        "accept": "application/json",
-        "user-agent": "Mozilla/5.0"
-      }
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const translated = data && data.responseData && data.responseData.translatedText;
-      if (translated) return jsonResponse({ ok: true, provider: "mymemory", text: applyTranslationGlossary(target, translated) });
-    }
-  } catch (error) {}
+  for (const candidate of candidates) {
+    try {
+      const translated = applyTranslationGlossary(target, await myMemoryTranslate(target, candidate));
+      if (usableTranslation(translated)) return jsonResponse({ ok: true, provider: "mymemory", text: translated });
+    } catch (error) {}
+  }
 
-  return jsonResponse({ ok: false, error: "translate_failed" }, { status: 502 });
+  return jsonResponse({ ok: true, provider: "glossary", degraded: true, text: preparedText });
 }
 
 export default {
