@@ -19,9 +19,11 @@ function isSamePath(left, right) {
 
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const html = sourceHtml;
+const webManifest = fs.readFileSync(path.join(root, "site.webmanifest"), "utf8");
 if (!isSamePath(dist, root)) {
   fs.writeFileSync(path.join(dist, "index.html"), html, "utf8");
   fs.writeFileSync(path.join(dist, "text-adventure.html"), html, "utf8");
+  fs.writeFileSync(path.join(dist, "site.webmanifest"), webManifest, "utf8");
 }
 if (!isSamePath(hostingSource, hostingDest)) {
   fs.copyFileSync(hostingSource, hostingDest);
@@ -46,7 +48,10 @@ for (const file of fs.readdirSync(assetDir).filter(file => /\.(webp|png)$/i.test
 }
 
 const worker = `const gameHtml = ${JSON.stringify(html)};
-const textAssets = ${JSON.stringify({ "/story-config.js": storyLoader })};
+const textAssets = ${JSON.stringify({
+  "/story-config.js": { body: storyLoader, type: "application/javascript; charset=utf-8" },
+  "/site.webmanifest": { body: webManifest, type: "application/manifest+json; charset=utf-8" }
+})};
 const imageAssets = ${JSON.stringify(imageAssets)};
 const statsKey = "dh-7m4q-20260713";
 
@@ -354,9 +359,10 @@ export default {
     }
 
     if (url.pathname in textAssets) {
-      return new Response(textAssets[url.pathname], {
+      const asset = textAssets[url.pathname];
+      return new Response(asset.body, {
         headers: {
-          "content-type": "application/javascript; charset=utf-8",
+          "content-type": asset.type,
           "cache-control": "no-cache"
         }
       });

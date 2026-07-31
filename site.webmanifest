@@ -1,0 +1,32 @@
+{
+  "name": "大荒轮回录",
+  "short_name": "大荒轮回录",
+  "description": "山海经神话气质的轮回文字 RPG。多世记忆、门派抉择、人物羁绊与太古铜门之谜。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#121510",
+  "theme_color": "#121510",
+  "lang": "zh-CN",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
